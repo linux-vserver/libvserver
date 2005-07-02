@@ -4,5 +4,5 @@ AUTOMAKE_OPTIONS = foreign 1.4
 
 SUBDIRS = lib tools
 
-vserver_HEADERS = kernel/*
+vserver_HEADERS = $(top_srcdir)/kernel/*
 vserverdir = $(includedir)/linux/vserver

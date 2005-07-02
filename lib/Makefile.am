@@ -1,5 +1,5 @@
 # set the include path found by configure
-INCLUDES = $(all_includes)
+INCLUDES = $(all_includes) -I$(top_srcdir)
 
 # the library search path.
 include_HEADERS = libvserver.h
