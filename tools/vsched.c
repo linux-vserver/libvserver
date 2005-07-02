@@ -102,6 +102,9 @@ void cmd_help()
 
 int main(int argc, char *argv[])
 {
+	if (getuid() != 0)
+		EXIT("This program requires root privileges", 1);
+
 	struct commands cmds = {
 		.help    = false,
 		.version = false,
