@@ -74,6 +74,10 @@ extern int vc_set_cflags(xid_t xid, struct vcmd_ctx_flags_v0 *cflags);
 extern int vc_get_ccaps(xid_t xid, struct vcmd_ctx_caps_v0 *ccaps);
 extern int vc_set_ccaps(xid_t xid, struct vcmd_ctx_caps_v0 *ccaps);
 
+/* cvirt.c */
+extern int vc_set_vhi_name(xid_t xid, struct vcmd_vx_vhi_name_v0 *vhiname);
+extern int vc_get_vhi_name(xid_t xid, struct vcmd_vx_vhi_name_v0 *vhiname);
+
 /* dlimit.c */
 extern int vc_add_dlimit(xid_t xid, struct vcmd_ctx_dlimit_base_v0 *dbase);
 extern int vc_rem_dlimit(xid_t xid, struct vcmd_ctx_dlimit_base_v0 *dbase);
@@ -118,7 +122,3 @@ extern int vc_wait_exit(xid_t xid, struct vcmd_wait_exit_v0 *wait);
 
 /* switch.c */
 extern int vc_get_version();
-
-/* uts.c */
-extern int vc_set_vhi_name(xid_t xid, struct vcmd_vx_vhi_name_v0 *vhiname);
-extern int vc_get_vhi_name(xid_t xid, struct vcmd_vx_vhi_name_v0 *vhiname);
