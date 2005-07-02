@@ -22,13 +22,16 @@
 #include <config.h>
 #endif
 
+#include <unistd.h>
+#include <stdio.h>
+#include <errno.h>
 #include <getopt.h>
+#include <sys/types.h>
 
 #include "libvserver.h"
 #include "tools.h"
 
 #define NAME	"vcontext"
-#define VERSION	"0.1"
 #define DESCR	"Context Manager"
 
 #define SHORT_OPTS "hVCMF:X:x:u:vq"
@@ -100,10 +103,10 @@ int main(int argc, char *argv[])
 		.setflags	= false,
 		.setcaps	= false
 	};
-	
+
 	struct options opts = {
-		.flags		= 0,
-		.caps		= 0,
+		.flags		= { .flagword = 0, .mask = 0 },
+		.caps		= { .bcaps = 0, .ccaps = 0, .cmask = 0 },
 		.xid		= 0,
 		.uid		= 0,
 		.verbose	= false,

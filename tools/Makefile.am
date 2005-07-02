@@ -1,6 +1,8 @@
 INCLUDES = -I$(top_srcdir)/lib -I$(top_srcdir)
 METASOURCES = AUTO
 
+AM_CFLAGS = -Wall
+
 sbin_PROGRAMS = vcontext vnamespace vlimit vsched vnetwork vdlimit vinode vinfo vsignal vuname
 
 vcontext_SOURCES = vcontext.c

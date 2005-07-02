@@ -22,13 +22,16 @@
 #include <config.h>
 #endif
 
+#include <unistd.h>
+#include <stdio.h>
+#include <errno.h>
 #include <getopt.h>
+#include <sys/types.h>
 
 #include "libvserver.h"
 #include "tools.h"
 
 #define NAME	"vuname"
-#define VERSION	"0.1"
 #define DESCR	"uts virtualization tool"
 
 #define VHI_LENGTH 65
@@ -75,7 +78,7 @@ int format2vhifields(char *format, struct vhifields *vhifields)
 	const char *delim = ",", *tmp = format;
 	int i = 0;
 
-	while (tmp = strpbrk(tmp, delim)) {
+	while ((tmp = strpbrk(tmp, delim))) {
 		tmp++; /* Skip delimiter */
 		i++;
 	}

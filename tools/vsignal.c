@@ -22,14 +22,16 @@
 #include <config.h>
 #endif
 
+#include <unistd.h>
+#include <stdio.h>
 #include <getopt.h>
 #include <signal.h>
+#include <sys/types.h>
 
 #include "libvserver.h"
 #include "tools.h"
 
 #define NAME	"vsignal"
-#define VERSION	"0.1"
 #define DESCR	"Context Signal Helper"
 
 #define SHORT_OPTS "hVKWp:s:x:vq"

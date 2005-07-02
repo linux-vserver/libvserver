@@ -22,14 +22,16 @@
 #include <config.h>
 #endif
 
+#include <unistd.h>
+#include <stdio.h>
 #include <getopt.h>
 #include <signal.h>
+#include <sys/types.h>
 
 #include "libvserver.h"
 #include "tools.h"
 
 #define NAME	"vdlimit"
-#define VERSION	"0.1"
 #define DESCR	"Disk Limit Manager"
 
 #define SHORT_OPTS "hVARS:x:mfvq"
@@ -107,12 +109,10 @@ int main(int argc, char *argv[])
 		.set    = false
 	};
 	
-	struct vcmd_ctx_dlimit_v0 format;
-	
 	struct options opts = {
 		.xid     = (xid_t) 1,
 		.mount   = 0,
-		.format  = &format,
+		.format  = { NULL, 0, 0, 0, 0, 0 ,0 },
 		.verbose = false,
 		.quiet   = false
 	};

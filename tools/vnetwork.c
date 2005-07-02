@@ -22,13 +22,15 @@
 #include <config.h>
 #endif
 
+#include <unistd.h>
+#include <stdio.h>
 #include <getopt.h>
+#include <sys/types.h>
 
 #include "libvserver.h"
 #include "tools.h"
 
 #define NAME	"vnetwork"
-#define VERSION	"0.1"
 #define DESCR	"Network Context Manager"
 
 #define SHORT_OPTS "hVCMARFSn:vq"

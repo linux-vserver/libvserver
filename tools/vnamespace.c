@@ -22,13 +22,16 @@
 #include <config.h>
 #endif
 
+#include <unistd.h>
+#include <stdio.h>
+#include <errno.h>
 #include <getopt.h>
+#include <sys/types.h>
 
 #include "libvserver.h"
 #include "tools.h"
 
 #define NAME	"vnamespace"
-#define VERSION	"0.1.1"
 #define DESCR	"Filesystem Namespace Manager"
 
 #define SHORT_OPTS "hVESCx:vq"
@@ -78,7 +81,7 @@ void cmd_help()
 	       "Generic options:\n"
 	       "    -v,--verbose            Print verbose information\n"
 	       "    -q,--quiet              Be quiet (i.e. no output at all)\n"
-	       "\n"
+	       "\n",
 	       NAME);
 	exit(0);
 }

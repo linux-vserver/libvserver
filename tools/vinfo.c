@@ -22,13 +22,15 @@
 #include <config.h>
 #endif
 
+#include <unistd.h>
+#include <stdio.h>
 #include <getopt.h>
+#include <sys/types.h>
 
 #include "libvserver.h"
 #include "tools.h"
 
 #define NAME	"vinfo"
-#define VERSION	"0.1"
 #define DESCR	"Context Information Grabber"
 
 #define T_TASK_XID    'A'

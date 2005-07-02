@@ -22,13 +22,16 @@
 #include <config.h>
 #endif
 
+#include <unistd.h>
+#include <stdio.h>
+#include <errno.h>
 #include <getopt.h>
+#include <sys/types.h>
 
 #include "libvserver.h"
 #include "tools.h"
 
 #define NAME    "vsched"
-#define VERSION "0.1"
 #define DESCR   "Context CPU Limit Manager"
 
 #define SHORT_OPTS "hVx:b:vq"

@@ -22,13 +22,15 @@
 #include <config.h>
 #endif
 
+#include <unistd.h>
+#include <stdio.h>
+#include <errno.h>
 #include <getopt.h>
 
 #include "libvserver.h"
 #include "tools.h"
 
 #define NAME	"vlimit"
-#define VERSION	"0.1"
 #define DESCR	"Context Resource Limit Manager"
 
 #define SHORT_OPTS "hVCESCNx:snekmdvq"
