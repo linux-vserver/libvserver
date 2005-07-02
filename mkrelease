@@ -1,0 +1,47 @@
+#!/bin/bash
+
+proj="libvserver"
+svnroot="http://dev.croup.de/repos/${proj}"
+
+usage() {
+	echo "Usage: mkrelease <ver>"
+}
+
+die() {
+	echo $1
+	exit ${2:-1}
+}
+
+if [ "$1" == "" ]; then
+	echo "Missing argument!"
+	usage
+	exit 1
+fi
+
+ver=$1
+
+tmpdir=`mktemp -d`
+pushd ${tmpdir} &>/dev/null || die "pushd failed"
+
+echo "Creating release tag... "
+
+svn copy ${svnroot}/trunk ${svnroot}/tags/release-${ver} \
+	-m "Tagging the ${ver} release of the libvserver project" &>/dev/null || die "svn copy failed"
+
+
+echo "Exporting release..."
+
+svn export ${svnroot}/trunk ${proj}-${ver}/ &>/dev/null || die "svn export failed"
+pushd ${proj}-${ver} &>/dev/null || die "pushd failed"
+
+echo "Running autotools..."
+
+make -f Makefile.cvs &>/dev/null || die "make failed"
+popd &>/dev/null || die "popd failed"
+
+echo "Creating tarball.."
+tar cjf ${proj}-${ver}.tar.bz2 ${proj}-${ver}/ &>/dev/null || die "tar failed"
+
+echo "Tarball ist at ${tmpdir}/${proj}-${ver}.tar.bz2"
+
+popd &>/dev/null || die "popd failed"
