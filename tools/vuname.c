@@ -31,6 +31,8 @@
 #define VERSION	"0.1"
 #define DESCR	"uts virtualization tool"
 
+#define VHI_LENGTH 65
+
 #define SHORT_OPTS "hVI:x:vq"
 
 struct option const
@@ -51,32 +53,44 @@ struct commands {
 };
 
 struct vhifields {
-	char *context;
-	char *sysname;
-	char *nodename;
-	char *release;
-	char *version;
-	char *machine;
-	char *domainname;
+	char context[VHI_LENGTH];
+	char sysname[VHI_LENGTH];
+	char nodename[VHI_LENGTH];
+	char release[VHI_LENGTH];
+	char version[VHI_LENGTH];
+	char machine[VHI_LENGTH];
+	char domainname[VHI_LENGTH];
 };
 
 struct options {
-	struct vhifields *vhifields;
+	struct vhifields vhifields;
 	xid_t xid;
 	bool verbose;
 	bool quiet;
 };
 
 	static inline
-void format2vhifields(char *format, struct vhifields *vhifields)
+int format2vhifields(char *format, struct vhifields *vhifields)
 {
-	const char *delim = ",";
-	strncpy(vhifields->sysname, strsep(&format, delim), 65);
-	strncpy(vhifields->nodename, strsep(&format, delim), 65);
-	strncpy(vhifields->release, strsep(&format, delim), 65);
-	strncpy(vhifields->version, strsep(&format, delim), 65);
-	strncpy(vhifields->machine, strsep(&format, delim), 65);
-	strncpy(vhifields->domainname, strsep(&format, delim), 65);
+	const char *delim = ",", *tmp = format;
+	int i = 0;
+
+	while (tmp = strpbrk(tmp, delim)) {
+		tmp++; /* Skip delimiter */
+		i++;
+	}
+
+	if (i != 5)
+		return -1;
+
+	strncpy(vhifields->sysname, strsep(&format, delim), VHI_LENGTH);
+	strncpy(vhifields->nodename, strsep(&format, delim), VHI_LENGTH);
+	strncpy(vhifields->release, strsep(&format, delim), VHI_LENGTH);
+	strncpy(vhifields->version, strsep(&format, delim), VHI_LENGTH);
+	strncpy(vhifields->machine, strsep(&format, delim), VHI_LENGTH);
+	strncpy(vhifields->domainname, strsep(&format, delim), VHI_LENGTH);
+
+	return 0;
 }
 
 	static inline
@@ -138,17 +152,7 @@ int main(int argc, char *argv[])
 		.setvhi		= false
 	};
 
-	struct vhifields vhifields = {
-		.sysname	= malloc(65),
-		.nodename	= malloc(65),
-		.release	= malloc(65),
-		.version	= malloc(65),
-		.machine	= malloc(65),
-		.domainname	= malloc(65)
-	};
-
 	struct options opts = {
-		.vhifields	= &vhifields,
 		.xid		= (xid_t) 1,
 		.verbose	= false,
 		.quiet		= false
@@ -171,7 +175,8 @@ int main(int argc, char *argv[])
 
 			case 'I':
 				cmds.setvhi = true;
-				format2vhifields(optarg, opts.vhifields);
+				if (format2vhifields(optarg, &opts.vhifields))
+					EXIT("Invalid vhi format", 1);
 				cmdcnt++;
 				break;
 
@@ -208,12 +213,12 @@ int main(int argc, char *argv[])
 		EXIT("No program given", 1);
 
 	if (cmds.setvhi) {
-		set_vhiname(opts.xid, VHIN_SYSNAME, vhifields.sysname);
-		set_vhiname(opts.xid, VHIN_NODENAME, vhifields.nodename);
-		set_vhiname(opts.xid, VHIN_RELEASE, vhifields.release);
-		set_vhiname(opts.xid, VHIN_VERSION, vhifields.version);
-		set_vhiname(opts.xid, VHIN_MACHINE, vhifields.machine);
-		set_vhiname(opts.xid, VHIN_DOMAINNAME, vhifields.domainname);
+		set_vhiname(opts.xid, VHIN_SYSNAME, opts.vhifields.sysname);
+		set_vhiname(opts.xid, VHIN_NODENAME, opts.vhifields.nodename);
+		set_vhiname(opts.xid, VHIN_RELEASE, opts.vhifields.release);
+		set_vhiname(opts.xid, VHIN_VERSION, opts.vhifields.version);
+		set_vhiname(opts.xid, VHIN_MACHINE, opts.vhifields.machine);
+		set_vhiname(opts.xid, VHIN_DOMAINNAME, opts.vhifields.domainname);
 	}
 
 	execvp(argv[optind], argv+optind);
