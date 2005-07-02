@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2005 by Benedikt Boehm                                  *
- *   hollow@gentoo.org                                                     *
+ *   Copyright 2005 by the libvserver team                                 *
+ *   See AUTHORS for details                                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
