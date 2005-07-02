@@ -22,6 +22,8 @@
 #include <config.h>
 #endif
 
+#include "vserver.h"
+
 #include "libvserver.h"
 
 int vc_add_dlimit(xid_t xid, struct vcmd_ctx_dlimit_base_v0 *dbase)

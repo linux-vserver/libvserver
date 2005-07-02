@@ -22,6 +22,8 @@
 #include <config.h>
 #endif
 
+#include "vserver.h"
+
 #include "libvserver.h"
 
 int vc_get_version()

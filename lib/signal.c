@@ -22,6 +22,8 @@
 #include <config.h>
 #endif
 
+#include "vserver.h"
+
 #include "libvserver.h"
 
 int vc_ctx_kill(xid_t xid, struct vcmd_ctx_kill_v0 *kill)

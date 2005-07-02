@@ -22,6 +22,8 @@
 #include <config.h>
 #endif
 
+#include "vserver.h"
+
 #include "libvserver.h"
 
 int vc_task_xid(pid_t pid)

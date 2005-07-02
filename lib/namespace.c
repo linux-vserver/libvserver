@@ -22,6 +22,8 @@
 #include <config.h>
 #endif
 
+#include "vserver.h"
+
 #include "libvserver.h"
 
 int vc_set_vhi_name(xid_t xid, struct vcmd_vx_vhi_name_v0 *vhiname)

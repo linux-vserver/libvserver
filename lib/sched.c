@@ -22,6 +22,8 @@
 #include <config.h>
 #endif
 
+#include "vserver.h"
+
 #include "libvserver.h"
 
 int vc_set_sched_v2(xid_t xid, struct vcmd_set_sched_v2 *sched)

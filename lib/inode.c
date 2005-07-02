@@ -22,6 +22,8 @@
 #include <config.h>
 #endif
 
+#include "vserver.h"
+
 #include "libvserver.h"
 
 int vc_get_iattr_v0(struct vcmd_ctx_iattr_v1 *iattr)
