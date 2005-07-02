@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2005 by Benedikt Boehm                                  *
- *   hollow@gentoo.org                                                     *
+ *   Copyright (C) 2005 by Björn Steinbrink                                *
+ *   B.Steinbrink@gmx.de                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -26,17 +26,22 @@
 
 #include "libvserver.h"
 
-int vc_enter_namespace(xid_t xid)
+int vc_set_vhi_name(xid_t xid, struct vcmd_vx_vhi_name_v0 *vhiname)
 {
-	return vserver(VCMD_enter_namespace, xid, NULL);
+	if (vhiname == 0) {
+		errno = EFAULT;
+		return -1;
+	}
+
+	return vserver(VCMD_vx_set_vhi_name, xid, vhiname);
 }
 
-int vc_cleanup_namespace()
+int vc_get_vhi_name(xid_t xid, struct vcmd_vx_vhi_name_v0 *vhiname)
 {
-	return vserver(VCMD_cleanup_namespace, 0, NULL);
-}
+	if (vhiname == 0) {
+		errno = EFAULT;
+		return -1;
+	}
 
-int vc_set_namespace()
-{
-	return vserver(VCMD_set_namespace, 0, NULL);
+	return vserver(VCMD_vx_get_vhi_name, xid, vhiname);
 }

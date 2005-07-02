@@ -92,8 +92,6 @@ extern int vc_set_rlimit(xid_t xid, struct vcmd_ctx_rlimit_v0 *rlimit);
 extern int vc_get_rlimit_mask(xid_t xid, struct vcmd_ctx_rlimit_mask_v0 *rmask);
 
 /* namespace.c */
-extern int vc_set_vhi_name(xid_t xid, struct vcmd_vx_vhi_name_v0 *vhiname);
-extern int vc_get_vhi_name(xid_t xid, struct vcmd_vx_vhi_name_v0 *vhiname);
 extern int vc_enter_namespace(xid_t xid);
 extern int vc_cleanup_namespace();
 extern int vc_set_namespace();
@@ -120,3 +118,7 @@ extern int vc_wait_exit(xid_t xid, struct vcmd_wait_exit_v0 *wait);
 
 /* switch.c */
 extern int vc_get_version();
+
+/* uts.c */
+extern int vc_set_vhi_name(xid_t xid, struct vcmd_vx_vhi_name_v0 *vhiname);
+extern int vc_get_vhi_name(xid_t xid, struct vcmd_vx_vhi_name_v0 *vhiname);
