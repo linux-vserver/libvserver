@@ -1,7 +1,7 @@
 INCLUDES = -I$(top_srcdir)/lib -I$(top_srcdir)
 METASOURCES = AUTO
 
-sbin_PROGRAMS = vcontext vnamespace vlimit vsched vnetwork vdlimit vinode vinfo vsignal
+sbin_PROGRAMS = vcontext vnamespace vlimit vsched vnetwork vdlimit vinode vinfo vsignal vuname
 
 vcontext_SOURCES = vcontext.c
 vcontext_LDADD = $(top_builddir)/lib/libvserver.a
@@ -29,3 +29,6 @@ vinode_LDADD = $(top_builddir)/lib/libvserver.a
 
 vsignal_SOURCES = vsignal.c
 vsignal_LDADD = $(top_builddir)/lib/libvserver.a
+
+vuname_SOURCES = vuname.c
+vuname_LDADD = $(top_builddir)/lib/libvserver.a
