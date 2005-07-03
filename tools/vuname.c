@@ -122,9 +122,10 @@ int format2vhifields(char *format, struct vhifields *vhifields)
 		i++;
 	}
 
-	if (i != 5)
+	if (i != 6)
 		return -1;
 
+	strncpy(vhifields->context, strsep(&format, delim), VHI_LENGTH);
 	strncpy(vhifields->sysname, strsep(&format, delim), VHI_LENGTH);
 	strncpy(vhifields->nodename, strsep(&format, delim), VHI_LENGTH);
 	strncpy(vhifields->release, strsep(&format, delim), VHI_LENGTH);
@@ -164,7 +165,8 @@ void cmd_help()
 			"    -q,--quiet              Be quiet (i.e. no output at all)\n"
 			"\n"
 			"VHI format string:\n"
-			"    <format> = <SN>,<NN>,<KR>,<KV>,<MA>,<DN> where\n"
+			"    <format> = <CN>,<SN>,<NN>,<KR>,<KV>,<MA>,<DN> where\n"
+			"                - CN is the context name\n"
 			"                - SN is the system name,\n"
 			"                - NN is the network node hostname,\n"
 			"                - KR is the kernel release,\n"
@@ -258,6 +260,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (cmds.set) {
+		set_vhiname(opts.xid, VHIN_CONTEXT, opts.vhifields.context);
 		set_vhiname(opts.xid, VHIN_SYSNAME, opts.vhifields.sysname);
 		set_vhiname(opts.xid, VHIN_NODENAME, opts.vhifields.nodename);
 		set_vhiname(opts.xid, VHIN_RELEASE, opts.vhifields.release);
