@@ -26,22 +26,25 @@
 
 #include "libvserver.h"
 
-int vc_set_vhi_name(xid_t xid, struct vcmd_vx_vhi_name_v0 *vhiname)
+int vc_set_vhi_name(xid_t xid, uint32_t field, char *name)
 {
-	if (vhiname == 0) {
-		errno = EFAULT;
-		return -1;
-	}
+	struct vcmd_vx_vhi_name_v0 vhiname;
+	int ret;
 
-	return vserver(VCMD_vx_set_vhi_name, xid, vhiname);
+	vhiname.field = field;
+	strncpy(vhiname.name, name, sizeof(vhiname.name));
+	return vserver(VCMD_vx_set_vhi_name, xid, &vhiname);
 }
 
-int vc_get_vhi_name(xid_t xid, struct vcmd_vx_vhi_name_v0 *vhiname)
+int vc_get_vhi_name(xid_t xid, uint32_t field, char *name, size_t length)
 {
-	if (vhiname == 0) {
-		errno = EFAULT;
-		return -1;
+	struct vcmd_vx_vhi_name_v0 vhiname;
+	int ret;
+
+	vhiname.field = field;
+	if ((ret = vserver(VCMD_vx_get_vhi_name, xid, &vhiname)) != -1) {
+		strncpy(name, vhiname.name, length);
 	}
 
-	return vserver(VCMD_vx_get_vhi_name, xid, vhiname);
+	return ret;
 }

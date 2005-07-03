@@ -77,42 +77,26 @@ struct options {
 /* TODO Reduce code... */
 void get_vhi_names(xid_t xid, struct vhifields *vhi)
 {
-	struct vcmd_vx_vhi_name_v0 vhiname;
-
-	vhiname.field = VHIN_CONTEXT;
-	if (vc_get_vhi_name(xid, &vhiname) == -1)
+	if (vc_get_vhi_name(xid, VHIN_CONTEXT, vhi->context, VHI_LENGTH) == -1)
 		PEXIT("Failed to get context name", 2);
-	strncpy(vhi->context, vhiname.name, VHI_LENGTH);
 
-	vhiname.field = VHIN_SYSNAME;
-	if (vc_get_vhi_name(xid, &vhiname) == -1)
+	if (vc_get_vhi_name(xid, VHIN_SYSNAME, vhi->sysname, VHI_LENGTH) == -1)
 		PEXIT("Failed to get sysname", 2);
-	strncpy(vhi->sysname, vhiname.name, VHI_LENGTH);
 
-	vhiname.field = VHIN_NODENAME;
-	if (vc_get_vhi_name(xid, &vhiname) == -1)
+	if (vc_get_vhi_name(xid, VHIN_NODENAME, vhi->nodename, VHI_LENGTH) == -1)
 		PEXIT("Failed to get nodename", 2);
-	strncpy(vhi->nodename, vhiname.name, VHI_LENGTH);
 
-	vhiname.field = VHIN_RELEASE;
-	if (vc_get_vhi_name(xid, &vhiname) == -1)
+	if (vc_get_vhi_name(xid, VHIN_RELEASE, vhi->release, VHI_LENGTH) == -1)
 		PEXIT("Failed to get release", 2);
-	strncpy(vhi->release, vhiname.name, VHI_LENGTH);
 
-	vhiname.field = VHIN_VERSION;
-	if (vc_get_vhi_name(xid, &vhiname) == -1)
+	if (vc_get_vhi_name(xid, VHIN_VERSION, vhi->version, VHI_LENGTH) == -1)
 		PEXIT("Failed to get version", 2);
-	strncpy(vhi->version, vhiname.name, VHI_LENGTH);
 
-	vhiname.field = VHIN_MACHINE;
-	if (vc_get_vhi_name(xid, &vhiname) == -1)
-		PEXIT("Failed to get machine", 2);
-	strncpy(vhi->machine, vhiname.name, VHI_LENGTH);
+	if (vc_get_vhi_name(xid, VHIN_MACHINE, vhi->machine, VHI_LENGTH) == -1)
+		PEXIT("Failed to get machine name", 2);
 
-	vhiname.field = VHIN_DOMAINNAME;
-	if (vc_get_vhi_name(xid, &vhiname) == -1)
-		PEXIT("Failed to get domain name", 2);
-	strncpy(vhi->domainname, vhiname.name, VHI_LENGTH);
+	if (vc_get_vhi_name(xid, VHIN_DOMAINNAME, vhi->domainname, VHI_LENGTH) == -1)
+		PEXIT("Failed to get domainname", 2);
 }
 
 void print_vhi_names(xid_t xid, struct vhifields *vhi)
@@ -154,17 +138,11 @@ int format2vhifields(char *format, struct vhifields *vhifields)
 	static inline
 int set_vhiname(xid_t xid, int field, char *name)
 {
-	if (strlen(name) <= 0)
+	if (!strlen(name))
 		return 0;
 
-	struct vcmd_vx_vhi_name_v0 vhiname;
-
-	if (field != 0) {
-		vhiname.field = field;
-		strcpy(vhiname.name, name);
-		if (vc_set_vhi_name(xid, &vhiname) < 0)
-			PEXIT(strcat(strcat("Failed to set VHI field (", (char*) vhiname.field), ")"), 2);
-	}
+	if (vc_set_vhi_name(xid, field, name) < 0)
+		PEXIT(strcat(strcat("Failed to set VHI field (", (char*) field), ")"), 2);
 }
 
 	static inline

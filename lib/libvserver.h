@@ -75,8 +75,8 @@ extern int vc_get_ccaps(xid_t xid, struct vcmd_ctx_caps_v0 *ccaps);
 extern int vc_set_ccaps(xid_t xid, struct vcmd_ctx_caps_v0 *ccaps);
 
 /* cvirt.c */
-extern int vc_set_vhi_name(xid_t xid, struct vcmd_vx_vhi_name_v0 *vhiname);
-extern int vc_get_vhi_name(xid_t xid, struct vcmd_vx_vhi_name_v0 *vhiname);
+extern int vc_set_vhi_name(xid_t xid, uint32_t field, char * name);
+extern int vc_get_vhi_name(xid_t xid, uint32_t field, char * name, size_t length);
 
 /* dlimit.c */
 extern int vc_add_dlimit(xid_t xid, struct vcmd_ctx_dlimit_base_v0 *dbase);
