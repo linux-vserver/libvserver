@@ -36,13 +36,14 @@
 
 #define VHI_LENGTH 65
 
-#define SHORT_OPTS "hVI:x:vq"
+#define SHORT_OPTS "hViGI:x:vq"
 
 struct option const
 LONG_OPTS[] = {
 	{ "help",		no_argument, 		0, 'h' },
 	{ "version",	no_argument, 		0, 'V' },
-	{ "setvhi",		required_argument,	0, 'I' },
+	{ "get",		no_argument, 		0, 'G' },
+	{ "set",		required_argument,	0, 'I' },
 	{ "xid",		required_argument,	0, 'x' },
 	{ "verbose",	no_argument, 		0, 'v' },
 	{ "quiet",		no_argument, 		0, 'q' },
@@ -52,7 +53,8 @@ LONG_OPTS[] = {
 struct commands {
 	bool help;
 	bool version;
-	bool setvhi;
+	bool get;
+	bool set;
 };
 
 struct vhifields {
@@ -71,6 +73,59 @@ struct options {
 	bool verbose;
 	bool quiet;
 };
+
+/* TODO Reduce code... */
+void get_vhi_names(xid_t xid, struct vhifields *vhi)
+{
+	struct vcmd_vx_vhi_name_v0 vhiname;
+
+	vhiname.field = VHIN_CONTEXT;
+	if (vc_get_vhi_name(xid, &vhiname) == -1)
+		PEXIT("Failed to get context name", 2);
+	strncpy(vhi->context, vhiname.name, VHI_LENGTH);
+
+	vhiname.field = VHIN_SYSNAME;
+	if (vc_get_vhi_name(xid, &vhiname) == -1)
+		PEXIT("Failed to get sysname", 2);
+	strncpy(vhi->sysname, vhiname.name, VHI_LENGTH);
+
+	vhiname.field = VHIN_NODENAME;
+	if (vc_get_vhi_name(xid, &vhiname) == -1)
+		PEXIT("Failed to get nodename", 2);
+	strncpy(vhi->nodename, vhiname.name, VHI_LENGTH);
+
+	vhiname.field = VHIN_RELEASE;
+	if (vc_get_vhi_name(xid, &vhiname) == -1)
+		PEXIT("Failed to get release", 2);
+	strncpy(vhi->release, vhiname.name, VHI_LENGTH);
+
+	vhiname.field = VHIN_VERSION;
+	if (vc_get_vhi_name(xid, &vhiname) == -1)
+		PEXIT("Failed to get version", 2);
+	strncpy(vhi->version, vhiname.name, VHI_LENGTH);
+
+	vhiname.field = VHIN_MACHINE;
+	if (vc_get_vhi_name(xid, &vhiname) == -1)
+		PEXIT("Failed to get machine", 2);
+	strncpy(vhi->machine, vhiname.name, VHI_LENGTH);
+
+	vhiname.field = VHIN_DOMAINNAME;
+	if (vc_get_vhi_name(xid, &vhiname) == -1)
+		PEXIT("Failed to get domain name", 2);
+	strncpy(vhi->domainname, vhiname.name, VHI_LENGTH);
+}
+
+void print_vhi_names(xid_t xid, struct vhifields *vhi)
+{
+	printf("XID: %d\n", xid);
+	printf("Context: %s\n", vhi->context);
+	printf("Sysname: %s\n", vhi->sysname);
+	printf("Nodename: %s\n", vhi->nodename);
+	printf("Release: %s\n", vhi->release);
+	printf("Version: %s\n", vhi->version);
+	printf("Machine: %s\n", vhi->machine);
+	printf("Domain name: %s\n", vhi->domainname);
+}
 
 	static inline
 int format2vhifields(char *format, struct vhifields *vhifields)
@@ -120,7 +175,8 @@ void cmd_help()
 			"Available commands:\n"
 			"    -h,--help               Show this help message\n"
 			"    -V,--version            Print version information\n"
-			"    -I,--setvhi <format>    Set virtual host information aka UTS described in <format>\n"
+			"    -G,--get             Get virtual host information\n"
+			"    -I,--set <format>    Set virtual host information aka UTS described in <format>\n"
 			"\n"
 			"Available options:\n"
 			"    -x,--xid <xid>          The Context ID\n"
@@ -152,7 +208,8 @@ int main(int argc, char *argv[])
 	struct commands cmds = {
 		.help		= false,
 		.version	= false,
-		.setvhi		= false
+		.get		= false,
+		.set		= false
 	};
 
 	struct options opts = {
@@ -176,8 +233,13 @@ int main(int argc, char *argv[])
 				CMD_VERSION;
 				break;
 
+			case 'G':
+				cmds.get = true;
+				cmdcnt++;
+				break;
+
 			case 'I':
-				cmds.setvhi = true;
+				cmds.set = true;
 				if (format2vhifields(optarg, &opts.vhifields))
 					EXIT("Invalid vhi format", 1);
 				cmdcnt++;
@@ -212,10 +274,12 @@ int main(int argc, char *argv[])
 		if ((opts.xid = vc_task_xid(0)) <= 1)
 			EXIT("Invalid --xid given", 1);
 
-	if (argc <= optind)
-		EXIT("No program given", 1);
+	if (cmds.get) {
+		get_vhi_names(opts.xid, &opts.vhifields);
+		print_vhi_names(opts.xid, &opts.vhifields);
+	}
 
-	if (cmds.setvhi) {
+	if (cmds.set) {
 		set_vhiname(opts.xid, VHIN_SYSNAME, opts.vhifields.sysname);
 		set_vhiname(opts.xid, VHIN_NODENAME, opts.vhifields.nodename);
 		set_vhiname(opts.xid, VHIN_RELEASE, opts.vhifields.release);
@@ -224,7 +288,8 @@ int main(int argc, char *argv[])
 		set_vhiname(opts.xid, VHIN_DOMAINNAME, opts.vhifields.domainname);
 	}
 
-	execvp(argv[optind], argv+optind);
+	if (argc > optind)
+		execvp(argv[optind], argv+optind);
 
 	return EXIT_SUCCESS;
 }
