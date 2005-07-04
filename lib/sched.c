@@ -28,25 +28,23 @@
 
 #include "vserver.h"
 
-int vc_set_sched_v2(xid_t xid, struct vcmd_set_sched_v2 *sched)
+int vx_set_sched(xid_t xid, const struct vx_sched *sched)
 {
-	if (sched == 0) {
-		errno = EFAULT;
-		return -1;
-	}
-	
-	int rc = vserver(VCMD_set_sched_v2, xid, sched);
-	return rc;
-}
+	struct vcmd_set_sched_v3 res;
 
-int vc_set_sched(xid_t xid, struct vcmd_set_sched_v3 *sched)
-{
-	if (sched == 0) {
+	if (!sched) {
 		errno = EFAULT;
 		return -1;
 	}
-	
-	int rc = vserver(VCMD_set_sched, xid, sched);
-	return rc;
+
+	res.set_mask      = sched->set_mask;
+	res.fill_rate     = sched->fill_rate;
+	res.interval      = sched->interval;
+	res.tokens        = sched->tokens;
+	res.tokens_min    = sched->tokens_min;
+	res.tokens_max    = sched->tokens_max;
+	res.priority_bias = sched->priority_bias;
+
+	return vserver(VCMD_set_sched, xid, &res);
 }
 

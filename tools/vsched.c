@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
 	if (opts.sched->set_mask == 0)
 		EXIT("You need to specify at least one option in the bucket", 1);
 	
-	if (vc_set_sched(opts.xid, opts.sched) < 0)
+	if (vx_set_sched(opts.xid, opts.sched) < 0)
 		PEXIT("Failed to set resource limits", 2);
 	
 	execvp(argv[optind], argv+optind);
