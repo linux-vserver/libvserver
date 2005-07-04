@@ -34,7 +34,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	
+
+#define XID_SELF  -1
+#define XID_ADMIN  0
+#define XID_WATCH  1
+
 	/* type definitions */
 	typedef uint32_t xid_t;
 	typedef uint32_t nid_t;

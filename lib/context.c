@@ -28,23 +28,21 @@
 
 #include "vserver.h"
 
-static int rc;
-
-int vx_get_task_xid(pid_t pid) {
+int vx_get_task_xid(pid_t pid)
+{
 	return vserver(VCMD_task_xid, pid, NULL);
 }
 
-int vx_get_info(xid_t xid, struct vx_info *info) {
-	if (xid <= 1) {
-		info->xid = xid;
-		info->initpid = (pid_t) -1;
-		
-		return 0;
-	}
-	
+int vx_get_info(xid_t xid, struct vx_info *info)
+{
 	struct vcmd_vx_info_v0 vcmd;
-	
-	if ((rc = vserver(VCMD_vx_info, xid, &vcmd)) < 0)
+
+	if (!info) {
+		errno = EFAULT;
+		return -1;
+	}
+
+	if (vserver(VCMD_vx_info, xid, &vcmd) < 0)
 		return -1;
 	
 	info->xid = vcmd.xid;
@@ -53,46 +51,41 @@ int vx_get_info(xid_t xid, struct vx_info *info) {
 	return 0;
 }
 
-int vx_create(xid_t xid) {
-	if ((rc = vserver(VCMD_ctx_create, xid, NULL)) < 0)
-		return -1;
-	
-	return 0;
+int vx_create(xid_t xid)
+{
+	return vserver(VCMD_ctx_create, xid, NULL);
 }
 
-int vx_migrate(xid_t xid) {
-	if ((rc = vserver(VCMD_ctx_migrate, xid, NULL)) < 0)
-		return -1;
-	
-	return 0;
+int vx_migrate(xid_t xid)
+{
+	return vserver(VCMD_ctx_migrate, xid, NULL);
 }
 
-int vx_set_flags(xid_t xid, const struct vx_flags *flags) {
-	if (flags == 0) {
+int vx_set_flags(xid_t xid, const struct vx_flags *flags)
+{
+	struct vcmd_ctx_flags_v0 cflags;
+
+	if (!flags) {
 		errno = EFAULT;
 		return -1;
 	}
-	
-	struct vcmd_ctx_flags_v0 cflags;
 	
 	cflags.flagword = flags->flags;
 	cflags.mask     = flags->mask;
 	
-	if ((rc = vserver(VCMD_set_cflags, xid, &cflags)) < 0)
-		return -1;
-	
-	return 0;
+	return vserver(VCMD_set_cflags, xid, &cflags);
 }
 
-int vx_get_flags(xid_t xid, struct vx_flags *flags) {
-	if (flags == 0) {
+int vx_get_flags(xid_t xid, struct vx_flags *flags)
+{
+	struct vcmd_ctx_flags_v0 cflags;
+
+	if (!flags) {
 		errno = EFAULT;
 		return -1;
 	}
 	
-	struct vcmd_ctx_flags_v0 cflags;
-	
-	if ((rc = vserver(VCMD_get_cflags, xid, &cflags)) < 0)
+	if (vserver(VCMD_get_cflags, xid, &cflags))
 		return -1;
 	
 	flags->flags = cflags.flagword;
@@ -101,38 +94,37 @@ int vx_get_flags(xid_t xid, struct vx_flags *flags) {
 	return 0;
 }
 
-int vx_set_caps(xid_t xid, const struct vx_caps *caps) {
-	if (caps == 0) {
+int vx_set_caps(xid_t xid, const struct vx_caps *caps)
+{
+	struct vcmd_ctx_caps_v0 ccaps;
+
+	if (!caps) {
 		errno = EFAULT;
 		return -1;
 	}
-	
-	struct vcmd_ctx_caps_v0 ccaps;
 	
 	ccaps.bcaps = caps->bcaps;
 	ccaps.ccaps = caps->ccaps;
 	ccaps.cmask = caps->cmask;
 	
-	if ((rc = vserver(VCMD_set_ccaps, xid, &ccaps)) < 0)
-		return -1;
-	
-	return 0;
+	return vserver(VCMD_set_ccaps, xid, &ccaps);
 }
 
-int vx_get_caps(xid_t xid, struct vx_caps *caps) {
-	if (caps == 0) {
+int vx_get_caps(xid_t xid, struct vx_caps *caps)
+{
+	struct vcmd_ctx_caps_v0 ccaps;
+
+	if (!caps) {
 		errno = EFAULT;
 		return -1;
 	}
 	
-	struct vcmd_ctx_caps_v0 ccaps;
-	
-	if ((rc = vserver(VCMD_get_ccaps, xid, &ccaps)) < 0)
+	if (vserver(VCMD_get_ccaps, xid, &ccaps) < 0)
 		return -1;
 	
 	caps->bcaps = ccaps.bcaps;
-	caps->ccaps  = ccaps.ccaps;
-	caps->cmask  = ccaps.cmask;
+	caps->ccaps = ccaps.ccaps;
+	caps->cmask = ccaps.cmask;
 	
 	return 0;
 }
