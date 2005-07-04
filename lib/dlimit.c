@@ -28,46 +28,23 @@
 
 #include "vserver.h"
 
+/* TODO Convert to new API */
 int vc_add_dlimit(xid_t xid, struct vcmd_ctx_dlimit_base_v0 *dbase)
 {
-	if (dbase == 0) {
-		errno = EFAULT;
-		return -1;
-	}
-	
-	int rc = vserver(VCMD_add_dlimit, xid, dbase);
-	return rc;
+	return vserver(VCMD_add_dlimit, xid, dbase);
 }
 
 int vc_rem_dlimit(xid_t xid, struct vcmd_ctx_dlimit_base_v0 *dbase)
 {
-	if (dbase == 0) {
-		errno = EFAULT;
-		return -1;
-	}
-	
-	int rc = vserver(VCMD_rem_dlimit, xid, dbase);
-	return rc;
+	return vserver(VCMD_rem_dlimit, xid, dbase);
 }
 
 int vc_set_dlimit(xid_t xid, struct vcmd_ctx_dlimit_v0 *dlimit)
 {
-	if (dlimit == 0) {
-		errno = EFAULT;
-		return -1;
-	}
-	
-	int rc = vserver(VCMD_set_dlimit, xid, dlimit);
-	return rc;
+	return vserver(VCMD_set_dlimit, xid, dlimit);
 }
 
 int vc_get_dlimit(xid_t xid, struct vcmd_ctx_dlimit_v0 *dlimit)
 {
-	if (dlimit == 0) {
-		errno = EFAULT;
-		return -1;
-	}
-	
-	int rc = vserver(VCMD_get_dlimit, xid, dlimit);
-	return rc;
+	return vserver(VCMD_get_dlimit, xid, dlimit);
 }
