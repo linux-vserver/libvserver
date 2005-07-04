@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005 by the libvserver team                                 *
+ *   Copyright 2005 The libvserver Team                                    *
  *   See AUTHORS for details                                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,107 +18,167 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
-#include <sys/types.h>
-#include <linux/compiler.h>
+#ifndef VSERVER_H
+#define VSERVER_H 1
 
-//#include "linux/vserver/context.h"
-#include "linux/vserver/context_cmd.h"
-//#include "linux/vserver/cvirt.h"
-//#include "linux/vserver/cvirt_cmd.h"
-//#include "linux/vserver/cvirt_def.h"
-//#include "linux/vserver/dlimit.h"
-#include "linux/vserver/dlimit_cmd.h"
-//#include "linux/vserver/inode.h"
-#include "linux/vserver/inode_cmd.h"
-//#include "linux/vserver/limit.h"
-#include "linux/vserver/limit_cmd.h"
-//#include "linux/vserver/limit_def.h"
-#include "linux/vserver/namespace.h"
-//#include "linux/vserver/network.h"
-#include "linux/vserver/network_cmd.h"
-//#include "linux/vserver/sched.h"
-#include "linux/vserver/sched_cmd.h"
-//#include "linux/vserver/sched_def.h"
-#include "linux/vserver/signal_cmd.h"
-#include "linux/vserver/switch.h"
-//#include "linux/vserver/xid.h"
-
-#define CMD_VERSION \
-	printf("%s %s -- %s\n", NAME, VERSION, DESCR); \
-	printf("This program is part of libvserver %s\n\n", LIBVSERVER_VERSION); \
-	\
-	printf("Copyright (c) 2005 Benedikt Boehm <hollow@gentoo.org>\n"); \
-	printf("This program is free software; you can redistribute it and/or\n"); \
-	printf("modify it under the terms of the GNU General Public License\n"); \
-	exit(0);
-
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 /* Constants */
 #define LIBVSERVER_VERSION "0.1"
 
-/* Type definitions */
-typedef uint32_t xid_t;
-typedef uint32_t nid_t;
+#ifdef __cplusplus
+extern "C" {
+#endif
+	
+	/* type definitions */
+	typedef uint32_t xid_t;
+	typedef uint32_t nid_t;
+	
+	/* context.c */
+	int vx_get_task_xid(pid_t pid, xid_t *xid);
+	
+	struct vx_info {
+		xid_t xid;
+		pid_t initpid;
+	};
+	
+	int vx_get_info(xid_t xid, struct vx_info *info);
+	
+	int vx_create(xid_t xid);
+	int vx_migrate(xid_t xid);
+	
+	struct vx_flags {
+		uint64_t flags;
+		uint64_t mask;
+	};
+	
+	int vx_set_flags(xid_t xid, const struct vx_flags *flags);
+	int vx_get_flags(xid_t xid, struct vx_flags *flags);
+	
+	struct vx_caps {
+		uint64_t bcaps;
+		uint64_t caps;
+		uint64_t mask;
+	};
+	
+	int vx_set_caps(xid_t xid, const struct vx_caps *caps);
+	int vx_get_caps(xid_t xid, struct vx_caps *caps);
+	
+	/* cvirt.c */
+	int vx_set_vhi_name(xid_t xid, uint32_t field, const char *name);
+	int vx_get_vhi_name(xid_t xid, uint32_t field, char *name);
+	
+	/* dlimit.c */
+	int vx_add_dlimit(xid_t xid, const char *name, uint32_t flags);
+	int vx_rem_dlimit(xid_t xid, const char *name);
+	
+	struct vx_dlimit {
+		uint32_t space_used;
+		uint32_t space_total;
+		uint32_t inodes_used;
+		uint32_t inodes_total;
+		uint32_t reserved;
+	};
+	
+	int vx_set_dlimit(xid_t xid, const char *name, const struct vx_dlimit *dlimit);
+	int vx_get_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit);
+	
+	/* inode.c */
+	struct vx_iattr {
+		uint32_t flags;
+		uint32_t mask;
+	};
+	
+	int vx_set_iattr(const char *name, const struct vx_iattr *iattr);
+	int vx_get_iattr(const char *name, struct vx_iattr *iattr);
+	
+	/* limit.c */
+	struct vx_rlimit {
+		uint32_t id;
+		uint64_t minimum;
+		uint64_t softlimit;
+		uint64_t maximum;
+	};
+	
+	int vx_set_rlimit(xid_t xid, const struct vx_rlimit *rlimit);
+	int vx_get_rlimit(xid_t xid, struct vx_rlimit *rlimit);
+	
+	struct vx_rlimit_mask {
+		uint32_t minimum;
+		uint32_t softlimit;
+		uint32_t maximum;
+	};
+	
+	int vx_get_rlimit_mask(struct vx_rlimit_mask *rlimit_mask);
+	
+	/* namespace.c */
+	int vx_enter_namespace(xid_t xid);
+	int vx_cleanup_namespace();
+	int vx_set_namespace();
+	
+	/* network.c */
+	int nx_get_task_nid(pid_t pid, nid_t *nid);
+	
+	struct nx_info {
+		nid_t nid;
+	};
+	
+	int nx_info(nid_t nid, struct nx_info *info);
+	
+	int nx_create(nid_t nid);
+	int nx_migrate(nid_t nid);
+	
+	struct nx_net {
+		uint16_t type;
+		uint16_t count;
+		uint32_t ip[4];
+		uint32_t mask[4];
+	};
+	
+	int nx_add_net(nid_t nid, const struct nx_net *net);
+	int nx_rem_net(nid_t nid, struct nx_net *net);
+	
+	struct nx_flags {
+		uint64_t flags;
+		uint64_t mask;
+	};
+	
+	int nx_set_flags(nid_t nid, const struct nx_flags *flags);
+	int nx_get_flags(nid_t nid, struct nx_flags *flags);
+	
+	struct nx_caps {
+		uint64_t caps;
+		uint64_t mask;
+	};
+	
+	int nx_set_caps(nid_t nid, const struct nx_caps *caps);
+	int nx_get_caps(nid_t nid, struct nx_caps *caps);
+	
+	/* sched.c */
+	struct vx_sched {
+		uint32_t set_mask;
+		int32_t fill_rate;
+		int32_t interval;
+		int32_t tokens;
+		int32_t tokens_min;
+		int32_t tokens_max;
+		int32_t priority_bias;
+	};
+	
+	int vx_set_sched(xid_t xid, const struct vx_sched *sched);
+	
+	/* signal.c */
+	int vx_kill(xid_t xid, pid_t pid, int sig);
+	
+	int vx_wait_exit(xid_t xid);
+	
+	/* switch.c */
+	int vs_get_version();
+	
+#ifdef __cplusplus
+}
+#endif
 
-/* context.c */
-extern int vc_task_xid(pid_t pid);
-extern int vc_vx_info(xid_t xid, struct vcmd_vx_info_v0 *info);
-extern int vc_ctx_create(xid_t xid);
-extern int vc_ctx_migrate(xid_t xid);
-extern int vc_get_cflags(xid_t xid, struct vcmd_ctx_flags_v0 *cflags);
-extern int vc_set_cflags(xid_t xid, struct vcmd_ctx_flags_v0 *cflags);
-extern int vc_get_ccaps(xid_t xid, struct vcmd_ctx_caps_v0 *ccaps);
-extern int vc_set_ccaps(xid_t xid, struct vcmd_ctx_caps_v0 *ccaps);
-
-/* cvirt.c */
-extern int vc_set_vhi_name(xid_t xid, uint32_t field, char * name);
-extern int vc_get_vhi_name(xid_t xid, uint32_t field, char * name, size_t length);
-
-/* dlimit.c */
-extern int vc_add_dlimit(xid_t xid, struct vcmd_ctx_dlimit_base_v0 *dbase);
-extern int vc_rem_dlimit(xid_t xid, struct vcmd_ctx_dlimit_base_v0 *dbase);
-extern int vc_set_dlimit(xid_t xid, struct vcmd_ctx_dlimit_v0 *dlimit);
-extern int vc_get_dlimit(xid_t xid, struct vcmd_ctx_dlimit_v0 *dlimit);
-
-/* inode.c */
-extern int vc_get_iattr_v0(struct vcmd_ctx_iattr_v1 *iattr);
-extern int vc_set_iattr_v0(struct vcmd_ctx_iattr_v1 *iattr);
-extern int vc_get_iattr(struct vcmd_ctx_iattr_v0 *iattr);
-extern int vc_set_iattr(struct vcmd_ctx_iattr_v0 *iattr);
-
-/* limit.c */
-extern int vc_get_rlimit(xid_t xid, struct vcmd_ctx_rlimit_v0 *rlimit);
-extern int vc_set_rlimit(xid_t xid, struct vcmd_ctx_rlimit_v0 *rlimit);
-extern int vc_get_rlimit_mask(xid_t xid, struct vcmd_ctx_rlimit_mask_v0 *rmask);
-
-/* namespace.c */
-extern int vc_enter_namespace(xid_t xid);
-extern int vc_cleanup_namespace();
-extern int vc_set_namespace();
-
-/* network.c */
-extern int vc_task_nid(pid_t pid);
-extern int vc_nx_info(nid_t nid, struct vcmd_nx_info_v0 *info);
-extern int vc_net_create(nid_t nid);
-extern int vc_net_migrate(nid_t nid);
-extern int vc_net_add(nid_t nid, struct vcmd_net_nx_v0 *nx);
-extern int vc_net_remove(nid_t nid, struct vcmd_net_nx_v0 *nx);
-extern int vc_get_nflags(nid_t nid, struct vcmd_net_flags_v0 *flags);
-extern int vc_set_nflags(nid_t nid, struct vcmd_net_flags_v0 *flags);
-extern int vc_get_ncaps(nid_t nid, struct vcmd_net_caps_v0 *caps);
-extern int vc_set_ncaps(nid_t nid, struct vcmd_net_caps_v0 *caps);
-
-/* sched.c */
-extern int vc_set_sched_v2(xid_t xid, struct vcmd_set_sched_v2 *sched);
-extern int vc_set_sched(xid_t xid, struct vcmd_set_sched_v3 *sched);
-
-/* signal.c */
-extern int vc_ctx_kill(xid_t xid, struct vcmd_ctx_kill_v0 *kill);
-extern int vc_wait_exit(xid_t xid, struct vcmd_wait_exit_v0 *wait);
-
-/* switch.c */
-extern int vc_get_version();
+#endif /* !VSERVER_H */
