@@ -33,21 +33,35 @@
 int vx_set_vhi_name(xid_t xid, uint32_t field, const char *name)
 {
 	struct vcmd_vx_vhi_name_v0 vhiname;
+	size_t len = sizeof(vhiname.name);
+
+	if (!name) {
+		errno = EFAULT;
+		return -1;
+	}
 
 	vhiname.field = field;
-	strncpy(vhiname.name, name, sizeof(vhiname.name));
+	strncpy(vhiname.name, name, len-1);
+	vhiname.name[len] = '\0';
+
 	return vserver(VCMD_vx_set_vhi_name, xid, &vhiname);
 }
 
 int vx_get_vhi_name(xid_t xid, uint32_t field, char *name, size_t len)
 {
 	struct vcmd_vx_vhi_name_v0 vhiname;
-	int ret;
 
-	vhiname.field = field;
-	if ((ret = vserver(VCMD_vx_get_vhi_name, xid, &vhiname)) != -1) {
-		strncpy(name, vhiname.name, len);
+	if (!name) {
+		errno = EFAULT;
+		return -1;
 	}
 
-	return ret;
+	vhiname.field = field;
+	if (vserver(VCMD_vx_get_vhi_name, xid, &vhiname) < 0)
+		return -1;
+
+	strncpy(name, vhiname.name, len-1);
+	name[len] = '\0';
+
+	return 0;
 }
