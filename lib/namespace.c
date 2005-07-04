@@ -28,17 +28,17 @@
 
 #include "vserver.h"
 
-int vc_enter_namespace(xid_t xid)
+int vx_enter_namespace(xid_t xid)
 {
 	return vserver(VCMD_enter_namespace, xid, NULL);
 }
 
-int vc_cleanup_namespace()
+int vx_cleanup_namespace()
 {
 	return vserver(VCMD_cleanup_namespace, 0, NULL);
 }
 
-int vc_set_namespace()
+int vx_set_namespace()
 {
 	return vserver(VCMD_set_namespace, 0, NULL);
 }

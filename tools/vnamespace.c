@@ -170,18 +170,18 @@ int main(int argc, char *argv[])
 		EXIT("No program given", 1);
 	
 	if (cmds.enter)
-		if (vc_enter_namespace(opts.xid) < 0)
+		if (vx_enter_namespace(opts.xid) < 0)
 			PEXIT("Failed to enter namespace", 2);
 	
 	if (cmds.set)
-		if (vc_set_namespace() < 0)
+		if (vx_set_namespace() < 0)
 			PEXIT("Failed to set namespace", 2);
 	
 	if (cmds.cleanup)
-		if (vc_cleanup_namespace() < 0)
+		if (vx_cleanup_namespace() < 0)
 			PEXIT("Failed to cleanup namespace", 2);
 
 	execvp(argv[optind], argv+optind);
 
-	return EXIT_SUCCESS;
+	exit(EXIT_SUCCESS);
 }
