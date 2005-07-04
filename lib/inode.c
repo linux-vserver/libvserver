@@ -28,46 +28,23 @@
 
 #include "vserver.h"
 
+/* TODO Convert to new API */
 int vc_get_iattr_v0(struct vcmd_ctx_iattr_v1 *iattr)
 {
-	if (iattr == 0) {
-		errno = EFAULT;
-		return -1;
-	}
-	
-	int rc = vserver(VCMD_get_iattr_v0, 0, iattr);
-	return rc;
+	return vserver(VCMD_get_iattr_v0, 0, iattr);
 }
 
 int vc_set_iattr_v0(struct vcmd_ctx_iattr_v1 *iattr)
 {
-	if (iattr == 0) {
-		errno = EFAULT;
-		return -1;
-	}
-	
-	int rc = vserver(VCMD_set_iattr_v0, 0, iattr);
-	return rc;
+	return vserver(VCMD_set_iattr_v0, 0, iattr);
 }
 
 int vc_get_iattr(struct vcmd_ctx_iattr_v0 *iattr)
 {
-	if (iattr == 0) {
-		errno = EFAULT;
-		return -1;
-	}
-	
-	int rc = vserver(VCMD_get_iattr, 0, iattr);
-	return rc;
+	return vserver(VCMD_get_iattr, 0, iattr);
 }
 
 int vc_set_iattr(struct vcmd_ctx_iattr_v0 *iattr)
 {
-	if (iattr == 0) {
-		errno = EFAULT;
-		return -1;
-	}
-	
-	int rc = vserver(VCMD_set_iattr, 0, iattr);
-	return rc;
+	return vserver(VCMD_set_iattr, 0, iattr);
 }
