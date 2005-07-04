@@ -237,7 +237,7 @@ int main(int argc, char *argv[])
 			EXIT("Invalid --xid given", 1);
 	
 	if (cmds.kill) {
-		if (vc_ctx_kill(opts.xid, opts.pid, opts.sig) < 0)
+		if (vx_kill(opts.xid, opts.pid, opts.sig) < 0)
 			PEXIT("Failed to kill process/context", 2);
 	}
 	

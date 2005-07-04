@@ -28,24 +28,17 @@
 
 #include "vserver.h"
 
-int vc_ctx_kill(xid_t xid, struct vcmd_ctx_kill_v0 *kill)
+int vx_kill(xid_t xid, pid_t pid, int sig)
 {
-	if (kill == 0) {
-		errno = EFAULT;
-		return -1;
-	}
-	
-	int rc = vserver(VCMD_ctx_kill, xid, kill);
-	return rc;
+	struct vcmd_ctx_kill_v0 res;
+
+	res.pid = pid;
+	res.sig = sig;
+
+	return vserver(VCMD_ctx_kill, xid, &res);
 }
 
-int vc_wait_exit(xid_t xid, struct vcmd_wait_exit_v0 *wait)
+int vx_wait_exit(xid_t xid)
 {
-	if (wait == 0) {
-		errno = EFAULT;
-		return -1;
-	}
-	
-	int rc = vserver(VCMD_wait_exit, xid, wait);
-	return rc;
+	return vserver(VCMD_wait_exit, xid, NULL);
 }
