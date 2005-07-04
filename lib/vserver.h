@@ -137,13 +137,13 @@ extern "C" {
 	int vx_set_namespace();
 	
 	/* network.c */
-	int nx_get_task_nid(pid_t pid, nid_t *nid);
+	int nx_get_task_nid(pid_t pid);
 	
 	struct nx_info {
 		nid_t nid;
 	};
 	
-	int nx_info(nid_t nid, struct nx_info *info);
+	int nx_get_info(nid_t nid, struct nx_info *info);
 	
 	int nx_create(nid_t nid);
 	int nx_migrate(nid_t nid);
@@ -156,7 +156,7 @@ extern "C" {
 	};
 	
 	int nx_add_net(nid_t nid, const struct nx_net *net);
-	int nx_rem_net(nid_t nid, struct nx_net *net);
+	int nx_rem_net(nid_t nid, const struct nx_net *net);
 	
 	struct nx_flags {
 		uint64_t flags;

@@ -22,106 +22,142 @@
 #include <config.h>
 #endif
 
+#include <string.h>
+
 #include "syscall-vserver.h"
 #include "linux/vserver/switch.h"
 #include "linux/vserver/network_cmd.h"
 
 #include "vserver.h"
 
-int vc_task_nid(pid_t pid)
+int nx_get_task_nid(pid_t pid)
 {
-	if (pid == 0) {
-		errno = ESRCH;
-		return -1;
-	}
-	
 	return vserver(VCMD_task_nid, pid, NULL);
 }
 
-int vc_nx_info(nid_t nid, struct vcmd_nx_info_v0 *info)
+int nx_get_info(nid_t nid, struct nx_info *info)
 {
-	if (info == 0) {
+	struct vcmd_nx_info_v0 res;
+
+	if (!info) {
 		errno = EFAULT;
 		return -1;
 	}
-	
-	return vserver(VCMD_nx_info, nid, info);
+
+	if (vserver(VCMD_nx_info, nid, &res) < 0)
+		return -1;
+
+	info->nid = res.nid;
+
+	return 0;
 }
 
-int vc_net_create(nid_t nid)
+int nx_create(nid_t nid)
 {
-	int rc = vserver(VCMD_net_create, nid, NULL);
-	return rc;
+	return vserver(VCMD_net_create, nid, NULL);
 }
 
-int vc_net_migrate(nid_t nid)
+int nx_migrate(nid_t nid)
 {
-	int rc = vserver(VCMD_net_migrate, nid, NULL);
-	return rc;
+	return vserver(VCMD_net_migrate, nid, NULL);
 }
 
-int vc_net_add(nid_t nid, struct vcmd_net_nx_v0 *nx)
+int nx_add_net(nid_t nid, const struct nx_net *net)
 {
-	if (nx == 0) {
+	struct vcmd_net_nx_v0 res;
+
+	if (!net) {
 		errno = EFAULT;
 		return -1;
 	}
-	
-	int rc = vserver(VCMD_net_add, nid, nx);
-	return rc;
+
+	res.type = net->type;
+	res.count = net->count;
+	memcpy(res.ip, net->ip, sizeof(res.ip));
+	memcpy(res.mask, net->mask, sizeof(res.mask));
+
+	return vserver(VCMD_net_add, nid, &res);
 }
 
-int vc_net_remove(nid_t nid, struct vcmd_net_nx_v0 *nx)
+int vx_rem_net(nid_t nid, const struct nx_net *net)
 {
-	if (nx == 0) {
+	struct vcmd_net_nx_v0 res;
+
+	if (!net) {
 		errno = EFAULT;
 		return -1;
 	}
-	
-	int rc = vserver(VCMD_net_remove, nid, nx);
-	return rc;
+
+	res.type = net->type;
+	res.count = net->count;
+	memcpy(res.ip, net->ip, sizeof(res.ip));
+	memcpy(res.mask, net->mask, sizeof(res.mask));
+
+	return vserver(VCMD_net_remove, nid, &res);
 }
 
-int vc_get_nflags(nid_t nid, struct vcmd_net_flags_v0 *flags)
+int nx_get_flags(nid_t nid, struct nx_flags *flags)
 {
-	if (flags == 0) {
+	struct vcmd_net_flags_v0 res;
+
+	if (!flags) {
 		errno = EFAULT;
 		return -1;
 	}
-	
-	int rc = vserver(VCMD_get_nflags, nid, flags);
-	return rc;
+
+	if (vserver(VCMD_get_nflags, nid, &res) < 0)
+		return -1;
+
+	flags->flags = res.flagword;
+	flags->mask  = res.mask;
+
+	return 0;
 }
 
-int vc_set_nflags(nid_t nid, struct vcmd_net_flags_v0 *flags)
+int nx_set_flags(nid_t nid, const struct nx_flags *flags)
 {
-	if (flags == 0) {
+	struct vcmd_net_flags_v0 res;
+
+	if (!flags) {
 		errno = EFAULT;
 		return -1;
 	}
-	
-	int rc = vserver(VCMD_set_nflags, nid, flags);
-	return rc;
+
+	res.flagword = flags->flags;
+	res.mask     = flags->mask;
+
+	return vserver(VCMD_set_nflags, nid, &res);
 }
 
-int vc_get_ncaps(nid_t nid, struct vcmd_net_caps_v0 *caps)
+int nx_get_caps(nid_t nid, struct nx_caps *caps)
 {
-	if (caps == 0) {
+	struct vcmd_net_caps_v0 res;
+
+	if (!caps) {
 		errno = EFAULT;
 		return -1;
 	}
-	
-	int rc = vserver(VCMD_get_ncaps, nid, caps);
-	return rc;
+
+	if (vserver(VCMD_get_ncaps, nid, &res) < 0)
+		return -1;
+
+	caps->caps = res.ncaps;
+	caps->mask = res.cmask;
+
+	return 0;
 }
 
-int vc_set_ncaps(nid_t nid, struct vcmd_net_caps_v0 *caps)
+int nx_set_caps(nid_t nid, const struct nx_caps *caps)
 {
-	if (caps == 0) {
+	struct vcmd_net_caps_v0 res;
+
+	if (!caps) {
 		errno = EFAULT;
 		return -1;
 	}
-	
-	int rc = vserver(VCMD_set_ncaps, nid, caps);
-	return rc;
+
+	res.ncaps = caps->caps;
+	res.cmask = caps->mask;
+
+	return vserver(VCMD_get_ncaps, nid, &res);
 }
