@@ -19,12 +19,13 @@
  ***************************************************************************/
 
 #ifndef VSERVER_H
-#define VSERVER_H 1
+#define VSERVER_H
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 
+#include <stdint.h>
 #include <sys/types.h>
 
 /* Constants */
@@ -39,7 +40,7 @@ extern "C" {
 	typedef uint32_t nid_t;
 	
 	/* context.c */
-	int vx_get_task_xid(pid_t pid, xid_t *xid);
+	int vx_get_task_xid(pid_t pid);
 	
 	struct vx_info {
 		xid_t xid;
@@ -61,16 +62,28 @@ extern "C" {
 	
 	struct vx_caps {
 		uint64_t bcaps;
-		uint64_t caps;
-		uint64_t mask;
+		uint64_t ccaps;
+		uint64_t cmask;
 	};
 	
 	int vx_set_caps(xid_t xid, const struct vx_caps *caps);
 	int vx_get_caps(xid_t xid, struct vx_caps *caps);
 	
 	/* cvirt.c */
+#ifndef _VX_NAMESPACE_H /* Don't conflict with the kernel definition */
+	enum vx_vhi_name_field {
+		VHIN_CONTEXT=0,
+		VHIN_SYSNAME,
+		VHIN_NODENAME,
+		VHIN_RELEASE,
+		VHIN_VERSION,
+		VHIN_MACHINE,
+		VHIN_DOMAINNAME,
+	};
+#endif
+
 	int vx_set_vhi_name(xid_t xid, uint32_t field, const char *name);
-	int vx_get_vhi_name(xid_t xid, uint32_t field, char *name);
+	int vx_get_vhi_name(xid_t xid, uint32_t field, char *name, size_t len);
 	
 	/* dlimit.c */
 	int vx_add_dlimit(xid_t xid, const char *name, uint32_t flags);
@@ -157,7 +170,16 @@ extern "C" {
 	
 	int nx_set_caps(nid_t nid, const struct nx_caps *caps);
 	int nx_get_caps(nid_t nid, struct nx_caps *caps);
-	
+
+#define VXSM_FILL_RATE  0x0001
+#define VXSM_INTERVAL   0x0002
+#define VXSM_TOKENS     0x0010
+#define VXSM_TOKENS_MIN 0x0020
+#define VXSM_TOKENS_MAX 0x0040
+#define VXSM_PRIO_BIAS  0x0100
+
+#define SCHED_KEEP      (-2)
+
 	/* sched.c */
 	struct vx_sched {
 		uint32_t set_mask;

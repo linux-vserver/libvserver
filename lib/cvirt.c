@@ -22,30 +22,31 @@
 #include <config.h>
 #endif
 
+#include <string.h>
+
 #include "syscall-vserver.h"
 #include "linux/vserver/switch.h"
 #include "linux/vserver/namespace.h"
 
 #include "vserver.h"
 
-int vc_set_vhi_name(xid_t xid, uint32_t field, char *name)
+int vx_set_vhi_name(xid_t xid, uint32_t field, const char *name)
 {
 	struct vcmd_vx_vhi_name_v0 vhiname;
-	int ret;
 
 	vhiname.field = field;
 	strncpy(vhiname.name, name, sizeof(vhiname.name));
 	return vserver(VCMD_vx_set_vhi_name, xid, &vhiname);
 }
 
-int vc_get_vhi_name(xid_t xid, uint32_t field, char *name, size_t length)
+int vx_get_vhi_name(xid_t xid, uint32_t field, char *name, size_t len)
 {
 	struct vcmd_vx_vhi_name_v0 vhiname;
 	int ret;
 
 	vhiname.field = field;
 	if ((ret = vserver(VCMD_vx_get_vhi_name, xid, &vhiname)) != -1) {
-		strncpy(name, vhiname.name, length);
+		strncpy(name, vhiname.name, len);
 	}
 
 	return ret;

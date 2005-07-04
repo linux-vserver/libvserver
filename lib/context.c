@@ -30,11 +30,8 @@
 
 static int rc;
 
-int vx_get_task_xid(pid_t pid, xid_t *xid) {
-	if ((xid = vserver(VCMD_task_xid, pid, NULL)) < 0)
-		return -1;
-	
-	return 0;
+int vx_get_task_xid(pid_t pid) {
+	return vserver(VCMD_task_xid, pid, NULL);
 }
 
 int vx_get_info(xid_t xid, struct vx_info *info) {
@@ -113,8 +110,8 @@ int vx_set_caps(xid_t xid, const struct vx_caps *caps) {
 	struct vcmd_ctx_caps_v0 ccaps;
 	
 	ccaps.bcaps = caps->bcaps;
-	ccaps.ccaps = caps->caps;
-	ccaps.cmask = caps->mask;
+	ccaps.ccaps = caps->ccaps;
+	ccaps.cmask = caps->cmask;
 	
 	if ((rc = vserver(VCMD_set_ccaps, xid, &ccaps)) < 0)
 		return -1;
@@ -134,8 +131,8 @@ int vx_get_caps(xid_t xid, struct vx_caps *caps) {
 		return -1;
 	
 	caps->bcaps = ccaps.bcaps;
-	caps->caps  = ccaps.ccaps;
-	caps->mask  = ccaps.cmask;
+	caps->ccaps  = ccaps.ccaps;
+	caps->cmask  = ccaps.cmask;
 	
 	return 0;
 }
