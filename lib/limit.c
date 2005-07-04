@@ -28,35 +28,59 @@
 
 #include "vserver.h"
 
-int vc_get_rlimit(xid_t xid, struct vcmd_ctx_rlimit_v0 *rlimit)
+int vx_get_rlimit(xid_t xid, uint32_t id, struct vx_rlimit *rlimit)
 {
-	if (rlimit == 0) {
+	struct vcmd_ctx_rlimit_v0 res;
+
+	if (!rlimit) {
 		errno = EFAULT;
 		return -1;
 	}
-	
-	int rc = vserver(VCMD_get_rlimit, xid, rlimit);
-	return rc;
+
+	res.id = id;
+
+	if (vserver(VCMD_get_rlimit, xid, &res) < 0)
+		return -1;
+
+	rlimit->minimum   = res.minimum;
+	rlimit->softlimit = res.softlimit;
+	rlimit->maximum   = res.maximum;
+
+	return 0;
 }
 
-int vc_set_rlimit(xid_t xid, struct vcmd_ctx_rlimit_v0 *rlimit)
+int vx_set_rlimit(xid_t xid, uint32_t id, const struct vx_rlimit *rlimit)
 {
-	if (rlimit == 0) {
+	struct vcmd_ctx_rlimit_v0 res;
+
+	if (!rlimit) {
 		errno = EFAULT;
 		return -1;
 	}
-	
-	int rc = vserver(VCMD_set_rlimit, xid, rlimit);
-	return rc;
+
+	res.id        = id;
+	res.minimum   = rlimit->minimum;
+	res.softlimit = rlimit->softlimit;
+	res.maximum   = rlimit->maximum;
+
+	return vserver(VCMD_set_rlimit, xid, &res);
 }
 
-int vc_get_rlimit_mask(xid_t xid, struct vcmd_ctx_rlimit_mask_v0 *rmask)
+int vx_get_rlimit_mask(struct vx_rlimit_mask *rmask)
 {
-	if (rmask == 0) {
+	struct vcmd_ctx_rlimit_mask_v0 res;
+
+	if (!rmask) {
 		errno = EFAULT;
 		return -1;
 	}
-	
-	int rc = vserver(VCMD_get_rlimit_mask, xid, rmask);
-	return rc;
+
+	if (vserver(VCMD_get_rlimit_mask, 0, &res) < 0)
+		return -1;
+
+	rmask->minimum   = res.minimum;
+	rmask->softlimit = res.softlimit;
+	rmask->maximum   = res.maximum;
+
+	return 0;
 }

@@ -115,14 +115,13 @@ extern "C" {
 	
 	/* limit.c */
 	struct vx_rlimit {
-		uint32_t id;
 		uint64_t minimum;
 		uint64_t softlimit;
 		uint64_t maximum;
 	};
 	
-	int vx_set_rlimit(xid_t xid, const struct vx_rlimit *rlimit);
-	int vx_get_rlimit(xid_t xid, struct vx_rlimit *rlimit);
+	int vx_set_rlimit(xid_t xid, uint32_t id, const struct vx_rlimit *rlimit);
+	int vx_get_rlimit(xid_t xid, uint32_t id, struct vx_rlimit *rlimit);
 	
 	struct vx_rlimit_mask {
 		uint32_t minimum;
@@ -130,7 +129,7 @@ extern "C" {
 		uint32_t maximum;
 	};
 	
-	int vx_get_rlimit_mask(struct vx_rlimit_mask *rlimit_mask);
+	int vx_get_rlimit_mask(struct vx_rlimit_mask *rmask);
 	
 	/* namespace.c */
 	int vx_enter_namespace(xid_t xid);
