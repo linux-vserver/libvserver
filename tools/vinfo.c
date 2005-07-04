@@ -22,12 +22,14 @@
 #include <config.h>
 #endif
 
+#include <stdlib.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <getopt.h>
 #include <sys/types.h>
 
-#include "libvserver.h"
+#include "vserver.h"
 #include "tools.h"
 
 #define NAME	"vinfo"
@@ -156,7 +158,7 @@ int main(int argc, char *argv[])
 				break;
 			
 			case 'V':
-				CMD_VERSION;
+				CMD_VERSION(NAME, VERSION, DESCR);
 				break;
 			
 			case 'v':

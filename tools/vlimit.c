@@ -22,12 +22,14 @@
 #include <config.h>
 #endif
 
+#include <stdlib.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <errno.h>
 #include <getopt.h>
 
-#include "libvserver.h"
+#include "vserver.h"
 #include "tools.h"
 
 #define NAME	"vlimit"
@@ -99,7 +101,7 @@ int main(int argc, char *argv[])
 				break;
 			
 			case 'V':
-				CMD_VERSION;
+				CMD_VERSION(NAME, VERSION, DESCR);
 				break;
 			
 			case 'v':
@@ -112,7 +114,7 @@ int main(int argc, char *argv[])
 			
 			default:
 				printf("Try '%s --help' for more information\n", argv[0]);
-				return EXIT_FAILURE;
+				exit(EXIT_FAILURE);
 				break;
 		}
 	}
@@ -132,5 +134,5 @@ int main(int argc, char *argv[])
 	
 	execvp(argv[optind], argv+optind);
 	
-	return EXIT_SUCCESS;
+	exit(EXIT_SUCCESS);
 }

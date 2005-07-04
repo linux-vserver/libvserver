@@ -22,13 +22,16 @@
 #include <config.h>
 #endif
 
+#include <stdlib.h>
 #include <unistd.h>
+#include <stdbool.h>
+#include <string.h>
 #include <stdio.h>
 #include <errno.h>
 #include <getopt.h>
 #include <sys/types.h>
 
-#include "libvserver.h"
+#include "vserver.h"
 #include "tools.h"
 
 #define NAME	"vuname"
@@ -77,25 +80,25 @@ struct options {
 /* TODO Reduce code... */
 void get_vhi_names(xid_t xid, struct vhifields *vhi)
 {
-	if (vc_get_vhi_name(xid, VHIN_CONTEXT, vhi->context, VHI_LENGTH) == -1)
+	if (vx_get_vhi_name(xid, VHIN_CONTEXT, vhi->context, VHI_LENGTH) == -1)
 		PEXIT("Failed to get context name", 2);
 
-	if (vc_get_vhi_name(xid, VHIN_SYSNAME, vhi->sysname, VHI_LENGTH) == -1)
+	if (vx_get_vhi_name(xid, VHIN_SYSNAME, vhi->sysname, VHI_LENGTH) == -1)
 		PEXIT("Failed to get sysname", 2);
 
-	if (vc_get_vhi_name(xid, VHIN_NODENAME, vhi->nodename, VHI_LENGTH) == -1)
+	if (vx_get_vhi_name(xid, VHIN_NODENAME, vhi->nodename, VHI_LENGTH) == -1)
 		PEXIT("Failed to get nodename", 2);
 
-	if (vc_get_vhi_name(xid, VHIN_RELEASE, vhi->release, VHI_LENGTH) == -1)
+	if (vx_get_vhi_name(xid, VHIN_RELEASE, vhi->release, VHI_LENGTH) == -1)
 		PEXIT("Failed to get release", 2);
 
-	if (vc_get_vhi_name(xid, VHIN_VERSION, vhi->version, VHI_LENGTH) == -1)
+	if (vx_get_vhi_name(xid, VHIN_VERSION, vhi->version, VHI_LENGTH) == -1)
 		PEXIT("Failed to get version", 2);
 
-	if (vc_get_vhi_name(xid, VHIN_MACHINE, vhi->machine, VHI_LENGTH) == -1)
+	if (vx_get_vhi_name(xid, VHIN_MACHINE, vhi->machine, VHI_LENGTH) == -1)
 		PEXIT("Failed to get machine name", 2);
 
-	if (vc_get_vhi_name(xid, VHIN_DOMAINNAME, vhi->domainname, VHI_LENGTH) == -1)
+	if (vx_get_vhi_name(xid, VHIN_DOMAINNAME, vhi->domainname, VHI_LENGTH) == -1)
 		PEXIT("Failed to get domainname", 2);
 }
 
@@ -142,7 +145,7 @@ int set_vhiname(xid_t xid, int field, char *name)
 	if (!strlen(name))
 		return 0;
 
-	if (vc_set_vhi_name(xid, field, name) < 0)
+	if (vx_set_vhi_name(xid, field, name) < 0)
 		PEXIT(strcat(strcat("Failed to set VHI field (", (char*) field), ")"), 2);
 }
 
@@ -210,7 +213,7 @@ int main(int argc, char *argv[])
 				break;
 
 			case 'V':
-				CMD_VERSION;
+				CMD_VERSION(NAME, VERSION, DESCR);
 				break;
 
 			case 'G':
@@ -251,7 +254,7 @@ int main(int argc, char *argv[])
 		EXIT("More than one command given", 1);
 
 	if (opts.xid <= 1)
-		if ((opts.xid = vc_task_xid(0)) <= 1)
+		if ((opts.xid = vx_get_task_xid(0)) <= 1)
 			EXIT("Invalid --xid given", 1);
 
 	if (cmds.get) {

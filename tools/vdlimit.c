@@ -22,13 +22,15 @@
 #include <config.h>
 #endif
 
+#include <stdlib.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <getopt.h>
 #include <signal.h>
 #include <sys/types.h>
 
-#include "libvserver.h"
+#include "vserver.h"
 #include "tools.h"
 
 #define NAME	"vdlimit"
@@ -60,7 +62,7 @@ struct commands {
 struct options {
 	xid_t xid;
 	char *mount;
-	struct vcmd_ctx_dlimit_v0 format;
+	struct vx_dlimit dlimit;
 	bool verbose;
 	bool quiet;
 };
@@ -112,7 +114,7 @@ int main(int argc, char *argv[])
 	struct options opts = {
 		.xid     = (xid_t) 1,
 		.mount   = 0,
-		.format  = { NULL, 0, 0, 0, 0, 0 ,0 },
+		.dlimit  = { 0, 0, 0, 0, 0 },
 		.verbose = false,
 		.quiet   = false
 	};
@@ -129,7 +131,7 @@ int main(int argc, char *argv[])
 				break;
 			
 			case 'V':
-				CMD_VERSION;
+				CMD_VERSION(NAME, VERSION, DESCR);
 				break;
 			
 			case 'v':

@@ -22,13 +22,16 @@
 #include <config.h>
 #endif
 
+#include <stdlib.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <errno.h>
 #include <getopt.h>
+#include <string.h>
 #include <sys/types.h>
 
-#include "libvserver.h"
+#include "vserver.h"
 #include "tools.h"
 
 #define NAME    "vsched"
@@ -54,25 +57,25 @@ struct commands {
 
 struct options {
 	xid_t xid;
-	struct vcmd_set_sched_v3 *bucket;
+	struct vx_sched *sched;
 	bool verbose;
 	bool quiet;
 };
 
-#define SETBUCKET(ATTR,MASK) \
-	if ((bucket->ATTR = (int32_t) atol(strsep(&format, delim))) > 0) \
-		bucket->set_mask |= MASK;
+#define SETSCHED(s,attr,mask) \
+	if (((s)->attr = (int32_t) atol(strsep(&format, delim))) > 0) \
+		(s)->set_mask |= (mask);
 
 static inline
-void format2bucket(char *format, struct vcmd_set_sched_v3 *bucket)
+void format2bucket(char *format, struct vx_sched *sched)
 {
 	const char *delim = ",";
-	SETBUCKET(fill_rate,     VXSM_FILL_RATE);
-	SETBUCKET(interval,      VXSM_INTERVAL);
-	SETBUCKET(tokens,        VXSM_TOKENS);
-	SETBUCKET(tokens_min,    VXSM_TOKENS_MIN);
-	SETBUCKET(tokens_max,    VXSM_TOKENS_MAX);
-	SETBUCKET(priority_bias, VXSM_PRIO_BIAS);
+	SETSCHED(sched, fill_rate,     VXSM_FILL_RATE);
+	SETSCHED(sched, interval,      VXSM_INTERVAL);
+	SETSCHED(sched, tokens,        VXSM_TOKENS);
+	SETSCHED(sched, tokens_min,    VXSM_TOKENS_MIN);
+	SETSCHED(sched, tokens_max,    VXSM_TOKENS_MAX);
+	SETSCHED(sched, priority_bias, VXSM_PRIO_BIAS);
 }
 
 void cmd_help()
@@ -113,13 +116,19 @@ int main(int argc, char *argv[])
 		.version = false,
 	};
 	
-	struct vcmd_set_sched_v3 bucket = {
-		.set_mask = 0
+	struct vx_sched sched = {
+		.fill_rate     = SCHED_KEEP,
+		.interval      = SCHED_KEEP,
+		.tokens        = SCHED_KEEP,
+		.tokens_min    = SCHED_KEEP,
+		.tokens_max    = SCHED_KEEP,
+		.priority_bias = SCHED_KEEP,
+		.set_mask  = 0
 	};
 	
 	struct options opts = {
 		.xid     = (xid_t) 1,
-		.bucket  = &bucket,
+		.sched   = &sched,
 		.verbose = false,
 		.quiet   = false
 	};
@@ -136,7 +145,7 @@ int main(int argc, char *argv[])
 				break;
 			
 			case 'V':
-				CMD_VERSION;
+				CMD_VERSION(NAME, VERSION, DESCR);
 				break;
 			
 			case 'x':
@@ -144,7 +153,7 @@ int main(int argc, char *argv[])
 				break;
 			
 			case 'b':
-				format2bucket(optarg, opts.bucket);
+				format2bucket(optarg, opts.sched);
 				break;
 			
 			case 'v':
@@ -157,25 +166,25 @@ int main(int argc, char *argv[])
 			
 			default:
 				printf("Try '%s --help' for more information\n", argv[0]);
-				return EXIT_FAILURE;
+				exit(EXIT_FAILURE);
 				break;
 		}
 	}
 	
 	if (opts.xid <= 1)
-		if ((opts.xid = vc_task_xid(0)) <= 1)
+		if ((opts.xid = vx_get_task_xid(0)) <= 1)
 			EXIT("Invalid --xid given", 1);
 	
 	if (argc <= optind)
 		EXIT("No program given", 1);
 	
-	if (opts.bucket->set_mask == 0)
+	if (opts.sched->set_mask == 0)
 		EXIT("You need to specify at least one option in the bucket", 1);
 	
-	if (vc_set_sched(opts.xid, opts.bucket) < 0)
+	if (vc_set_sched(opts.xid, opts.sched) < 0)
 		PEXIT("Failed to set resource limits", 2);
 	
 	execvp(argv[optind], argv+optind);
 	
-	return EXIT_SUCCESS;
+	exit(EXIT_SUCCESS);
 }

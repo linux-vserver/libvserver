@@ -22,13 +22,15 @@
 #include <config.h>
 #endif
 
+#include <stdlib.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <errno.h>
 #include <getopt.h>
 #include <sys/types.h>
 
-#include "libvserver.h"
+#include "vserver.h"
 #include "tools.h"
 
 #define NAME	"vnamespace"
@@ -117,7 +119,7 @@ int main(int argc, char *argv[])
 				break;
 			
 			case 'V':
-				CMD_VERSION;
+				CMD_VERSION(NAME, VERSION, DESCR);
 				break;
 			
 			case 'E':
@@ -149,7 +151,7 @@ int main(int argc, char *argv[])
 			
 			default:
 				printf("Try '%s --help' for more information\n", argv[0]);
-				return EXIT_FAILURE;
+				exit(EXIT_FAILURE);
 				break;
 		}
 	}
@@ -161,7 +163,7 @@ int main(int argc, char *argv[])
 		EXIT("More than one command given", 1);
 	
 	if (opts.xid <= 1)
-		if ((opts.xid = vc_task_xid(0)) <= 1)
+		if ((opts.xid = vx_get_task_xid(0)) <= 1)
 			EXIT("Invalid --xid given", 1);
 	
 	if (argc <= optind)

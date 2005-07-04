@@ -22,13 +22,15 @@
 #include <config.h>
 #endif
 
+#include <stdlib.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <getopt.h>
 #include <signal.h>
 #include <sys/types.h>
 
-#include "libvserver.h"
+#include "vserver.h"
 #include "tools.h"
 
 #define NAME	"vsignal"
@@ -184,7 +186,7 @@ int main(int argc, char *argv[])
 				break;
 			
 			case 'V':
-				CMD_VERSION;
+				CMD_VERSION(NAME, VERSION, DESCR);
 				break;
 			
 			case 'K':
@@ -231,16 +233,11 @@ int main(int argc, char *argv[])
 		EXIT("More than one command given", 1);
 	
 	if (opts.xid <= 1)
-		if ((opts.xid = vc_task_xid(opts.pid)) <= 1)
+		if ((opts.xid = vx_get_task_xid(opts.pid)) <= 1)
 			EXIT("Invalid --xid given", 1);
 	
 	if (cmds.kill) {
-		struct vcmd_ctx_kill_v0 ctxkill = {
-			.pid = (int32_t) opts.pid,
-			.sig = (int32_t) opts.sig
-		};
-		
-		if (vc_ctx_kill(opts.xid, &ctxkill) < 0)
+		if (vc_ctx_kill(opts.xid, opts.pid, opts.sig) < 0)
 			PEXIT("Failed to kill process/context", 2);
 	}
 	

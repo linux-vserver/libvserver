@@ -22,13 +22,15 @@
 #include <config.h>
 #endif
 
+#include <stdlib.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <errno.h>
 #include <getopt.h>
 #include <sys/types.h>
 
-#include "libvserver.h"
+#include "vserver.h"
 #include "tools.h"
 
 #define NAME	"vcontext"
@@ -59,8 +61,8 @@ struct commands {
 };
 
 struct options {
-	struct vcmd_ctx_flags_v0 flags;
-	struct vcmd_ctx_caps_v0 caps;
+	struct vx_flags flags;
+	struct vx_caps caps;
 	xid_t xid;
 	uid_t uid;
 	bool verbose;
@@ -105,7 +107,7 @@ int main(int argc, char *argv[])
 	};
 
 	struct options opts = {
-		.flags		= { .flagword = 0, .mask = 0 },
+		.flags		= { .flags = 0, .mask = 0 },
 		.caps		= { .bcaps = 0, .ccaps = 0, .cmask = 0 },
 		.xid		= 0,
 		.uid		= 0,
@@ -125,7 +127,7 @@ int main(int argc, char *argv[])
 				break;
 			
 			case 'V':
-				CMD_VERSION;
+				CMD_VERSION(NAME, VERSION, DESCR);
 				break;
 			
 			case 'C':
@@ -178,27 +180,27 @@ int main(int argc, char *argv[])
 		EXIT("More than one command given", 1);
 	
 	if (opts.xid <= 1)
-		if ((opts.xid = vc_task_xid(0)) <= 1)
+		if ((opts.xid = vx_get_task_xid(0)) <= 1)
 			EXIT("Invalid --xid given", 1);
 	
 	if (argc <= optind)
 		EXIT("No program given", 1);
 	
-	struct vcmd_vx_info_v0 info;
+	struct vx_info info;
 	
 	if (cmds.create) {
-		if (vc_vx_info(opts.xid, &info) >= 0)
+		if (vx_get_info(opts.xid, &info) >= 0)
 			EXIT("Context already exists", 2);
 		
-		if (vc_ctx_create(opts.xid) < 0)
+		if (vx_create(opts.xid) < 0)
 			PEXIT("Failed to create context", 2);
 	}
 	
-	if (!cmds.create && vc_vx_info(opts.xid, &info) != 0)
+	if (!cmds.create && vx_get_info(opts.xid, &info) != 0)
 		EXIT("Context does not exist", 2);
 	
 	if (cmds.migrate)
-		if (vc_ctx_migrate(opts.xid) < 0)
+		if (vx_migrate(opts.xid) < 0)
 			PEXIT("Failed to migrate to context", 2);
 	
 	if (cmds.setflags || cmds.setcaps)
@@ -214,5 +216,5 @@ int main(int argc, char *argv[])
 	
 	execvp(argv[optind], argv+optind);
 	
-	return EXIT_SUCCESS;
+	exit(EXIT_SUCCESS);
 }
