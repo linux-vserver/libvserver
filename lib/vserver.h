@@ -25,6 +25,8 @@
 #include <config.h>
 #endif
 
+#include <sys/types.h>
+
 /* Constants */
 #define LIBVSERVER_VERSION "0.1"
 

@@ -22,9 +22,11 @@
 #include <config.h>
 #endif
 
-#include "vserver.h"
+#include "syscall-vserver.h"
+#include "linux/vserver/switch.h"
+#include "linux/vserver/signal_cmd.h"
 
-#include "libvserver.h"
+#include "vserver.h"
 
 int vc_ctx_kill(xid_t xid, struct vcmd_ctx_kill_v0 *kill)
 {

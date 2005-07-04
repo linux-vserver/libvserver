@@ -22,9 +22,11 @@
 #include <config.h>
 #endif
 
-#include "vserver.h"
+#include "syscall-vserver.h"
+#include "linux/vserver/switch.h"
+#include "linux/vserver/namespace.h"
 
-#include "libvserver.h"
+#include "vserver.h"
 
 int vc_set_vhi_name(xid_t xid, uint32_t field, char *name)
 {

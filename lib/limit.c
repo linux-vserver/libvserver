@@ -22,9 +22,11 @@
 #include <config.h>
 #endif
 
-#include "vserver.h"
+#include "syscall-vserver.h"
+#include "linux/vserver/switch.h"
+#include "linux/vserver/limit_cmd.h"
 
-#include "libvserver.h"
+#include "vserver.h"
 
 int vc_get_rlimit(xid_t xid, struct vcmd_ctx_rlimit_v0 *rlimit)
 {

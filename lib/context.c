@@ -23,7 +23,8 @@
 #endif
 
 #include "syscall-vserver.h"
-#include <linux/vserver/context_cmd.h>
+#include "linux/vserver/switch.h"
+#include "linux/vserver/context_cmd.h"
 
 #include "vserver.h"
 

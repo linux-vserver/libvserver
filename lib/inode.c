@@ -22,9 +22,11 @@
 #include <config.h>
 #endif
 
-#include "vserver.h"
+#include "syscall-vserver.h"
+#include "linux/vserver/switch.h"
+#include "linux/vserver/inode_cmd.h"
 
-#include "libvserver.h"
+#include "vserver.h"
 
 int vc_get_iattr_v0(struct vcmd_ctx_iattr_v1 *iattr)
 {

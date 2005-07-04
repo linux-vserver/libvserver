@@ -22,9 +22,11 @@
 #include <config.h>
 #endif
 
-#include "vserver.h"
+#include "syscall-vserver.h"
+#include "linux/vserver/switch.h"
+#include "linux/vserver/dlimit_cmd.h"
 
-#include "libvserver.h"
+#include "vserver.h"
 
 int vc_add_dlimit(xid_t xid, struct vcmd_ctx_dlimit_base_v0 *dbase)
 {

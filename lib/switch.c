@@ -22,9 +22,10 @@
 #include <config.h>
 #endif
 
-#include "vserver.h"
+#include "syscall-vserver.h"
+#include "linux/vserver/switch.h"
 
-#include "libvserver.h"
+#include "vserver.h"
 
 int vc_get_version()
 {
