@@ -175,6 +175,7 @@ extern "C" {
 	int nx_set_caps(nid_t nid, const struct nx_caps *caps);
 	int nx_get_caps(nid_t nid, struct nx_caps *caps);
 
+	/* sched.c */
 #define VXSM_FILL_RATE  0x0001
 #define VXSM_INTERVAL   0x0002
 #define VXSM_TOKENS     0x0010
@@ -184,7 +185,6 @@ extern "C" {
 
 #define SCHED_KEEP      (-2)
 
-	/* sched.c */
 	struct vx_sched {
 		uint32_t set_mask;
 		int32_t fill_rate;

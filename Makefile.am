@@ -17,6 +17,7 @@ nobase_include_HEADERS = \
 	linux/vserver/limit_cmd.h \
 	linux/vserver/limit_def.h \
 	linux/vserver/limit.h \
+	linux/vserver/namespace_cmd.h \
 	linux/vserver/namespace.h \
 	linux/vserver/network_cmd.h \
 	linux/vserver/network.h \
