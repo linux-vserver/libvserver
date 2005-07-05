@@ -22,6 +22,8 @@
 #include <config.h>
 #endif
 
+#include <string.h>
+
 #include "syscall-vserver.h"
 #include "linux/vserver/switch.h"
 #include "linux/vserver/inode_cmd.h"
@@ -29,22 +31,30 @@
 #include "vserver.h"
 
 /* TODO Convert to new API */
-int vc_get_iattr_v0(struct vcmd_ctx_iattr_v1 *iattr)
+int vx_get_iattr(const char *name, struct vx_iattr *iattr)
 {
-	return vserver(VCMD_get_iattr_v0, 0, iattr);
+	struct vcmd_ctx_iattr_v1 res;
+
+	res.name = name;
+
+	if (vserver(VCMD_get_iattr, 0, &res) < 0)
+		return -1;
+
+	iattr->xid   = res.xid;
+	iattr->flags = res.flags;
+	iattr->mask  = res.mask;
+
+	return 0;
 }
 
-int vc_set_iattr_v0(struct vcmd_ctx_iattr_v1 *iattr)
+int vx_set_iattr(const char *name, const struct vx_iattr *iattr)
 {
-	return vserver(VCMD_set_iattr_v0, 0, iattr);
-}
+	struct vcmd_ctx_iattr_v1 res;
 
-int vc_get_iattr(struct vcmd_ctx_iattr_v0 *iattr)
-{
-	return vserver(VCMD_get_iattr, 0, iattr);
-}
+	res.name = name;
+	res.xid   = iattr->xid;
+	res.flags = iattr->flags;
+	res.mask  = iattr->mask;
 
-int vc_set_iattr(struct vcmd_ctx_iattr_v0 *iattr)
-{
-	return vserver(VCMD_set_iattr, 0, iattr);
+	return vserver(VCMD_set_iattr, 0, &res);
 }

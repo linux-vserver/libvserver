@@ -106,6 +106,7 @@ extern "C" {
 	
 	/* inode.c */
 	struct vx_iattr {
+		xid_t xid;
 		uint32_t flags;
 		uint32_t mask;
 	};
