@@ -99,6 +99,7 @@ extern "C" {
 		uint32_t inodes_used;
 		uint32_t inodes_total;
 		uint32_t reserved;
+		uint32_t flags;
 	};
 	
 	int vx_set_dlimit(xid_t xid, const char *name, const struct vx_dlimit *dlimit);

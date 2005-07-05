@@ -28,23 +28,70 @@
 
 #include "vserver.h"
 
-/* TODO Convert to new API */
-int vc_add_dlimit(xid_t xid, struct vcmd_ctx_dlimit_base_v0 *dbase)
+int vc_add_dlimit(xid_t xid, const char *name, uint32_t flags)
 {
-	return vserver(VCMD_add_dlimit, xid, dbase);
+	struct vcmd_ctx_dlimit_base_v0 res;
+
+	if (!name) {
+		errno = EFAULT;
+		return -1;
+	}
+
+	res.name = name;
+	res.flags = flags;
+
+	return vserver(VCMD_add_dlimit, xid, &res);
 }
 
-int vc_rem_dlimit(xid_t xid, struct vcmd_ctx_dlimit_base_v0 *dbase)
+int vc_rem_dlimit(xid_t xid, const char *name)
 {
-	return vserver(VCMD_rem_dlimit, xid, dbase);
+	struct vcmd_ctx_dlimit_base_v0 res;
+
+	res.name = name;
+
+	return vserver(VCMD_rem_dlimit, xid, &res);
 }
 
-int vc_set_dlimit(xid_t xid, struct vcmd_ctx_dlimit_v0 *dlimit)
+int vc_set_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
 {
+	struct vcmd_ctx_dlimit_v0 res;
+
+	if (!dlimit) {
+		errno = EFAULT;
+		return -1;
+	}
+
+	res.name         = name;
+	res.space_used   = dlimit->space_used;
+	res.space_total  = dlimit->space_total;
+	res.inodes_used  = dlimit->inodes_used;
+	res.inodes_total = dlimit->inodes_total;
+	res.reserved     = dlimit->reserved;
+	res.flags        = dlimit->flags;
+
 	return vserver(VCMD_set_dlimit, xid, dlimit);
 }
 
-int vc_get_dlimit(xid_t xid, struct vcmd_ctx_dlimit_v0 *dlimit)
+int vc_get_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
 {
-	return vserver(VCMD_get_dlimit, xid, dlimit);
+	struct vcmd_ctx_dlimit_v0 res;
+
+	if (!dlimit) {
+		errno = EFAULT;
+		return -1;
+	}
+
+	res.name = name;
+
+	if (vserver(VCMD_get_dlimit, xid, dlimit) < 0)
+		return -1;
+
+	dlimit->space_used   = res.space_used;
+	dlimit->space_total  = res.space_total;
+	dlimit->inodes_used  = res.inodes_used;
+	dlimit->inodes_total = res.inodes_total;
+	dlimit->reserved     = res.reserved;
+	dlimit->flags        = res.flags;
+
+	return 0;
 }
