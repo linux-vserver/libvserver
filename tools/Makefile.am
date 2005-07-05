@@ -1,7 +1,7 @@
 INCLUDES = -I$(top_srcdir)/lib -I$(top_srcdir)
 METASOURCES = AUTO
 
-AM_CFLAGS = -Wall-gnu99
+AM_CFLAGS = -Wall -std=gnu99
 
 sbin_PROGRAMS = vcontext vnamespace vlimit vsched vnetwork vdlimit vinode vinfo vsignal vuname
 

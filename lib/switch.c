@@ -27,9 +27,8 @@
 
 #include "vserver.h"
 
-int vc_get_version()
+int vs_get_version()
 {
-	int rc = vserver(VCMD_get_version, 0, NULL);
-	return rc;
+	return vserver(VCMD_get_version, 0, NULL);
 }
 
