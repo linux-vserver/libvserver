@@ -30,7 +30,6 @@
 
 #include "vserver.h"
 
-/* TODO Convert to new API */
 int vx_get_iattr(const char *name, struct vx_iattr *iattr)
 {
 	struct vcmd_ctx_iattr_v1 res;
