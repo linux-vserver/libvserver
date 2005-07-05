@@ -53,7 +53,7 @@ extern "C" {
 	
 	int vx_get_info(xid_t xid, struct vx_info *info);
 	
-	int vx_create(xid_t xid);
+	int vx_create(xid_t xid, uint64_t flags);
 	int vx_migrate(xid_t xid);
 	
 	struct vx_flags {
@@ -147,7 +147,7 @@ extern "C" {
 	
 	int nx_get_info(nid_t nid, struct nx_info *info);
 	
-	int nx_create(nid_t nid);
+	int nx_create(nid_t nid, uint64_t flags);
 	int nx_migrate(nid_t nid);
 	
 	struct nx_net {

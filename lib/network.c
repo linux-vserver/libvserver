@@ -52,9 +52,13 @@ int nx_get_info(nid_t nid, struct nx_info *info)
 	return 0;
 }
 
-int nx_create(nid_t nid)
+int nx_create(nid_t nid, uint64_t flags)
 {
-	return vserver(VCMD_net_create_v0, nid, NULL);
+	struct vcmd_net_create res;
+
+	res.flagword = flags;
+
+	return vserver(VCMD_net_create, nid, &res);
 }
 
 int nx_migrate(nid_t nid)

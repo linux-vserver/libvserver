@@ -51,9 +51,13 @@ int vx_get_info(xid_t xid, struct vx_info *info)
 	return 0;
 }
 
-int vx_create(xid_t xid)
+int vx_create(xid_t xid, uint64_t flags)
 {
-	return vserver(VCMD_ctx_create_v0, xid, NULL);
+	struct vcmd_ctx_create res;
+
+	res.flagword = flags;
+
+	return vserver(VCMD_ctx_create, xid, &res);
 }
 
 int vx_migrate(xid_t xid)

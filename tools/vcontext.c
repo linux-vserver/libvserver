@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
 		if (vx_get_info(opts.xid, &info) >= 0)
 			EXIT("Context already exists", 2);
 		
-		if (vx_create(opts.xid) < 0)
+		if (vx_create(opts.xid, 0) < 0)
 			PEXIT("Failed to create context", 2);
 	}
 	
