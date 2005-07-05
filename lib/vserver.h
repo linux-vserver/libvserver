@@ -150,15 +150,15 @@ extern "C" {
 	int nx_create(nid_t nid, uint64_t flags);
 	int nx_migrate(nid_t nid);
 	
-	struct nx_net {
+	struct nx_addr {
 		uint16_t type;
 		uint16_t count;
 		uint32_t ip[4];
 		uint32_t mask[4];
 	};
 	
-	int nx_add_net(nid_t nid, const struct nx_net *net);
-	int nx_rem_net(nid_t nid, const struct nx_net *net);
+	int nx_add_addr(nid_t nid, const struct nx_addr *net);
+	int nx_rem_addr(nid_t nid, const struct nx_addr *net);
 	
 	struct nx_flags {
 		uint64_t flags;

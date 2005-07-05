@@ -66,9 +66,9 @@ int nx_migrate(nid_t nid)
 	return vserver(VCMD_net_migrate, nid, NULL);
 }
 
-int nx_add_net(nid_t nid, const struct nx_net *net)
+int nx_add_addr(nid_t nid, const struct nx_addr *net)
 {
-	struct vcmd_net_nx_v0 res;
+	struct vcmd_net_addr_v0 res;
 
 	if (!net) {
 		errno = EFAULT;
@@ -83,9 +83,9 @@ int nx_add_net(nid_t nid, const struct nx_net *net)
 	return vserver(VCMD_net_add, nid, &res);
 }
 
-int vx_rem_net(nid_t nid, const struct nx_net *net)
+int nx_rem_addr(nid_t nid, const struct nx_addr *net)
 {
-	struct vcmd_net_nx_v0 res;
+	struct vcmd_net_addr_v0 res;
 
 	if (!net) {
 		errno = EFAULT;
