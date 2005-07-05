@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
 		EXIT("More than one command given", 1);
 	
 	if (opts.xid <= 1)
-		if ((opts.xid = vc_task_xid(0)) <= 1)
+		if ((opts.xid = vx_get_task_xid(0)) <= 1)
 			EXIT("Invalid --xid given", 1);
 	
 	if (argc <= optind)

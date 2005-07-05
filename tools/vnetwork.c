@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
 		EXIT("More than one command given", 1);
 	
 	if (opts.nid <= 1)
-		if ((opts.nid = vc_task_nid(0)) <= 1)
+		if ((opts.nid = nx_get_task_nid(0)) <= 1)
 			EXIT("Invalid --nid given", 1);
 	
 	if (argc <= optind)
