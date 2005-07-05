@@ -24,7 +24,7 @@
 
 #include "syscall-vserver.h"
 #include "linux/vserver/switch.h"
-#include "linux/vserver/namespace.h"
+#include "linux/vserver/namespace_cmd.h"
 
 #include "vserver.h"
 

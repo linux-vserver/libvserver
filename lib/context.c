@@ -53,7 +53,7 @@ int vx_get_info(xid_t xid, struct vx_info *info)
 
 int vx_create(xid_t xid)
 {
-	return vserver(VCMD_ctx_create, xid, NULL);
+	return vserver(VCMD_ctx_create_v0, xid, NULL);
 }
 
 int vx_migrate(xid_t xid)

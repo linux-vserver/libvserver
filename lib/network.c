@@ -54,7 +54,7 @@ int nx_get_info(nid_t nid, struct nx_info *info)
 
 int nx_create(nid_t nid)
 {
-	return vserver(VCMD_net_create, nid, NULL);
+	return vserver(VCMD_net_create_v0, nid, NULL);
 }
 
 int nx_migrate(nid_t nid)

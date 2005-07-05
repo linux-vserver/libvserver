@@ -26,13 +26,13 @@
 
 #include "syscall-vserver.h"
 #include "linux/vserver/switch.h"
-#include "linux/vserver/namespace.h"
+#include "linux/vserver/cvirt_cmd.h"
 
 #include "vserver.h"
 
 int vx_set_vhi_name(xid_t xid, uint32_t field, const char *name)
 {
-	struct vcmd_vx_vhi_name_v0 vhiname;
+	struct vcmd_vhi_name_v0 vhiname;
 	size_t len = sizeof(vhiname.name);
 
 	if (!name) {
@@ -44,12 +44,12 @@ int vx_set_vhi_name(xid_t xid, uint32_t field, const char *name)
 	strncpy(vhiname.name, name, len-1);
 	vhiname.name[len] = '\0';
 
-	return vserver(VCMD_vx_set_vhi_name, xid, &vhiname);
+	return vserver(VCMD_set_vhi_name, xid, &vhiname);
 }
 
 int vx_get_vhi_name(xid_t xid, uint32_t field, char *name, size_t len)
 {
-	struct vcmd_vx_vhi_name_v0 vhiname;
+	struct vcmd_vhi_name_v0 vhiname;
 
 	if (!name) {
 		errno = EFAULT;
@@ -57,7 +57,7 @@ int vx_get_vhi_name(xid_t xid, uint32_t field, char *name, size_t len)
 	}
 
 	vhiname.field = field;
-	if (vserver(VCMD_vx_get_vhi_name, xid, &vhiname) < 0)
+	if (vserver(VCMD_get_vhi_name, xid, &vhiname) < 0)
 		return -1;
 
 	strncpy(name, vhiname.name, len-1);

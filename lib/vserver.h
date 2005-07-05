@@ -74,8 +74,8 @@ extern "C" {
 	int vx_get_caps(xid_t xid, struct vx_caps *caps);
 	
 	/* cvirt.c */
-#ifndef _VX_NAMESPACE_H /* Don't conflict with the kernel definition */
-	enum vx_vhi_name_field {
+#ifndef _VX_CVIRT_CMD_H /* Don't conflict with the kernel definition */
+	enum vhi_name_field {
 		VHIN_CONTEXT=0,
 		VHIN_SYSNAME,
 		VHIN_NODENAME,
