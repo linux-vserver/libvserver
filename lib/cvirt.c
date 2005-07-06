@@ -33,7 +33,6 @@
 int vx_set_vhi_name(xid_t xid, uint32_t field, const char *name)
 {
 	struct vcmd_vhi_name_v0 vhiname;
-	size_t len = sizeof(vhiname.name);
 
 	if (!name) {
 		errno = EFAULT;
@@ -41,8 +40,8 @@ int vx_set_vhi_name(xid_t xid, uint32_t field, const char *name)
 	}
 
 	vhiname.field = field;
-	strncpy(vhiname.name, name, len-1);
-	vhiname.name[len] = '\0';
+	strncpy(vhiname.name, name, VHI_SIZE-1);
+	vhiname.name[VHI_SIZE] = '\0';
 
 	return vserver(VCMD_set_vhi_name, xid, &vhiname);
 }

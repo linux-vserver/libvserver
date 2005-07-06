@@ -37,8 +37,6 @@
 #define NAME	"vuname"
 #define DESCR	"Virtual Host Information Manager"
 
-#define VHI_LENGTH 65
-
 #define SHORT_OPTS "hVGS:x:vq"
 
 struct option const
@@ -61,13 +59,13 @@ struct commands {
 };
 
 struct vhi_name_fields {
-	char context[VHI_LENGTH];
-	char sysname[VHI_LENGTH];
-	char nodename[VHI_LENGTH];
-	char release[VHI_LENGTH];
-	char version[VHI_LENGTH];
-	char machine[VHI_LENGTH];
-	char domainname[VHI_LENGTH];
+	char context[VHI_SIZE];
+	char sysname[VHI_SIZE];
+	char nodename[VHI_SIZE];
+	char release[VHI_SIZE];
+	char version[VHI_SIZE];
+	char machine[VHI_SIZE];
+	char domainname[VHI_SIZE];
 };
 
 struct options {
@@ -80,25 +78,25 @@ struct options {
 /* TODO Reduce code... */
 void get_vhi_names(xid_t xid, struct vhi_name_fields *vhi)
 {
-	if (vx_get_vhi_name(xid, VHIN_CONTEXT, vhi->context, VHI_LENGTH) == -1)
+	if (vx_get_vhi_name(xid, VHIN_CONTEXT, vhi->context, VHI_SIZE) == -1)
 		PEXIT("Failed to get context name", 2);
 
-	if (vx_get_vhi_name(xid, VHIN_SYSNAME, vhi->sysname, VHI_LENGTH) == -1)
+	if (vx_get_vhi_name(xid, VHIN_SYSNAME, vhi->sysname, VHI_SIZE) == -1)
 		PEXIT("Failed to get sysname", 2);
 
-	if (vx_get_vhi_name(xid, VHIN_NODENAME, vhi->nodename, VHI_LENGTH) == -1)
+	if (vx_get_vhi_name(xid, VHIN_NODENAME, vhi->nodename, VHI_SIZE) == -1)
 		PEXIT("Failed to get nodename", 2);
 
-	if (vx_get_vhi_name(xid, VHIN_RELEASE, vhi->release, VHI_LENGTH) == -1)
+	if (vx_get_vhi_name(xid, VHIN_RELEASE, vhi->release, VHI_SIZE) == -1)
 		PEXIT("Failed to get release", 2);
 
-	if (vx_get_vhi_name(xid, VHIN_VERSION, vhi->version, VHI_LENGTH) == -1)
+	if (vx_get_vhi_name(xid, VHIN_VERSION, vhi->version, VHI_SIZE) == -1)
 		PEXIT("Failed to get version", 2);
 
-	if (vx_get_vhi_name(xid, VHIN_MACHINE, vhi->machine, VHI_LENGTH) == -1)
+	if (vx_get_vhi_name(xid, VHIN_MACHINE, vhi->machine, VHI_SIZE) == -1)
 		PEXIT("Failed to get machine name", 2);
 
-	if (vx_get_vhi_name(xid, VHIN_DOMAINNAME, vhi->domainname, VHI_LENGTH) == -1)
+	if (vx_get_vhi_name(xid, VHIN_DOMAINNAME, vhi->domainname, VHI_SIZE) == -1)
 		PEXIT("Failed to get domainname", 2);
 }
 
@@ -128,13 +126,13 @@ int format2vhi(char *format, struct vhi_name_fields *vhi)
 	if (i != 6)
 		return -1;
 
-	strncpy(vhi->context, strsep(&format, delim), VHI_LENGTH);
-	strncpy(vhi->sysname, strsep(&format, delim), VHI_LENGTH);
-	strncpy(vhi->nodename, strsep(&format, delim), VHI_LENGTH);
-	strncpy(vhi->release, strsep(&format, delim), VHI_LENGTH);
-	strncpy(vhi->version, strsep(&format, delim), VHI_LENGTH);
-	strncpy(vhi->machine, strsep(&format, delim), VHI_LENGTH);
-	strncpy(vhi->domainname, strsep(&format, delim), VHI_LENGTH);
+	strncpy(vhi->context, strsep(&format, delim), VHI_SIZE);
+	strncpy(vhi->sysname, strsep(&format, delim), VHI_SIZE);
+	strncpy(vhi->nodename, strsep(&format, delim), VHI_SIZE);
+	strncpy(vhi->release, strsep(&format, delim), VHI_SIZE);
+	strncpy(vhi->version, strsep(&format, delim), VHI_SIZE);
+	strncpy(vhi->machine, strsep(&format, delim), VHI_SIZE);
+	strncpy(vhi->domainname, strsep(&format, delim), VHI_SIZE);
 
 	return 0;
 }

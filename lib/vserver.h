@@ -74,6 +74,8 @@ extern "C" {
 	int vx_get_caps(xid_t xid, struct vx_caps *caps);
 	
 	/* cvirt.c */
+#define VHI_SIZE (size_t) 65
+
 #ifndef _VX_CVIRT_CMD_H /* Don't conflict with the kernel definition */
 	enum vhi_name_field {
 		VHIN_CONTEXT=0,
