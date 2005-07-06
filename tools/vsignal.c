@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
 	struct options opts = {
 		.pid		= (pid_t) 0,
 		.sig		= (int32_t) SIGKILL,
-		.xid		= (xid_t) 1,
+		.xid		= XID_SELF,
 		.verbose	= false,
 		.quiet		= false
 	};
@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
 				break;
 			
 			case 'V':
-				CMD_VERSION(NAME, VERSION, DESCR);
+				CMD_VERSION(NAME, DESCR);
 				break;
 			
 			case 'K':

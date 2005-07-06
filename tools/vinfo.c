@@ -43,7 +43,7 @@
 #define T_RLIMIT      'F'
 #define T_RLIMITMASK  'G'
 #define T_IATTR       'H'
-#define T_UTSNAME     'I'
+#define T_UNAME       'I'
 #define T_TASK_NID    'J'
 #define T_NX_INFO     'K'
 #define T_NFLAGS      'L'
@@ -64,7 +64,7 @@ struct option LONG_OPTS[] = {
 	{ "rlimit",		no_argument, 		0, T_RLIMIT },
 	{ "rlimitmask",	no_argument, 		0, T_RLIMITMASK },
 	{ "iattr",		required_argument,	0, T_IATTR },
-	{ "utsname",	no_argument, 		0, T_UTSNAME },
+	{ "uname",		no_argument, 		0, T_UNAME },
 	{ "task-nid",	required_argument,	0, T_TASK_NID },
 	{ "nx-info",	no_argument, 		0, T_NX_INFO },
 	{ "nflags",		no_argument, 		0, T_NFLAGS },
@@ -109,8 +109,8 @@ void cmd_help()
 	       "  Inode information:\n"
 	       "    --iattr <inode>         Print inode information\n"
 	       "\n"
-	       "  Namespace information:\n"
-	       "    --vhi                   Print virtual informations aka UTS\n"
+	       "  Virtual host information:\n"
+	       "    --uname                 Print virtual host information aka UTS\n"
 	       "\n"
 	       "  Network Context information:\n"
 	       "    --task-nid <pid>        Print nid of process <pid>\n"
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
 	struct commands cmds = {};
 	
 	struct options opts = {
-		.xid     = (xid_t) 1,
+		.xid     = XID_SELF,
 		.verbose = false,
 		.quiet   = false
 	};
@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
 				break;
 			
 			case 'V':
-				CMD_VERSION(NAME, VERSION, DESCR);
+				CMD_VERSION(NAME, DESCR);
 				break;
 			
 			case 'v':

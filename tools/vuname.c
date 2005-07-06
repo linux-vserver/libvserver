@@ -35,18 +35,18 @@
 #include "tools.h"
 
 #define NAME	"vuname"
-#define DESCR	"uts virtualization tool"
+#define DESCR	"Virtual Host Information Manager"
 
 #define VHI_LENGTH 65
 
-#define SHORT_OPTS "hViGI:x:vq"
+#define SHORT_OPTS "hVGS:x:vq"
 
 struct option const
 LONG_OPTS[] = {
 	{ "help",		no_argument, 		0, 'h' },
 	{ "version",	no_argument, 		0, 'V' },
 	{ "get",		no_argument, 		0, 'G' },
-	{ "set",		required_argument,	0, 'I' },
+	{ "set",		required_argument,	0, 'S' },
 	{ "xid",		required_argument,	0, 'x' },
 	{ "verbose",	no_argument, 		0, 'v' },
 	{ "quiet",		no_argument, 		0, 'q' },
@@ -60,7 +60,7 @@ struct commands {
 	bool set;
 };
 
-struct vhifields {
+struct vhi_name_fields {
 	char context[VHI_LENGTH];
 	char sysname[VHI_LENGTH];
 	char nodename[VHI_LENGTH];
@@ -71,14 +71,14 @@ struct vhifields {
 };
 
 struct options {
-	struct vhifields vhifields;
+	struct vhi_name_fields vhi;
 	xid_t xid;
 	bool verbose;
 	bool quiet;
 };
 
 /* TODO Reduce code... */
-void get_vhi_names(xid_t xid, struct vhifields *vhi)
+void get_vhi_names(xid_t xid, struct vhi_name_fields *vhi)
 {
 	if (vx_get_vhi_name(xid, VHIN_CONTEXT, vhi->context, VHI_LENGTH) == -1)
 		PEXIT("Failed to get context name", 2);
@@ -102,7 +102,7 @@ void get_vhi_names(xid_t xid, struct vhifields *vhi)
 		PEXIT("Failed to get domainname", 2);
 }
 
-void print_vhi_names(xid_t xid, struct vhifields *vhi)
+void print_vhi_names(xid_t xid, struct vhi_name_fields *vhi)
 {
 	printf("XID: %d\n", xid);
 	printf("Context: %s\n", vhi->context);
@@ -114,8 +114,8 @@ void print_vhi_names(xid_t xid, struct vhifields *vhi)
 	printf("Domain name: %s\n", vhi->domainname);
 }
 
-	static inline
-int format2vhifields(char *format, struct vhifields *vhifields)
+static inline
+int format2vhi(char *format, struct vhi_name_fields *vhi)
 {
 	const char *delim = ",", *tmp = format;
 	int i = 0;
@@ -128,28 +128,31 @@ int format2vhifields(char *format, struct vhifields *vhifields)
 	if (i != 6)
 		return -1;
 
-	strncpy(vhifields->context, strsep(&format, delim), VHI_LENGTH);
-	strncpy(vhifields->sysname, strsep(&format, delim), VHI_LENGTH);
-	strncpy(vhifields->nodename, strsep(&format, delim), VHI_LENGTH);
-	strncpy(vhifields->release, strsep(&format, delim), VHI_LENGTH);
-	strncpy(vhifields->version, strsep(&format, delim), VHI_LENGTH);
-	strncpy(vhifields->machine, strsep(&format, delim), VHI_LENGTH);
-	strncpy(vhifields->domainname, strsep(&format, delim), VHI_LENGTH);
+	strncpy(vhi->context, strsep(&format, delim), VHI_LENGTH);
+	strncpy(vhi->sysname, strsep(&format, delim), VHI_LENGTH);
+	strncpy(vhi->nodename, strsep(&format, delim), VHI_LENGTH);
+	strncpy(vhi->release, strsep(&format, delim), VHI_LENGTH);
+	strncpy(vhi->version, strsep(&format, delim), VHI_LENGTH);
+	strncpy(vhi->machine, strsep(&format, delim), VHI_LENGTH);
+	strncpy(vhi->domainname, strsep(&format, delim), VHI_LENGTH);
 
 	return 0;
 }
 
-	static inline
-int set_vhiname(xid_t xid, int field, char *name)
+static inline
+int set_vhi_name(xid_t xid, int field, char *name)
 {
 	if (!strlen(name))
 		return 0;
-
+	
+	/* TODO: return the syscall + handle error in main() ? */
 	if (vx_set_vhi_name(xid, field, name) < 0)
 		PEXIT(strcat(strcat("Failed to set VHI field (", (char*) field), ")"), 2);
+	
+	return 0;
 }
 
-	static inline
+static inline
 void cmd_help()
 {
 	printf("Usage: %s <command> <opts>* -- <programm> <args>*\n"
@@ -157,8 +160,8 @@ void cmd_help()
 			"Available commands:\n"
 			"    -h,--help               Show this help message\n"
 			"    -V,--version            Print version information\n"
-			"    -G,--get             Get virtual host information\n"
-			"    -I,--set <format>    Set virtual host information aka UTS described in <format>\n"
+			"    -G,--get                Get virtual host information\n"
+			"    -S,--set <format>       Set virtual host information aka UTS described in <format>\n"
 			"\n"
 			"Available options:\n"
 			"    -x,--xid <xid>          The Context ID\n"
@@ -196,7 +199,7 @@ int main(int argc, char *argv[])
 	};
 
 	struct options opts = {
-		.xid		= (xid_t) 1,
+		.xid		= XID_SELF,
 		.verbose	= false,
 		.quiet		= false
 	};
@@ -213,7 +216,7 @@ int main(int argc, char *argv[])
 				break;
 
 			case 'V':
-				CMD_VERSION(NAME, VERSION, DESCR);
+				CMD_VERSION(NAME, DESCR);
 				break;
 
 			case 'G':
@@ -223,7 +226,7 @@ int main(int argc, char *argv[])
 
 			case 'I':
 				cmds.set = true;
-				if (format2vhifields(optarg, &opts.vhifields))
+				if (format2vhi(optarg, &opts.vhi))
 					EXIT("Invalid vhi format", 1);
 				cmdcnt++;
 				break;
@@ -258,18 +261,18 @@ int main(int argc, char *argv[])
 			EXIT("Invalid --xid given", 1);
 
 	if (cmds.get) {
-		get_vhi_names(opts.xid, &opts.vhifields);
-		print_vhi_names(opts.xid, &opts.vhifields);
+		get_vhi_names(opts.xid, &opts.vhi);
+		print_vhi_names(opts.xid, &opts.vhi);
 	}
 
 	if (cmds.set) {
-		set_vhiname(opts.xid, VHIN_CONTEXT, opts.vhifields.context);
-		set_vhiname(opts.xid, VHIN_SYSNAME, opts.vhifields.sysname);
-		set_vhiname(opts.xid, VHIN_NODENAME, opts.vhifields.nodename);
-		set_vhiname(opts.xid, VHIN_RELEASE, opts.vhifields.release);
-		set_vhiname(opts.xid, VHIN_VERSION, opts.vhifields.version);
-		set_vhiname(opts.xid, VHIN_MACHINE, opts.vhifields.machine);
-		set_vhiname(opts.xid, VHIN_DOMAINNAME, opts.vhifields.domainname);
+		set_vhi_name(opts.xid, VHIN_CONTEXT,    opts.vhi.context);
+		set_vhi_name(opts.xid, VHIN_SYSNAME,    opts.vhi.sysname);
+		set_vhi_name(opts.xid, VHIN_NODENAME,   opts.vhi.nodename);
+		set_vhi_name(opts.xid, VHIN_RELEASE,    opts.vhi.release);
+		set_vhi_name(opts.xid, VHIN_VERSION,    opts.vhi.version);
+		set_vhi_name(opts.xid, VHIN_MACHINE,    opts.vhi.machine);
+		set_vhi_name(opts.xid, VHIN_DOMAINNAME, opts.vhi.domainname);
 	}
 
 	if (argc > optind)

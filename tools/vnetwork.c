@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 	struct commands cmds = {};
 	
 	struct options opts = {
-		.nid     = (nid_t) 1,
+		.nid     = NID_SELF,
 		.verbose = false,
 		.quiet   = false
 	};
@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
 				break;
 			
 			case 'V':
-				CMD_VERSION(NAME, VERSION, DESCR);
+				CMD_VERSION(NAME, DESCR);
 				break;
 			
 			case 'v':

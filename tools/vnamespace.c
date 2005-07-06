@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 	};
 
 	struct options opts = {
-		.xid		= (xid_t) 1,
+		.xid		= XID_SELF,
 		.verbose	= false,
 		.quiet		= false
 	};
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 				break;
 			
 			case 'V':
-				CMD_VERSION(NAME, VERSION, DESCR);
+				CMD_VERSION(NAME, DESCR);
 				break;
 			
 			case 'E':

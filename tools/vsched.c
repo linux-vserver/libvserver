@@ -123,11 +123,11 @@ int main(int argc, char *argv[])
 		.tokens_min    = SCHED_KEEP,
 		.tokens_max    = SCHED_KEEP,
 		.priority_bias = SCHED_KEEP,
-		.set_mask  = 0
+		.set_mask      = 0
 	};
 	
 	struct options opts = {
-		.xid     = (xid_t) 1,
+		.xid     = XID_SELF,
 		.sched   = &sched,
 		.verbose = false,
 		.quiet   = false
@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
 				break;
 			
 			case 'V':
-				CMD_VERSION(NAME, VERSION, DESCR);
+				CMD_VERSION(NAME, DESCR);
 				break;
 			
 			case 'x':

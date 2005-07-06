@@ -35,9 +35,9 @@
 extern "C" {
 #endif
 
-#define XID_SELF  -1
-#define XID_ADMIN  0
-#define XID_WATCH  1
+#define XID_SELF   (xid_t) -1
+#define XID_ADMIN  (xid_t)  0
+#define XID_WATCH  (xid_t)  1
 
 	/* type definitions */
 	typedef uint32_t xid_t;
@@ -139,6 +139,10 @@ extern "C" {
 	int vx_set_namespace();
 	
 	/* network.c */
+#define NID_SELF   (nid_t) -1
+#define NID_ADMIN  (nid_t)  0
+#define NID_WATCH  (nid_t)  1
+
 	int nx_get_task_nid(pid_t pid);
 	
 	struct nx_info {

@@ -18,13 +18,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#define CMD_VERSION(name, version, desc) do { \
-	printf("%s %s -- %s\n", name, version, desc); \
-	printf("This program is part of libvserver\n\n"); \
+#define CMD_VERSION(name, desc) do { \
+	printf("%s -- %s\n", name, desc); \
+	printf("This program is part of %s\n\n", PACKAGE_STRING); \
 	\
-	printf("Copyright (c) 2005 Benedikt Boehm <hollow@gentoo.org>\n"); \
+	printf("Copyright (c) 2005 The libvserver Team\n"); \
 	printf("This program is free software; you can redistribute it and/or\n"); \
 	printf("modify it under the terms of the GNU General Public License\n"); \
+	exit(0); \
 }	while(0)
 
 /* exit, silent exit, perror exit

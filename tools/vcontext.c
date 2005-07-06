@@ -109,8 +109,8 @@ int main(int argc, char *argv[])
 	struct options opts = {
 		.flags		= { .flags = 0, .mask = 0 },
 		.caps		= { .bcaps = 0, .ccaps = 0, .cmask = 0 },
-		.xid		= 0,
-		.uid		= 0,
+		.xid		= XID_SELF,
+		.uid		= (uid_t) 0,
 		.verbose	= false,
 		.quiet		= false
 	};
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
 				break;
 			
 			case 'V':
-				CMD_VERSION(NAME, VERSION, DESCR);
+				CMD_VERSION(NAME, DESCR);
 				break;
 			
 			case 'C':
