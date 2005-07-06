@@ -40,14 +40,14 @@
 
 static const
 struct option LONG_OPTS[] = {
-	{ "help",		no_argument, 		0, 'h' },
-	{ "version",	no_argument, 		0, 'V' },
-	{ "create",		no_argument, 		0, 'C' },
-	{ "migrate",	no_argument, 		0, 'M' },
-	{ "set-flags",	no_argument, 		0, 'F' },
-	{ "set-caps",	no_argument, 		0, 'X' },
-	{ "xid",		required_argument, 	0, 'x' },
-	{ "uid",		required_argument, 	0, 'u' },
+	{ "help",      no_argument,       0, 'h' },
+	{ "version",   no_argument,       0, 'V' },
+	{ "create",    no_argument,       0, 'C' },
+	{ "migrate",   no_argument,       0, 'M' },
+	{ "set-flags", no_argument,       0, 'F' },
+	{ "set-caps",  no_argument,       0, 'X' },
+	{ "xid",       required_argument, 0, 'x' },
+	{ "uid",       required_argument, 0, 'u' },
 	{ 0,0,0,0 }
 };
 
@@ -101,96 +101,79 @@ int main(int argc, char *argv[])
 		.xid		= XID_SELF,
 		.uid		= (uid_t) 0
 	};
-	
-	int c, cmdcnt = 0;
-	
+
+	int c;
+
 	while (1) {
 		c = getopt_long(argc, argv, SHORT_OPTS, LONG_OPTS, 0);
 		if (c == -1) break;
-		
+
 		switch (c) {
 			case 'h':
 				cmd_help();
 				break;
-			
+
 			case 'V':
 				CMD_VERSION(NAME, DESCR);
 				break;
-			
+
 			case 'C':
 				cmds.create = true;
-				cmdcnt++;
 				break;
-			
+
 			case 'M':
 				cmds.migrate = true;
-				cmdcnt++;
 				break;
-			
+
 			case 'F':
 				cmds.setflags = true;
-				cmdcnt++;
 				break;
-			
+
 			case 'X':
 				cmds.setcaps = true;
-				cmdcnt++;
 				break;
-			
+
 			case 'x':
 				opts.xid = (xid_t) atoi(optarg);
 				break;
-			
+
 			case 'u':
 				opts.uid = (uid_t) atoi(optarg);
 				break;
-			
+
 			default:
 				printf("Try '%s --help' for more information\n", argv[0]);
 				return 1;
 				break;
 		}
 	}
-	
+
 	if (getuid() != 0)
-		SEXIT("This programm requires root privileges", 1);
-	
-	if (cmdcnt == 0)
-		EXIT("No command given", 1);
-	
+		SEXIT("This program requires root privileges", 1);
+
 	if (cmds.create && cmds.migrate)
 		EXIT("Can't create and migrate at the same time", 1);
-	
-	struct vx_info info;
-	
-	if (cmds.create) {
-		if (vx_get_info(opts.xid, &info) >= 0)
-			EXIT("Context already exists", 2);
-		
+
+	if (cmds.create)
 		if (vx_create(opts.xid, 0) < 0)
 			PEXIT("Failed to create context", 2);
-	}
-	
-	if (!cmds.create && vx_get_info(opts.xid, &info) != 0)
-		EXIT("Context does not exist", 2);
-	
+
 	if (cmds.migrate)
 		if (vx_migrate(opts.xid) < 0)
 			PEXIT("Failed to migrate to context", 2);
-	
-	if (cmds.setflags || cmds.setcaps)
-		SEXIT("Not implemented yet...", 1);
-	
-	if (opts.uid > 0) {
+
+	if (cmds.setflags)
+		SEXIT("--set-flags not implemented yet...", 1);
+
+	if (cmds.setcaps)
+		SEXIT("--set-caps not implemented yet...", 1);
+
+	if (opts.uid > 0)
 		if (setuid(opts.uid) < 0)
 			PEXIT("Failed to change user id", 3);
-		
-		if (getuid() != opts.uid)
-			SEXIT("getuid() returns wrong user id", 3);
-	}
-	
+
 	if (argc > optind)
 		execvp(argv[optind], argv+optind);
-	
+
 	return EXIT_SUCCESS;
 }
