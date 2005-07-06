@@ -33,10 +33,10 @@
 #include "vserver.h"
 #include "tools.h"
 
-#define NAME	"vcontext"
-#define DESCR	"Context Manager"
+#define NAME  "vcontext"
+#define DESCR "Context Manager"
 
-#define SHORT_OPTS "hVCMF:X:x:u:vq"
+#define SHORT_OPTS "hVCMF:X:x:u:"
 
 static const
 struct option LONG_OPTS[] = {
@@ -48,8 +48,6 @@ struct option LONG_OPTS[] = {
 	{ "set-caps",	no_argument, 		0, 'X' },
 	{ "xid",		required_argument, 	0, 'x' },
 	{ "uid",		required_argument, 	0, 'u' },
-	{ "verbose",	no_argument, 		0, 'v' },
-	{ "quiet",		no_argument, 		0, 'q' },
 	{ 0,0,0,0 }
 };
 
@@ -65,8 +63,6 @@ struct options {
 	struct vx_caps caps;
 	xid_t xid;
 	uid_t uid;
-	bool verbose;
-	bool quiet;
 };
 
 static inline
@@ -85,20 +81,13 @@ void cmd_help()
 	       "Available options:\n"
 	       "    -x,--xid <xid>          The Context ID\n"
 	       "    -u,--uid <uid>          Set the uid of the current process\n"
-	       "\n"
-	       "Generic options:\n"
-	       "    -v,--verbose            Print verbose information\n"
-	       "    -q,--quiet              Be quiet\n"
 	       "\n",
 	       NAME);
-	exit(0);
+	exit(EXIT_SUCCESS);
 }
 
 int main(int argc, char *argv[])
 {
-	if (getuid() != 0)
-		EXIT("This programm requires root privileges", 1);
-	
 	struct commands cmds = {
 		.create		= false,
 		.migrate	= false,
@@ -110,9 +99,7 @@ int main(int argc, char *argv[])
 		.flags		= { .flags = 0, .mask = 0 },
 		.caps		= { .bcaps = 0, .ccaps = 0, .cmask = 0 },
 		.xid		= XID_SELF,
-		.uid		= (uid_t) 0,
-		.verbose	= false,
-		.quiet		= false
+		.uid		= (uid_t) 0
 	};
 	
 	int c, cmdcnt = 0;
@@ -123,7 +110,7 @@ int main(int argc, char *argv[])
 		
 		switch (c) {
 			case 'h':
-				cmd_help(0);
+				cmd_help();
 				break;
 			
 			case 'V':
@@ -158,14 +145,6 @@ int main(int argc, char *argv[])
 				opts.uid = (uid_t) atoi(optarg);
 				break;
 			
-			case 'v':
-				opts.verbose = true;
-				break;
-			
-			case 'q':
-				opts.quiet = true;
-				break;
-			
 			default:
 				printf("Try '%s --help' for more information\n", argv[0]);
 				return 1;
@@ -173,18 +152,14 @@ int main(int argc, char *argv[])
 		}
 	}
 	
+	if (getuid() != 0)
+		SEXIT("This programm requires root privileges", 1);
+	
 	if (cmdcnt == 0)
 		EXIT("No command given", 1);
 	
-	if (cmdcnt > 1)
-		EXIT("More than one command given", 1);
-	
-	if (opts.xid <= 1)
-		if ((opts.xid = vx_get_task_xid(0)) <= 1)
-			EXIT("Invalid --xid given", 1);
-	
-	if (argc <= optind)
-		EXIT("No program given", 1);
+	if (cmds.create && cmds.migrate)
+		EXIT("Can't create and migrate at the same time", 1);
 	
 	struct vx_info info;
 	
@@ -214,7 +189,8 @@ int main(int argc, char *argv[])
 			SEXIT("getuid() returns wrong user id", 3);
 	}
 	
-	execvp(argv[optind], argv+optind);
+	if (argc > optind)
+		execvp(argv[optind], argv+optind);
 	
-	exit(EXIT_SUCCESS);
+	return EXIT_SUCCESS;
 }
