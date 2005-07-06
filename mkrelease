@@ -31,7 +31,7 @@ svn copy ${svnroot}/trunk ${svnroot}/tags/release-${ver} \
 
 echo "Exporting release..."
 
-svn export ${svnroot}/trunk ${proj}-${ver}/ &>/dev/null || die "svn export failed"
+svn export ${svnroot}/tags/release-${ver} ${proj}-${ver}/ &>/dev/null || die "svn export failed"
 pushd ${proj}-${ver} &>/dev/null || die "pushd failed"
 
 echo "Running autotools..."
