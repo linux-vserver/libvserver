@@ -224,7 +224,7 @@ int main(int argc, char *argv[])
 				cmdcnt++;
 				break;
 
-			case 'I':
+			case 'S':
 				cmds.set = true;
 				if (format2vhi(optarg, &opts.vhi))
 					EXIT("Invalid vhi format", 1);
