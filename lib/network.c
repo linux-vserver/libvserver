@@ -66,7 +66,7 @@ int nx_migrate(nid_t nid)
 	return vserver(VCMD_net_migrate, nid, NULL);
 }
 
-int nx_add_addr(nid_t nid, const struct nx_addr *net)
+int nx_add_addr(nid_t nid, struct nx_addr *net)
 {
 	struct vcmd_net_addr_v0 res;
 
@@ -83,7 +83,7 @@ int nx_add_addr(nid_t nid, const struct nx_addr *net)
 	return vserver(VCMD_net_add, nid, &res);
 }
 
-int nx_rem_addr(nid_t nid, const struct nx_addr *net)
+int nx_rem_addr(nid_t nid, struct nx_addr *net)
 {
 	struct vcmd_net_addr_v0 res;
 
@@ -118,7 +118,7 @@ int nx_get_flags(nid_t nid, struct nx_flags *flags)
 	return 0;
 }
 
-int nx_set_flags(nid_t nid, const struct nx_flags *flags)
+int nx_set_flags(nid_t nid, struct nx_flags *flags)
 {
 	struct vcmd_net_flags_v0 res;
 
@@ -151,7 +151,7 @@ int nx_get_caps(nid_t nid, struct nx_caps *caps)
 	return 0;
 }
 
-int nx_set_caps(nid_t nid, const struct nx_caps *caps)
+int nx_set_caps(nid_t nid, struct nx_caps *caps)
 {
 	struct vcmd_net_caps_v0 res;
 

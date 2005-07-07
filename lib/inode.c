@@ -46,7 +46,7 @@ int vx_get_iattr(const char *name, struct vx_iattr *iattr)
 	return 0;
 }
 
-int vx_set_iattr(const char *name, const struct vx_iattr *iattr)
+int vx_set_iattr(const char *name, struct vx_iattr *iattr)
 {
 	struct vcmd_ctx_iattr_v1 res;
 

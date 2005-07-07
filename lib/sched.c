@@ -28,7 +28,7 @@
 
 #include "vserver.h"
 
-int vx_set_sched(xid_t xid, const struct vx_sched *sched)
+int vx_set_sched(xid_t xid, struct vx_sched *sched)
 {
 	struct vcmd_set_sched_v3 res;
 

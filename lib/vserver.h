@@ -61,7 +61,7 @@ extern "C" {
 		uint64_t mask;
 	};
 
-	int vx_set_flags(xid_t xid, const struct vx_flags *flags);
+	int vx_set_flags(xid_t xid, struct vx_flags *flags);
 	int vx_get_flags(xid_t xid, struct vx_flags *flags);
 
 	struct vx_caps {
@@ -70,7 +70,7 @@ extern "C" {
 		uint64_t cmask;
 	};
 
-	int vx_set_caps(xid_t xid, const struct vx_caps *caps);
+	int vx_set_caps(xid_t xid, struct vx_caps *caps);
 	int vx_get_caps(xid_t xid, struct vx_caps *caps);
 
 	/* cvirt.c */
@@ -104,7 +104,7 @@ extern "C" {
 		uint32_t flags;
 	};
 
-	int vx_set_dlimit(xid_t xid, const char *name, const struct vx_dlimit *dlimit);
+	int vx_set_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit);
 	int vx_get_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit);
 
 	/* inode.c */
@@ -114,7 +114,7 @@ extern "C" {
 		uint32_t mask;
 	};
 
-	int vx_set_iattr(const char *name, const struct vx_iattr *iattr);
+	int vx_set_iattr(const char *name, struct vx_iattr *iattr);
 	int vx_get_iattr(const char *name, struct vx_iattr *iattr);
 
 	/* limit.c */
@@ -124,7 +124,7 @@ extern "C" {
 		uint64_t maximum;
 	};
 
-	int vx_set_rlimit(xid_t xid, uint32_t id, const struct vx_rlimit *rlimit);
+	int vx_set_rlimit(xid_t xid, uint32_t id, struct vx_rlimit *rlimit);
 	int vx_get_rlimit(xid_t xid, uint32_t id, struct vx_rlimit *rlimit);
 
 	struct vx_rlimit_mask {
@@ -163,15 +163,15 @@ extern "C" {
 		uint32_t mask[4];
 	};
 
-	int nx_add_addr(nid_t nid, const struct nx_addr *net);
-	int nx_rem_addr(nid_t nid, const struct nx_addr *net);
+	int nx_add_addr(nid_t nid, struct nx_addr *net);
+	int nx_rem_addr(nid_t nid, struct nx_addr *net);
 
 	struct nx_flags {
 		uint64_t flags;
 		uint64_t mask;
 	};
 
-	int nx_set_flags(nid_t nid, const struct nx_flags *flags);
+	int nx_set_flags(nid_t nid, struct nx_flags *flags);
 	int nx_get_flags(nid_t nid, struct nx_flags *flags);
 
 	struct nx_caps {
@@ -179,7 +179,7 @@ extern "C" {
 		uint64_t mask;
 	};
 
-	int nx_set_caps(nid_t nid, const struct nx_caps *caps);
+	int nx_set_caps(nid_t nid, struct nx_caps *caps);
 	int nx_get_caps(nid_t nid, struct nx_caps *caps);
 
 	/* sched.c */
@@ -202,7 +202,7 @@ extern "C" {
 		int32_t priority_bias;
 	};
 
-	int vx_set_sched(xid_t xid, const struct vx_sched *sched);
+	int vx_set_sched(xid_t xid, struct vx_sched *sched);
 
 	/* signal.c */
 	int vx_kill(xid_t xid, pid_t pid, int sig);

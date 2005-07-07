@@ -65,7 +65,7 @@ int vx_migrate(xid_t xid)
 	return vserver(VCMD_ctx_migrate, xid, NULL);
 }
 
-int vx_set_flags(xid_t xid, const struct vx_flags *flags)
+int vx_set_flags(xid_t xid, struct vx_flags *flags)
 {
 	struct vcmd_ctx_flags_v0 res;
 
@@ -98,7 +98,7 @@ int vx_get_flags(xid_t xid, struct vx_flags *flags)
 	return 0;
 }
 
-int vx_set_caps(xid_t xid, const struct vx_caps *caps)
+int vx_set_caps(xid_t xid, struct vx_caps *caps)
 {
 	struct vcmd_ctx_caps_v0 res;
 

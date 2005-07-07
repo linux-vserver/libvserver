@@ -49,7 +49,7 @@ int vx_get_rlimit(xid_t xid, uint32_t id, struct vx_rlimit *rlimit)
 	return 0;
 }
 
-int vx_set_rlimit(xid_t xid, uint32_t id, const struct vx_rlimit *rlimit)
+int vx_set_rlimit(xid_t xid, uint32_t id, struct vx_rlimit *rlimit)
 {
 	struct vcmd_ctx_rlimit_v0 res;
 
