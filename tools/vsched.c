@@ -37,7 +37,7 @@
 #define NAME    "vsched"
 #define DESCR   "Context CPU Limit Manager"
 
-#define SHORT_OPTS "hVx:b:vq"
+#define SHORT_OPTS "hVx:b:"
 
 static const
 struct option LONG_OPTS[] = {
@@ -45,21 +45,12 @@ struct option LONG_OPTS[] = {
 	{ "version", no_argument,       0, 'V' },
 	{ "xid",     required_argument, 0, 'x' },
 	{ "bucket",  required_argument, 0, 'b' },
-	{ "verbose", no_argument,       0, 'v' },
-	{ "quiet",   no_argument,       0, 'q' },
 	{ 0,0,0,0 }
-};
-
-struct commands {
-	bool help;
-	bool version;
 };
 
 struct options {
 	xid_t xid;
-	struct vx_sched *sched;
-	bool verbose;
-	bool quiet;
+	struct vx_sched *bucket;
 };
 
 #define SETSCHED(s,attr,mask) \
@@ -67,32 +58,28 @@ struct options {
 		(s)->set_mask |= (mask);
 
 static inline
-void format2bucket(char *format, struct vx_sched *sched)
+void format2bucket(char *format, struct vx_sched *bucket)
 {
 	const char *delim = ",";
-	SETSCHED(sched, fill_rate,     VXSM_FILL_RATE);
-	SETSCHED(sched, interval,      VXSM_INTERVAL);
-	SETSCHED(sched, tokens,        VXSM_TOKENS);
-	SETSCHED(sched, tokens_min,    VXSM_TOKENS_MIN);
-	SETSCHED(sched, tokens_max,    VXSM_TOKENS_MAX);
-	SETSCHED(sched, priority_bias, VXSM_PRIO_BIAS);
+	SETSCHED(bucket, fill_rate,     VXSM_FILL_RATE);
+	SETSCHED(bucket, interval,      VXSM_INTERVAL);
+	SETSCHED(bucket, tokens,        VXSM_TOKENS);
+	SETSCHED(bucket, tokens_min,    VXSM_TOKENS_MIN);
+	SETSCHED(bucket, tokens_max,    VXSM_TOKENS_MAX);
+	SETSCHED(bucket, priority_bias, VXSM_PRIO_BIAS);
 }
 
 void cmd_help()
 {
-	printf("Usage: %s [<command>] <opts>* -- <programm> <args>*\n"
+	printf("Usage: %s [<command>] <opts>* -- <program> <args>*\n"
 	       "\n"
 	       "Available commands:\n"
 	       "    -h,--help               Show this help message\n"
 	       "    -V,--version            Print version information\n"
 	       "\n"
 	       "Available options:\n"
-	       "    -x,--xid <xid>          Context ID\n"
+	       "    -x,--xid <xid>          The Context ID\n"
 	       "    -b,--bucket <format>    Create a bucket described in <format>\n"
-	       "\n"
-	       "Generic options:\n"
-	       "    -v,--verbose            Print verbose information\n"
-	       "    -q,--quiet              Be quiet\n"
 	       "\n"
 	       "Tocken Bucket format string:\n"
 	       "    <format> = <FR>,<IV>,<TK>,<TI>,<TA>,<PB> where\n"
@@ -104,19 +91,12 @@ void cmd_help()
 	       "                - PB is the priority bias (currently unused).\n"
 	       "\n",
 	       NAME);
+	exit(EXIT_SUCCESS);
 }
 
 int main(int argc, char *argv[])
 {
-	if (getuid() != 0)
-		EXIT("This program requires root privileges", 1);
-
-	struct commands cmds = {
-		.help    = false,
-		.version = false,
-	};
-	
-	struct vx_sched sched = {
+	struct vx_sched bucket = {
 		.fill_rate     = SCHED_KEEP,
 		.interval      = SCHED_KEEP,
 		.tokens        = SCHED_KEEP,
@@ -125,66 +105,53 @@ int main(int argc, char *argv[])
 		.priority_bias = SCHED_KEEP,
 		.set_mask      = 0
 	};
-	
+
 	struct options opts = {
-		.xid     = XID_SELF,
-		.sched   = &sched,
-		.verbose = false,
-		.quiet   = false
+		.xid    = XID_SELF,
+		.bucket = &bucket
 	};
-	
+
 	int c;
-	
+
 	while (1) {
 		c = getopt_long(argc, argv, SHORT_OPTS, LONG_OPTS, 0);
 		if(c == -1) break;
-		
+
 		switch (c) {
 			case 'h':
-				cmd_help(0);
+				cmd_help();
 				break;
-			
+
 			case 'V':
 				CMD_VERSION(NAME, DESCR);
 				break;
-			
+
 			case 'x':
 				opts.xid = (xid_t) atoi(optarg);
 				break;
-			
+
 			case 'b':
-				format2bucket(optarg, opts.sched);
+				format2bucket(optarg, opts.bucket);
 				break;
-			
-			case 'v':
-				opts.verbose = true;
-				break;
-			
-			case 'q':
-				opts.quiet = true;
-				break;
-			
+
 			default:
 				printf("Try '%s --help' for more information\n", argv[0]);
-				exit(EXIT_FAILURE);
+				exit(EXIT_USAGE);
 				break;
 		}
 	}
-	
-	if (opts.xid <= 1)
-		if ((opts.xid = vx_get_task_xid(0)) <= 1)
-			EXIT("Invalid --xid given", 1);
-	
-	if (argc <= optind)
-		EXIT("No program given", 1);
-	
-	if (opts.sched->set_mask == 0)
-		EXIT("You need to specify at least one option in the bucket", 1);
-	
-	if (vx_set_sched(opts.xid, opts.sched) < 0)
-		PEXIT("Failed to set resource limits", 2);
-	
-	execvp(argv[optind], argv+optind);
-	
+
+	if (getuid() != 0)
+		EXIT("This program requires root privileges", EXIT_USAGE);
+
+	if (opts.bucket->set_mask == 0)
+		EXIT("You need to specify at least one option in the bucket", EXIT_USAGE);
+
+	if (vx_set_sched(opts.xid, opts.bucket) < 0)
+		PEXIT("Failed to set resource limits", EXIT_COMMAND);
+
+	if (argc > optind)
+		execvp(argv[optind], argv+optind);
+
 	exit(EXIT_SUCCESS);
 }
