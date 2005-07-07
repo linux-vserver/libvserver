@@ -37,23 +37,19 @@
 #define NAME	"vuname"
 #define DESCR	"Virtual Host Information Manager"
 
-#define SHORT_OPTS "hVGS:x:vq"
+#define SHORT_OPTS "hVGS:x:"
 
-struct option const
-LONG_OPTS[] = {
-	{ "help",		no_argument, 		0, 'h' },
-	{ "version",	no_argument, 		0, 'V' },
-	{ "get",		no_argument, 		0, 'G' },
-	{ "set",		required_argument,	0, 'S' },
-	{ "xid",		required_argument,	0, 'x' },
-	{ "verbose",	no_argument, 		0, 'v' },
-	{ "quiet",		no_argument, 		0, 'q' },
+static const
+struct option LONG_OPTS[] = {
+	{ "help",    no_argument,       0, 'h' },
+	{ "version", no_argument,       0, 'V' },
+	{ "get",     no_argument,       0, 'G' },
+	{ "set",     required_argument, 0, 'S' },
+	{ "xid",     required_argument, 0, 'x' },
 	{ 0,0,0,0 }
 };
 
 struct commands {
-	bool help;
-	bool version;
 	bool get;
 	bool set;
 };
@@ -71,45 +67,36 @@ struct vhi_name_fields {
 struct options {
 	struct vhi_name_fields vhi;
 	xid_t xid;
-	bool verbose;
-	bool quiet;
 };
 
-/* TODO Reduce code... */
+#define GET_VHI_NAME(NAME, PTR) do { \
+	if (vx_get_vhi_name(xid, VHIN_ ## NAME, PTR, VHI_SIZE) == -1) \
+		PEXIT("Failed to get " #NAME " name", EXIT_COMMAND); \
+	} while (0)
+
+static inline
 void get_vhi_names(xid_t xid, struct vhi_name_fields *vhi)
 {
-	if (vx_get_vhi_name(xid, VHIN_CONTEXT, vhi->context, VHI_SIZE) == -1)
-		PEXIT("Failed to get context name", 2);
-
-	if (vx_get_vhi_name(xid, VHIN_SYSNAME, vhi->sysname, VHI_SIZE) == -1)
-		PEXIT("Failed to get sysname", 2);
-
-	if (vx_get_vhi_name(xid, VHIN_NODENAME, vhi->nodename, VHI_SIZE) == -1)
-		PEXIT("Failed to get nodename", 2);
-
-	if (vx_get_vhi_name(xid, VHIN_RELEASE, vhi->release, VHI_SIZE) == -1)
-		PEXIT("Failed to get release", 2);
-
-	if (vx_get_vhi_name(xid, VHIN_VERSION, vhi->version, VHI_SIZE) == -1)
-		PEXIT("Failed to get version", 2);
-
-	if (vx_get_vhi_name(xid, VHIN_MACHINE, vhi->machine, VHI_SIZE) == -1)
-		PEXIT("Failed to get machine name", 2);
-
-	if (vx_get_vhi_name(xid, VHIN_DOMAINNAME, vhi->domainname, VHI_SIZE) == -1)
-		PEXIT("Failed to get domainname", 2);
+	GET_VHI_NAME(CONTEXT,    vhi->context);
+	GET_VHI_NAME(SYSNAME,    vhi->sysname);
+	GET_VHI_NAME(NODENAME,   vhi->nodename);
+	GET_VHI_NAME(RELEASE,    vhi->release);
+	GET_VHI_NAME(VERSION,    vhi->version);
+	GET_VHI_NAME(MACHINE,    vhi->machine);
+	GET_VHI_NAME(DOMAINNAME, vhi->domainname);
 }
 
+static inline
 void print_vhi_names(xid_t xid, struct vhi_name_fields *vhi)
 {
-	printf("XID: %d\n", xid);
-	printf("Context: %s\n", vhi->context);
-	printf("Sysname: %s\n", vhi->sysname);
-	printf("Nodename: %s\n", vhi->nodename);
-	printf("Release: %s\n", vhi->release);
-	printf("Version: %s\n", vhi->version);
-	printf("Machine: %s\n", vhi->machine);
-	printf("Domain name: %s\n", vhi->domainname);
+	printf("XID: %d\n",        xid);
+	printf("Context: %s\n",    vhi->context);
+	printf("Sysname: %s\n",    vhi->sysname);
+	printf("Nodename: %s\n",   vhi->nodename);
+	printf("Release: %s\n",    vhi->release);
+	printf("Version: %s\n",    vhi->version);
+	printf("Machine: %s\n",    vhi->machine);
+	printf("Domainname: %s\n", vhi->domainname);
 }
 
 static inline
@@ -126,12 +113,12 @@ int format2vhi(char *format, struct vhi_name_fields *vhi)
 	if (i != 6)
 		return -1;
 
-	strncpy(vhi->context, strsep(&format, delim), VHI_SIZE);
-	strncpy(vhi->sysname, strsep(&format, delim), VHI_SIZE);
-	strncpy(vhi->nodename, strsep(&format, delim), VHI_SIZE);
-	strncpy(vhi->release, strsep(&format, delim), VHI_SIZE);
-	strncpy(vhi->version, strsep(&format, delim), VHI_SIZE);
-	strncpy(vhi->machine, strsep(&format, delim), VHI_SIZE);
+	strncpy(vhi->context,    strsep(&format, delim), VHI_SIZE);
+	strncpy(vhi->sysname,    strsep(&format, delim), VHI_SIZE);
+	strncpy(vhi->nodename,   strsep(&format, delim), VHI_SIZE);
+	strncpy(vhi->release,    strsep(&format, delim), VHI_SIZE);
+	strncpy(vhi->version,    strsep(&format, delim), VHI_SIZE);
+	strncpy(vhi->machine,    strsep(&format, delim), VHI_SIZE);
 	strncpy(vhi->domainname, strsep(&format, delim), VHI_SIZE);
 
 	return 0;
@@ -143,9 +130,8 @@ int set_vhi_name(xid_t xid, int field, char *name)
 	if (!strlen(name))
 		return 0;
 	
-	/* TODO: return the syscall + handle error in main() ? */
 	if (vx_set_vhi_name(xid, field, name) < 0)
-		PEXIT(strcat(strcat("Failed to set VHI field (", (char*) field), ")"), 2);
+		PEXIT(strcat(strcat("Failed to set VHI field (", (char*) field), ")"), EXIT_COMMAND);
 	
 	return 0;
 }
@@ -153,20 +139,16 @@ int set_vhi_name(xid_t xid, int field, char *name)
 static inline
 void cmd_help()
 {
-	printf("Usage: %s <command> <opts>* -- <programm> <args>*\n"
+	printf("Usage: %s <command> <opts>* -- <program> <args>*\n"
 			"\n"
 			"Available commands:\n"
 			"    -h,--help               Show this help message\n"
 			"    -V,--version            Print version information\n"
 			"    -G,--get                Get virtual host information\n"
-			"    -S,--set <format>       Set virtual host information aka UTS described in <format>\n"
+			"    -S,--set <format>       Set virtual host information described in <format>\n"
 			"\n"
 			"Available options:\n"
 			"    -x,--xid <xid>          The Context ID\n"
-			"\n"
-			"Generic options:\n"
-			"    -v,--verbose            Print verbose information\n"
-			"    -q,--quiet              Be quiet (i.e. no output at all)\n"
 			"\n"
 			"VHI format string:\n"
 			"    <format> = <CN>,<SN>,<NN>,<KR>,<KV>,<MA>,<DN> where\n"
@@ -181,28 +163,21 @@ void cmd_help()
 			"    Empty fields cause the value to be left the same as before\n"
 			"\n",
 		NAME);
-	exit(0);
+	exit(EXIT_SUCCESS);
 }
 
 int main(int argc, char *argv[])
 {
-	if (getuid() != 0)
-		SEXIT("This programm requires root privileges", 1);
-
 	struct commands cmds = {
-		.help		= false,
-		.version	= false,
 		.get		= false,
 		.set		= false
 	};
 
 	struct options opts = {
-		.xid		= XID_SELF,
-		.verbose	= false,
-		.quiet		= false
+		.xid		= XID_SELF
 	};
 
-	int c, cmdcnt = 0;
+	int c;
 
 	while (1) {
 		c = getopt_long(argc, argv, SHORT_OPTS, LONG_OPTS, 0);
@@ -210,7 +185,7 @@ int main(int argc, char *argv[])
 
 		switch (c) {
 			case 'h':
-				cmd_help(0);
+				cmd_help();
 				break;
 
 			case 'V':
@@ -219,44 +194,27 @@ int main(int argc, char *argv[])
 
 			case 'G':
 				cmds.get = true;
-				cmdcnt++;
 				break;
 
 			case 'S':
 				cmds.set = true;
-				if (format2vhi(optarg, &opts.vhi))
-					EXIT("Invalid vhi format", 1);
-				cmdcnt++;
+				if (!format2vhi(optarg, &opts.vhi))
+					EXIT("Invalid vhi format", EXIT_USAGE);
 				break;
 
 			case 'x':
 				opts.xid = (xid_t) atoi(optarg);
 				break;
 
-			case 'v':
-				opts.verbose = true;
-				break;
-
-			case 'q':
-				opts.quiet = true;
-				break;
-
 			default:
 				printf("Try '%s --help' for more information\n", argv[0]);
-				return EXIT_FAILURE;
+				exit(EXIT_USAGE);
 				break;
 		}
 	}
 
-	if (cmdcnt == 0)
-		EXIT("No command given", 1);
-
-	if (cmdcnt > 1)
-		EXIT("More than one command given", 1);
-
-	if (opts.xid <= 1)
-		if ((opts.xid = vx_get_task_xid(0)) <= 1)
-			EXIT("Invalid --xid given", 1);
+	if (getuid() != 0)
+		SEXIT("This programm requires root privileges", EXIT_USAGE);
 
 	if (cmds.get) {
 		get_vhi_names(opts.xid, &opts.vhi);
@@ -276,5 +234,5 @@ int main(int argc, char *argv[])
 	if (argc > optind)
 		execvp(argv[optind], argv+optind);
 
-	return EXIT_SUCCESS;
+	exit(EXIT_SUCCESS);
 }
