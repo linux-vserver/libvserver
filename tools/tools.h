@@ -37,6 +37,10 @@
  * 2 = A command failed
  * 3 = An opts specific function failed
  */
+#define EXIT_USAGE   1
+#define EXIT_COMMAND 2
+#define EXIT_OPTS    3
+
 #define EXIT(MSG,RC) { \
 	printf(MSG"; try '%s --help' for more information\n", argv[0]); \
 	exit(RC); \

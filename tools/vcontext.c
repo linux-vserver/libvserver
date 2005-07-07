@@ -36,7 +36,7 @@
 #define NAME  "vcontext"
 #define DESCR "Context Manager"
 
-#define SHORT_OPTS "hVCMF:X:x:u:"
+#define SHORT_OPTS "hVCMF:P:x:u:f:p:"
 
 static const
 struct option LONG_OPTS[] = {
@@ -45,9 +45,11 @@ struct option LONG_OPTS[] = {
 	{ "create",    no_argument,       0, 'C' },
 	{ "migrate",   no_argument,       0, 'M' },
 	{ "set-flags", no_argument,       0, 'F' },
-	{ "set-caps",  no_argument,       0, 'X' },
+	{ "set-caps",  no_argument,       0, 'P' },
 	{ "xid",       required_argument, 0, 'x' },
 	{ "uid",       required_argument, 0, 'u' },
+	{ "flags",     required_argument, 0, 'f' },
+	{ "caps",      required_argument, 0, 'p' },
 	{ 0,0,0,0 }
 };
 
@@ -59,28 +61,30 @@ struct commands {
 };
 
 struct options {
-	struct vx_flags flags;
-	struct vx_caps caps;
 	xid_t xid;
 	uid_t uid;
+	struct vx_flags flags;
+	struct vx_caps caps;
 };
 
 static inline
 void cmd_help()
 {
-	printf("Usage: %s <command> <opts>* -- <programm> <args>*\n"
+	printf("Usage: %s <command> <opts>* -- <program> <args>*\n"
 	       "\n"
 	       "Available commands:\n"
 	       "    -h,--help               Show this help message\n"
 	       "    -V,--version            Print version information\n"
 	       "    -C,--create             Create a new security context\n"
 	       "    -M,--migrate            Migrate to an existing context\n"
-	       "    -F,--set-flags <format> Set context flags described in <format>\n"
-	       "    -X,--set-caps <format>  Set context capabilities described in <format>\n"
+	       "    -F,--set-flags          Set context flags\n"
+	       "    -P,--set-caps           Set context capabilities\n"
 	       "\n"
 	       "Available options:\n"
 	       "    -x,--xid <xid>          The Context ID\n"
-	       "    -u,--uid <uid>          Set the uid of the current process\n"
+	       "    -u,--uid <uid>          Set the user id for <program>\n"
+	       "    -f,--flags <format>     Set flags described in <format>\n"
+	       "    -p,--caps <format>      Set capabilities described in <format>\n"
 	       "\n",
 	       NAME);
 	exit(EXIT_SUCCESS);
@@ -89,17 +93,17 @@ void cmd_help()
 int main(int argc, char *argv[])
 {
 	struct commands cmds = {
-		.create		= false,
-		.migrate	= false,
-		.setflags	= false,
-		.setcaps	= false
+		.create   = false,
+		.migrate  = false,
+		.setflags = false,
+		.setcaps  = false
 	};
 
 	struct options opts = {
-		.flags		= { .flags = 0, .mask = 0 },
-		.caps		= { .bcaps = 0, .ccaps = 0, .cmask = 0 },
-		.xid		= XID_SELF,
-		.uid		= (uid_t) 0
+		.xid   = XID_SELF,
+		.uid   = (uid_t) 0,
+		.flags = { .flags = 0, .mask = 0 },
+		.caps  = { .bcaps = 0, .ccaps = 0, .cmask = 0 }
 	};
 
 	int c;
@@ -129,7 +133,7 @@ int main(int argc, char *argv[])
 				cmds.setflags = true;
 				break;
 
-			case 'X':
+			case 'P':
 				cmds.setcaps = true;
 				break;
 
@@ -141,39 +145,51 @@ int main(int argc, char *argv[])
 				opts.uid = (uid_t) atoi(optarg);
 				break;
 
+			case 'f':
+				//opts.flags = 0; /* TODO: implement flag parser (maybe in lib?) */
+				SEXIT("--flags not implemented yet...", EXIT_USAGE);
+				break;
+
+			case 'p':
+				//opts.caps = 0; /* TODO: implement caps parser (maybe in lib?) */
+				SEXIT("--caps not implemented yet...", EXIT_USAGE);
+				break;
+
 			default:
 				printf("Try '%s --help' for more information\n", argv[0]);
-				return 1;
+				exit(EXIT_USAGE);
 				break;
 		}
 	}
 
 	if (getuid() != 0)
-		SEXIT("This program requires root privileges", 1);
+		SEXIT("This program requires root privileges", EXIT_USAGE);
 
 	if (cmds.create && cmds.migrate)
-		EXIT("Can't create and migrate at the same time", 1);
+		EXIT("Can't create and migrate at the same time", EXIT_USAGE);
 
 	if (cmds.create)
-		if (vx_create(opts.xid, 0) < 0)
-			PEXIT("Failed to create context", 2);
+		if (vx_create(opts.xid, opts.flags.flags) < 0)
+			PEXIT("Failed to create context", EXIT_COMMAND);
 
 	if (cmds.migrate)
 		if (vx_migrate(opts.xid) < 0)
-			PEXIT("Failed to migrate to context", 2);
+			PEXIT("Failed to migrate to context", EXIT_COMMAND);
 
 	if (cmds.setflags)
-		SEXIT("--set-flags not implemented yet...", 1);
+		if (vx_set_flags(opts.xid, &opts.flags) < 0)
+			PEXIT("Failed to set context flags", EXIT_COMMAND);
 
 	if (cmds.setcaps)
-		SEXIT("--set-caps not implemented yet...", 1);
+		if (vx_set_caps(opts.xid, &opts.caps) < 0)
+			PEXIT("Failed to set context capabilities", EXIT_COMMAND);
 
 	if (opts.uid > 0)
 		if (setuid(opts.uid) < 0)
-			PEXIT("Failed to change user id", 3);
+			PEXIT("Failed to change user id", EXIT_OPTS);
 
 	if (argc > optind)
 		execvp(argv[optind], argv+optind);
 
-	return EXIT_SUCCESS;
+	exit(EXIT_SUCCESS);
 }
