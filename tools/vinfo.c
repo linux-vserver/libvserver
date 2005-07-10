@@ -32,8 +32,8 @@
 #include "vserver.h"
 #include "tools.h"
 
-#define NAME	"vinfo"
-#define DESCR	"Context Information Grabber"
+#define NAME  "vinfo"
+#define DESCR "Context Information Grabber"
 
 #define T_TASK_XID    'A'
 #define T_VX_INFO     'B'
@@ -50,7 +50,7 @@
 #define T_NCAPS       'M'
 #define T_VS_VERSION  'N'
 
-#define SHORT_OPTS "hVx:n:vq"
+#define SHORT_OPTS "hVx:n:"
 
 static const
 struct option LONG_OPTS[] = {
@@ -72,18 +72,11 @@ struct option LONG_OPTS[] = {
 	{ "vs-version",	no_argument, 		0, T_VS_VERSION },
 	{ "xid",		required_argument, 	0, 'x' },
 	{ "nid",		required_argument, 	0, 'n' },
-	{ "verbose",	no_argument, 		0, 'v' },
-	{ "quiet",		no_argument, 		0, 'q' },
 	{ 0,0,0,0 }
-};
-
-struct commands {
 };
 
 struct options {
 	xid_t xid;
-	bool verbose;
-	bool quiet;
 };
 
 static inline
@@ -124,10 +117,6 @@ void cmd_help()
 	       "Available options:\n"
 	       "    -x,--xid <xid>          Context ID\n"
 	       "    -n,--nid <nid>          Network context ID\n"
-	       "\n"
-	       "Generic options:\n"
-	       "    -v,--verbose            Print verbose information\n"
-	       "    -q,--quiet              Be quiet\n"
 	       "\n",
 	       NAME);
 	exit(0);
@@ -138,12 +127,8 @@ int main(int argc, char *argv[])
 	if (getuid() != 0)
 		EXIT("This programm requires root privileges", 1);
 	
-	struct commands cmds = {};
-	
 	struct options opts = {
-		.xid     = XID_SELF,
-		.verbose = false,
-		.quiet   = false
+		.xid     = XID_SELF
 	};
 	
 	int c, cmdcnt = 0;
@@ -161,14 +146,6 @@ int main(int argc, char *argv[])
 				CMD_VERSION(NAME, DESCR);
 				break;
 			
-			case 'v':
-				opts.verbose = true;
-				break;
-			
-			case 'q':
-				opts.quiet = true;
-				break;
-			
 			default:
 				printf("Try '%s --help' for more information\n", argv[0]);
 				return EXIT_FAILURE;
@@ -176,20 +153,12 @@ int main(int argc, char *argv[])
 		}
 	}
 	
-	if (cmdcnt == 0)
-		EXIT("No command given", 1);
-	
-	if (cmdcnt > 1)
-		EXIT("More than one command given", 1);
-	
 	if (opts.xid <= 1)
 		if ((opts.xid = vx_get_task_xid(0)) <= 1)
 			EXIT("Invalid --xid given", 1);
 	
-	if (argc <= optind)
-		EXIT("No program given", 1);
-	
-	execvp(argv[optind], argv+optind);
+	if (argc > optind)
+		execvp(argv[optind], argv+optind);
 	
 	return EXIT_SUCCESS;
 }

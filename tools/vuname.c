@@ -111,7 +111,7 @@ int format2vhi(char *format, struct vhi_name_fields *vhi)
 	}
 
 	if (i != 6)
-		return -1;
+		return EXIT_USAGE;
 
 	strncpy(vhi->context,    strsep(&format, delim), VHI_SIZE);
 	strncpy(vhi->sysname,    strsep(&format, delim), VHI_SIZE);
@@ -121,19 +121,19 @@ int format2vhi(char *format, struct vhi_name_fields *vhi)
 	strncpy(vhi->machine,    strsep(&format, delim), VHI_SIZE);
 	strncpy(vhi->domainname, strsep(&format, delim), VHI_SIZE);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 static inline
 int set_vhi_name(xid_t xid, int field, char *name)
 {
 	if (!strlen(name))
-		return 0;
+		return EXIT_SUCCESS;
 	
 	if (vx_set_vhi_name(xid, field, name) < 0)
-		PEXIT(strcat(strcat("Failed to set VHI field (", (char*) field), ")"), EXIT_COMMAND);
+		printf("Failed to set VHI field '%d': %s", field, strerror(field));
 	
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 static inline
@@ -152,7 +152,7 @@ void cmd_help()
 			"\n"
 			"VHI format string:\n"
 			"    <format> = <CN>,<SN>,<NN>,<KR>,<KV>,<MA>,<DN> where\n"
-			"                - CN is the context name\n"
+			"                - CN is the context name,\n"
 			"                - SN is the system name,\n"
 			"                - NN is the network node hostname,\n"
 			"                - KR is the kernel release,\n"
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
 
 			case 'S':
 				cmds.set = true;
-				if (!format2vhi(optarg, &opts.vhi))
+				if (format2vhi(optarg, &opts.vhi))
 					EXIT("Invalid vhi format", EXIT_USAGE);
 				break;
 
@@ -222,6 +222,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (cmds.set) {
+		printf("context: %s\n", opts.vhi.context);
 		set_vhi_name(opts.xid, VHIN_CONTEXT,    opts.vhi.context);
 		set_vhi_name(opts.xid, VHIN_SYSNAME,    opts.vhi.sysname);
 		set_vhi_name(opts.xid, VHIN_NODENAME,   opts.vhi.nodename);

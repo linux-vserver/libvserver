@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
 		EXIT("Can't create and migrate at the same time", EXIT_USAGE);
 
 	if (cmds.create)
-		if (vx_create(opts.xid, opts.flags.flags) < 0)
+		if (vx_create(opts.xid, 0) < 0)
 			PEXIT("Failed to create context", EXIT_COMMAND);
 
 	if (cmds.migrate)
