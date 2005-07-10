@@ -34,8 +34,8 @@
 #include "vserver.h"
 #include "tools.h"
 
-#define NAME	"vuname"
-#define DESCR	"Virtual Host Information Manager"
+#define NAME  "vuname"
+#define DESCR "Virtual Host Information Manager"
 
 #define SHORT_OPTS "hVGS:x:"
 

@@ -34,8 +34,8 @@
 #include "vserver.h"
 #include "tools.h"
 
-#define NAME    "vsched"
-#define DESCR   "Context CPU Limit Manager"
+#define NAME  "vsched"
+#define DESCR "Context CPU Limit Manager"
 
 #define SHORT_OPTS "hVx:b:"
 

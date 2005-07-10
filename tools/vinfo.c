@@ -32,8 +32,8 @@
 #include "vserver.h"
 #include "tools.h"
 
-#define NAME	"vinfo"
-#define DESCR	"Context Information Grabber"
+#define NAME  "vinfo"
+#define DESCR "Context Information Grabber"
 
 #define T_TASK_XID    'A'
 #define T_VX_INFO     'B'
@@ -42,7 +42,6 @@
 #define T_BCAPS       'E'
 #define T_RLIMIT      'F'
 #define T_RLIMITMASK  'G'
-#define T_IATTR       'H'
 #define T_UNAME       'I'
 #define T_TASK_NID    'J'
 #define T_NX_INFO     'K'
@@ -50,40 +49,33 @@
 #define T_NCAPS       'M'
 #define T_VS_VERSION  'N'
 
-#define SHORT_OPTS "hVx:n:vq"
+#define SHORT_OPTS "hVx:n:"
 
 static const
 struct option LONG_OPTS[] = {
-	{ "help",		no_argument, 		0, 'h' },
-	{ "version",	no_argument, 		0, 'V' },
-	{ "task-xid",	required_argument,	0, T_TASK_XID },
-	{ "vx-info",	no_argument, 		0, T_VX_INFO },
-	{ "cflags",		no_argument, 		0, T_CFLAGS },
-	{ "ccaps",		no_argument, 		0, T_CCAPS },
-	{ "bcaps",		no_argument, 		0, T_BCAPS },
-	{ "rlimit",		no_argument, 		0, T_RLIMIT },
-	{ "rlimitmask",	no_argument, 		0, T_RLIMITMASK },
-	{ "iattr",		required_argument,	0, T_IATTR },
-	{ "uname",		no_argument, 		0, T_UNAME },
-	{ "task-nid",	required_argument,	0, T_TASK_NID },
-	{ "nx-info",	no_argument, 		0, T_NX_INFO },
-	{ "nflags",		no_argument, 		0, T_NFLAGS },
-	{ "ncaps",		no_argument, 		0, T_NCAPS },
-	{ "vs-version",	no_argument, 		0, T_VS_VERSION },
-	{ "xid",		required_argument, 	0, 'x' },
-	{ "nid",		required_argument, 	0, 'n' },
-	{ "verbose",	no_argument, 		0, 'v' },
-	{ "quiet",		no_argument, 		0, 'q' },
+	{ "help",       no_argument,       0, 'h' },
+	{ "version",    no_argument,       0, 'V' },
+	{ "task-xid",   required_argument, 0, T_TASK_XID },
+	{ "vx-info",    no_argument,       0, T_VX_INFO },
+	{ "cflags",     no_argument,       0, T_CFLAGS },
+	{ "ccaps",      no_argument,       0, T_CCAPS },
+	{ "bcaps",      no_argument,       0, T_BCAPS },
+	{ "rlimit",     no_argument,       0, T_RLIMIT },
+	{ "rlimitmask", no_argument,       0, T_RLIMITMASK },
+	{ "uname",      no_argument,       0, T_UNAME },
+	{ "task-nid",   required_argument, 0, T_TASK_NID },
+	{ "nx-info",    no_argument,       0, T_NX_INFO },
+	{ "nflags",     no_argument,       0, T_NFLAGS },
+	{ "ncaps",      no_argument,       0, T_NCAPS },
+	{ "vs-version", no_argument,       0, T_VS_VERSION },
+	{ "xid",        required_argument, 0, 'x' },
+	{ "nid",        required_argument, 0, 'n' },
 	{ 0,0,0,0 }
-};
-
-struct commands {
 };
 
 struct options {
 	xid_t xid;
-	bool verbose;
-	bool quiet;
+	nid_t nid;
 };
 
 static inline
@@ -106,9 +98,6 @@ void cmd_help()
 	       "    --rlimit                Print context resource limits\n"
 	       "    --rlimitmask            Print context resource limit mask\n"
 	       "\n"
-	       "  Inode information:\n"
-	       "    --iattr <inode>         Print inode information\n"
-	       "\n"
 	       "  Virtual host information:\n"
 	       "    --uname                 Print virtual host information aka UTS\n"
 	       "\n"
@@ -124,72 +113,45 @@ void cmd_help()
 	       "Available options:\n"
 	       "    -x,--xid <xid>          Context ID\n"
 	       "    -n,--nid <nid>          Network context ID\n"
-	       "\n"
-	       "Generic options:\n"
-	       "    -v,--verbose            Print verbose information\n"
-	       "    -q,--quiet              Be quiet\n"
 	       "\n",
 	       NAME);
-	exit(0);
+	exit(EXIT_SUCCESS);
 }
 
 int main(int argc, char *argv[])
 {
-	if (getuid() != 0)
-		EXIT("This programm requires root privileges", 1);
-	
-	struct commands cmds = {};
-	
 	struct options opts = {
-		.xid     = XID_SELF,
-		.verbose = false,
-		.quiet   = false
+		.xid = XID_SELF,
+		.nid = NID_SELF
 	};
-	
-	int c, cmdcnt = 0;
-	
+
+	int c;
+
 	while (1) {
 		c = getopt_long(argc, argv, SHORT_OPTS, LONG_OPTS, 0);
 		if (c == -1) break;
-		
+
 		switch (c) {
 			case 'h':
-				cmd_help(0);
+				cmd_help();
 				break;
-			
+
 			case 'V':
 				CMD_VERSION(NAME, DESCR);
 				break;
-			
-			case 'v':
-				opts.verbose = true;
-				break;
-			
-			case 'q':
-				opts.quiet = true;
-				break;
-			
+
 			default:
 				printf("Try '%s --help' for more information\n", argv[0]);
-				return EXIT_FAILURE;
+				exit(EXIT_USAGE);
 				break;
 		}
 	}
-	
-	if (cmdcnt == 0)
-		EXIT("No command given", 1);
-	
-	if (cmdcnt > 1)
-		EXIT("More than one command given", 1);
-	
-	if (opts.xid <= 1)
-		if ((opts.xid = vx_get_task_xid(0)) <= 1)
-			EXIT("Invalid --xid given", 1);
-	
-	if (argc <= optind)
-		EXIT("No program given", 1);
-	
-	execvp(argv[optind], argv+optind);
-	
-	return EXIT_SUCCESS;
+
+	if (getuid() != 0)
+		EXIT("This programm requires root privileges", 1);
+
+	if (argc > optind)
+		execvp(argv[optind], argv+optind);
+
+	exit(EXIT_SUCCESS);
 }

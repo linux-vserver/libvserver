@@ -32,40 +32,46 @@
 #include "vserver.h"
 #include "tools.h"
 
-#define NAME	"vnetwork"
-#define DESCR	"Network Context Manager"
+#define NAME  "vnetwork"
+#define DESCR "Network Context Manager"
 
-#define SHORT_OPTS "hVCMARFSn:vq"
+#define SHORT_OPTS "hVCMARFPn:f:p:"
 
 static const
 struct option LONG_OPTS[] = {
-	{ "help",		no_argument, 		0, 'h' },
-	{ "version",	no_argument, 		0, 'V' },
-	{ "create",		no_argument, 		0, 'C' },
-	{ "migrate",	no_argument, 		0, 'M' },
-	{ "add",		no_argument, 		0, 'A' },
-	{ "remove",		no_argument, 		0, 'R' },
-	{ "set-flag",	required_argument, 	0, 'F' },
-	{ "set-cap",	required_argument, 	0, 'S' },
-	{ "nid",		required_argument, 	0, 'n' },
-	{ "verbose",	no_argument, 		0, 'v' },
-	{ "quiet",		no_argument, 		0, 'q' },
+	{ "help",      no_argument,       0, 'h' },
+	{ "version",   no_argument,       0, 'V' },
+	{ "create",    no_argument,       0, 'C' },
+	{ "migrate",   no_argument,       0, 'M' },
+	{ "add",       no_argument,       0, 'A' },
+	{ "remove",    no_argument,       0, 'R' },
+	{ "set-flags", no_argument,       0, 'F' },
+	{ "set-caps",  no_argument,       0, 'P' },
+	{ "nid",       required_argument, 0, 'n' },
+	{ "flags",     required_argument, 0, 'f' },
+	{ "caps",      required_argument, 0, 'p' },
 	{ 0,0,0,0 }
 };
 
 struct commands {
+	bool create;
+	bool migrate;
+	bool add;
+	bool remove;
+	bool setflags;
+	bool setcaps;
 };
 
 struct options {
 	nid_t nid;
-	bool verbose;
-	bool quiet;
+	struct nx_flags flags;
+	struct nx_caps caps;
 };
 
 static inline
 void cmd_help()
 {
-	printf("Usage: %s <command> <opts>* -- <programm> <args>*\n"
+	printf("Usage: %s <command> <opts>* -- <program> <args>*\n"
 	       "\n"
 	       "Available commands:\n"
 	       "    -h,--help               Show this help message\n"
@@ -74,77 +80,62 @@ void cmd_help()
 	       "    -M,--migrate            Migrate to an existing context\n"
 	       "    -A,--add                Add an interface to the context\n"
 	       "    -R,--remove             Remove an interface from the context\n"
-	       "    -F,--set-flag <flag>    Set a network context flag\n"
-	       "    -S,--set-cap <cap>      Set a network context capability\n"
+	       "    -F,--set-flags          Set network context flags\n"
+	       "    -P,--set-caps           Set network context capabilities\n"
 	       "\n"
 	       "Available options:\n"
 	       "    -n,--nid <nid>          Network Context ID\n"
-	       "\n"
-	       "Generic options:\n"
-	       "    -v,--verbose            Print verbose information\n"
-	       "    -q,--quiet              Be quiet\n"
+	       "    -f,--flags <format>     Set flags described in <format>\n"
+	       "    -p,--caps <format>      Set capabilities described in <format>\n"
 	       "\n",
 	       NAME);
-	exit(0);
+	exit(EXIT_SUCCESS);
 }
 
 int main(int argc, char *argv[])
 {
-	if (getuid() != 0)
-		EXIT("This programm requires root privileges", 1);
-	
-	struct commands cmds = {};
-	
-	struct options opts = {
-		.nid     = NID_SELF,
-		.verbose = false,
-		.quiet   = false
+	struct commands cmds = {
+		.create   = false,
+		.migrate  = false,
+		.add      = false,
+		.remove   = false,
+		.setflags = false,
+		.setcaps  = false
 	};
-	
-	int c, cmdcnt = 0;
-	
+
+	struct options opts = {
+		.nid   = NID_SELF,
+		.flags = { .flags = 0, .mask = 0 },
+		.caps  = { .caps = 0, .mask = 0 }
+	};
+
+	int c;
+
 	while (1) {
 		c = getopt_long(argc, argv, SHORT_OPTS, LONG_OPTS, 0);
 		if (c == -1) break;
-		
+
 		switch (c) {
 			case 'h':
-				cmd_help(0);
+				cmd_help();
 				break;
-			
+
 			case 'V':
 				CMD_VERSION(NAME, DESCR);
 				break;
-			
-			case 'v':
-				opts.verbose = true;
-				break;
-			
-			case 'q':
-				opts.quiet = true;
-				break;
-			
+
 			default:
 				printf("Try '%s --help' for more information\n", argv[0]);
-				return EXIT_FAILURE;
+				exit(EXIT_USAGE);
 				break;
 		}
 	}
-	
-	if (cmdcnt == 0)
-		EXIT("No command given", 1);
-	
-	if (cmdcnt > 1)
-		EXIT("More than one command given", 1);
-	
-	if (opts.nid <= 1)
-		if ((opts.nid = nx_get_task_nid(0)) <= 1)
-			EXIT("Invalid --nid given", 1);
-	
-	if (argc <= optind)
-		EXIT("No program given", 1);
-	
-	execvp(argv[optind], argv+optind);
-	
-	return EXIT_SUCCESS;
+
+	if (getuid() != 0)
+		EXIT("This programm requires root privileges", 1);
+
+	if (argc > optind)
+		execvp(argv[optind], argv+optind);
+
+	exit(EXIT_SUCCESS);
 }

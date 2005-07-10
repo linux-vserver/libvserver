@@ -3,7 +3,7 @@ METASOURCES = AUTO
 
 AM_CFLAGS = -Wall -std=gnu99
 
-sbin_PROGRAMS = vcontext vnamespace vlimit vsched vnetwork vdlimit vinode vinfo vsignal vuname
+sbin_PROGRAMS = vcontext vnamespace vlimit vsched vnetwork vdlimit vinfo vsignal vuname
 
 vcontext_SOURCES = vcontext.c
 vcontext_LDADD = $(top_builddir)/lib/libvserver.la
@@ -25,9 +25,6 @@ vdlimit_LDADD = $(top_builddir)/lib/libvserver.la
 
 vinfo_SOURCES = vinfo.c
 vinfo_LDADD = $(top_builddir)/lib/libvserver.la
-
-vinode_SOURCES = vinode.c
-vinode_LDADD = $(top_builddir)/lib/libvserver.la
 
 vsignal_SOURCES = vsignal.c
 vsignal_LDADD = $(top_builddir)/lib/libvserver.la

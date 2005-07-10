@@ -33,23 +33,21 @@
 #include "vserver.h"
 #include "tools.h"
 
-#define NAME	"vdlimit"
-#define DESCR	"Disk Limit Manager"
+#define NAME  "vdlimit"
+#define DESCR "Disk Limit Manager"
 
-#define SHORT_OPTS "hVARS:x:mfvq"
+#define SHORT_OPTS "hVARS:x:m:f:"
 
 static const
 struct option LONG_OPTS[] = {
-	{ "help",		no_argument, 		0, 'h' },
-	{ "version",	no_argument, 		0, 'V' },
-	{ "add",		no_argument,		0, 'A' },
-	{ "remove",		no_argument,		0, 'R' },
-	{ "set",		required_argument,	0, 'S' },
-	{ "xid",		required_argument,	0, 'x' },
-	{ "mount",		required_argument,	0, 'm' },
-	{ "flags",		required_argument,	0, 'f' },
-	{ "verbose",	no_argument, 		0, 'v' },
-	{ "quiet",		no_argument, 		0, 'q' },
+	{ "help",    no_argument,       0, 'h' },
+	{ "version", no_argument,       0, 'V' },
+	{ "add",     no_argument,       0, 'A' },
+	{ "remove",  no_argument,       0, 'R' },
+	{ "set",     required_argument, 0, 'S' },
+	{ "xid",     required_argument, 0, 'x' },
+	{ "mount",   required_argument, 0, 'm' },
+	{ "flags",   required_argument, 0, 'f' },
 	{ 0,0,0,0 }
 };
 
@@ -63,14 +61,12 @@ struct options {
 	xid_t xid;
 	char *mount;
 	struct vx_dlimit dlimit;
-	bool verbose;
-	bool quiet;
 };
 
 static inline
 void cmd_help()
 {
-	printf("Usage: %s <command> <opts>* -- <programm> <args>*\n"
+	printf("Usage: %s <command> <opts>* -- <program> <args>*\n"
 	       "\n"
 	       "Available commands:\n"
 	       "    -h,--help               Show this help message\n"
@@ -80,13 +76,9 @@ void cmd_help()
 	       "    -S,--set <format>       Set a disk limit described in <format>\n"
 	       "\n"
 	       "Available options:\n"
-	       "    -x,--xid <xid>          Context ID\n"
+	       "    -x,--xid <xid>          The Context ID\n"
 	       "    -m,--mount <dir>        The mount point of the disk\n"
 	       "    -f,--flags <flags>      Disk limit flags\n"
-	       "\n"
-	       "Generic options:\n"
-	       "    -v,--verbose            Print verbose information\n"
-	       "    -q,--quiet              Be quiet\n"
 	       "\n"
 	       "Disk Limit format string:\n"
 	       "    <format> = <SU>,<SM>,<IU>,<IM>,<RR> where\n"
@@ -97,72 +89,50 @@ void cmd_help()
 	       "                - RR is reserved for root in percent.\n"
 	       "\n",
 	       NAME);
-	exit(0);
+	exit(EXIT_SUCCESS);
 }
 
 int main(int argc, char *argv[])
 {
-	if (getuid() != 0)
-		EXIT("This programm requires root privileges", 1);
-	
 	struct commands cmds = {
 		.add    = false,
 		.remove = false,
 		.set    = false
 	};
-	
+
 	struct options opts = {
 		.xid     = XID_SELF,
 		.mount   = 0,
 		.dlimit  = { 0, 0, 0, 0, 0 },
-		.verbose = false,
-		.quiet   = false
 	};
-	
-	int c, cmdcnt = 0;
-	
+
+	int c;
+
 	while (1) {
 		c = getopt_long(argc, argv, SHORT_OPTS, LONG_OPTS, 0);
 		if (c == -1) break;
-		
+
 		switch (c) {
 			case 'h':
-				cmd_help(0);
+				cmd_help();
 				break;
-			
+
 			case 'V':
 				CMD_VERSION(NAME, DESCR);
 				break;
-			
-			case 'v':
-				opts.verbose = true;
-				break;
-			
-			case 'q':
-				opts.quiet = true;
-				break;
-			
+
 			default:
 				printf("Try '%s --help' for more information\n", argv[0]);
-				return EXIT_FAILURE;
+				exit(EXIT_USAGE);
 				break;
 		}
 	}
-	
-	if (cmdcnt == 0)
-		EXIT("No command given", 1);
-	
-	if (cmdcnt > 1)
-		EXIT("More than one command given", 1);
-	
-	if (opts.xid <= 1)
-		if ((opts.xid = vx_get_task_xid(0)) <= 1)
-			EXIT("Invalid --xid given", 1);
-	
-	if (argc <= optind)
-		EXIT("No program given", 1);
-	
-	execvp(argv[optind], argv+optind);
-	
-	return EXIT_SUCCESS;
+
+	if (getuid() != 0)
+		EXIT("This program requires root privileges", 1);
+
+	if (argc > optind)
+		execvp(argv[optind], argv+optind);
+
+	exit(EXIT_SUCCESS);
 }

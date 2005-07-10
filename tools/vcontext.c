@@ -36,7 +36,7 @@
 #define NAME  "vcontext"
 #define DESCR "Context Manager"
 
-#define SHORT_OPTS "hVCMF:P:x:u:f:p:"
+#define SHORT_OPTS "hVCMFPx:u:f:p:"
 
 static const
 struct option LONG_OPTS[] = {
