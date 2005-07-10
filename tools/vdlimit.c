@@ -36,7 +36,7 @@
 #define NAME	"vdlimit"
 #define DESCR	"Disk Limit Manager"
 
-#define SHORT_OPTS "hVARS:x:mf"
+#define SHORT_OPTS "hVARS:x:mfvq"
 
 static const
 struct option LONG_OPTS[] = {
@@ -48,6 +48,8 @@ struct option LONG_OPTS[] = {
 	{ "xid",		required_argument,	0, 'x' },
 	{ "mount",		required_argument,	0, 'm' },
 	{ "flags",		required_argument,	0, 'f' },
+	{ "verbose",	no_argument, 		0, 'v' },
+	{ "quiet",		no_argument, 		0, 'q' },
 	{ 0,0,0,0 }
 };
 
@@ -61,6 +63,8 @@ struct options {
 	xid_t xid;
 	char *mount;
 	struct vx_dlimit dlimit;
+	bool verbose;
+	bool quiet;
 };
 
 static inline
@@ -80,6 +84,10 @@ void cmd_help()
 	       "    -m,--mount <dir>        The mount point of the disk\n"
 	       "    -f,--flags <flags>      Disk limit flags\n"
 	       "\n"
+	       "Generic options:\n"
+	       "    -v,--verbose            Print verbose information\n"
+	       "    -q,--quiet              Be quiet\n"
+	       "\n"
 	       "Disk Limit format string:\n"
 	       "    <format> = <SU>,<SM>,<IU>,<IM>,<RR> where\n"
 	       "                - SU is the used space in kbytes,\n"
@@ -94,6 +102,9 @@ void cmd_help()
 
 int main(int argc, char *argv[])
 {
+	if (getuid() != 0)
+		EXIT("This programm requires root privileges", 1);
+	
 	struct commands cmds = {
 		.add    = false,
 		.remove = false,
@@ -104,6 +115,8 @@ int main(int argc, char *argv[])
 		.xid     = XID_SELF,
 		.mount   = 0,
 		.dlimit  = { 0, 0, 0, 0, 0 },
+		.verbose = false,
+		.quiet   = false
 	};
 	
 	int c, cmdcnt = 0;
@@ -121,6 +134,14 @@ int main(int argc, char *argv[])
 				CMD_VERSION(NAME, DESCR);
 				break;
 			
+			case 'v':
+				opts.verbose = true;
+				break;
+			
+			case 'q':
+				opts.quiet = true;
+				break;
+			
 			default:
 				printf("Try '%s --help' for more information\n", argv[0]);
 				return EXIT_FAILURE;
@@ -128,17 +149,20 @@ int main(int argc, char *argv[])
 		}
 	}
 	
-	if (getuid() != 0)
-		EXIT("This program requires root privileges", 1);
-	
 	if (cmdcnt == 0)
 		EXIT("No command given", 1);
 	
 	if (cmdcnt > 1)
 		EXIT("More than one command given", 1);
 	
-	if (argc > optind)
-		execvp(argv[optind], argv+optind);
+	if (opts.xid <= 1)
+		if ((opts.xid = vx_get_task_xid(0)) <= 1)
+			EXIT("Invalid --xid given", 1);
+	
+	if (argc <= optind)
+		EXIT("No program given", 1);
+	
+	execvp(argv[optind], argv+optind);
 	
 	return EXIT_SUCCESS;
 }

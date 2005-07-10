@@ -37,7 +37,7 @@
 #define NAME	"vsignal"
 #define DESCR	"Context Signal Helper"
 
-#define SHORT_OPTS "hVKWp:s:x:"
+#define SHORT_OPTS "hVKWp:s:x:vq"
 
 static const
 struct option LONG_OPTS[] = {
@@ -48,10 +48,14 @@ struct option LONG_OPTS[] = {
 	{ "pid",     required_argument, 0, 'p' },
 	{ "sig",     required_argument, 0, 's' },
 	{ "xid",     required_argument, 0, 'x' },
+	{ "verbose", no_argument,       0, 'v' },
+	{ "quiet",   no_argument,       0, 'q' },
 	{ 0,0,0,0 }
 };
 
 struct commands {
+	bool help;
+	bool version;
 	bool kill;
 	bool wait;
 };
@@ -60,6 +64,8 @@ struct options {
 	pid_t pid;
 	int32_t sig;
 	xid_t xid;
+	bool verbose;
+	bool quiet;
 };
 
 typedef struct signalmap_f {
@@ -71,13 +77,13 @@ static const
 struct signalmap_f signalmap[] = {
 	{ "ABRT", SIGABRT },
 	{ "ALRM", SIGALRM },
-	{ "BUS",  SIGBUS },
+	{ "BUS", SIGBUS },
 	{ "CHLD", SIGCHLD },
 	{ "CONT", SIGCONT },
-	{ "FPE",  SIGFPE },
-	{ "HUP",  SIGHUP },
-	{ "ILL",  SIGILL },
-	{ "INT",  SIGINT },
+	{ "FPE", SIGFPE },
+	{ "HUP", SIGHUP },
+	{ "ILL", SIGILL },
+	{ "INT", SIGINT },
 	{ "KILL", SIGKILL },
 	{ "PIPE", SIGPIPE },
 	{ "QUIT", SIGQUIT },
@@ -91,9 +97,9 @@ struct signalmap_f signalmap[] = {
 	{ "USR2", SIGUSR2 },
 	{ "POLL", SIGPOLL },
 	{ "PROF", SIGPROF },
-	{ "SYS",  SIGSYS },
+	{ "SYS", SIGSYS },
 	{ "TRAP", SIGTRAP },
-	{ "URG",  SIGURG },
+	{ "URG", SIGURG },
 	{ "VTALRM", SIGVTALRM },
 	{ "XCPU", SIGXCPU },
 	{ "XFSZ", SIGXFSZ }
@@ -107,7 +113,7 @@ int sigcmp(const void *a, const void *b)
 	return strcasecmp(((const signalmap_f*)a)->name, ((const signalmap_f*)b)->name);
 }
 
-static inline
+static
 int str2sig(const char *str)
 {
 	const signalmap_f signalmap_f = { str, 0 };
@@ -118,15 +124,15 @@ int str2sig(const char *str)
 		sizeof signalmap_f,
 		sigcmp
 	);
-
+	
 	if (res)
 		return res->num;
-
+	
 	return 0;
 }
 
 static inline
-void cmd_help()
+void cmd_help(int rc)
 {
 	printf("Usage: %s <command> <opts>*\n"
 	       "\n"
@@ -140,82 +146,104 @@ void cmd_help()
 	       "    -p,--pid <pid>          Send signal <sig> to process <pid>\n"
 	       "    -s,--sig <sig>          Send signal <sig> to process <pid>\n"
 	       "    -x,--xid <xid>          The Context ID\n"
+	       "\n"
+	       "Generic options:\n"
+	       "    -v,--verbose            Print verbose information\n"
+	       "    -q,--quiet              Be quiet\n"
 	       "\n",
 	       NAME);
-	exit(EXIT_SUCCESS);
+	exit(rc);
 }
 
 int main(int argc, char *argv[])
 {
+	if (getuid() != 0)
+		EXIT("This programm requires root privileges", 1);
+	
 	struct commands cmds = {
-		.kill = false,
-		.wait = false
+		.help		= false,
+		.version	= false,
+		.kill		= false,
+		.wait		= false
 	};
-
+	
 	struct options opts = {
-		.pid = (pid_t) 0,
-		.sig = (int32_t) SIGKILL,
-		.xid = XID_SELF
+		.pid		= (pid_t) 0,
+		.sig		= (int32_t) SIGKILL,
+		.xid		= XID_SELF,
+		.verbose	= false,
+		.quiet		= false
 	};
-
-	int c;
-
+	
+	int c, cmdcnt = 0;
+	
 	while (1) {
 		c = getopt_long(argc, argv, SHORT_OPTS, LONG_OPTS, 0);
 		if (c == -1) break;
-
+		
 		switch (c) {
 			case 'h':
-				cmd_help();
+				cmd_help(0);
 				break;
-
+			
 			case 'V':
 				CMD_VERSION(NAME, DESCR);
 				break;
-
+			
 			case 'K':
 				cmds.kill = true;
+				cmdcnt++;
 				break;
-
+			
 			case 'W':
 				cmds.wait = true;
+				cmdcnt++;
 				break;
-
+			
 			case 'p':
 				opts.pid = (pid_t) atoi(optarg);
 				break;
-
+			
 			case 's':
 				opts.sig = (int32_t) str2sig(optarg);
 				break;
-
+			
 			case 'x':
 				opts.xid = (xid_t) atoi(optarg);
 				break;
-
+			
+			case 'v':
+				opts.verbose = true;
+				break;
+			
+			case 'q':
+				opts.quiet = true;
+				break;
+			
 			default:
 				printf("Try '%s --help' for more information\n", argv[0]);
-				exit(EXIT_USAGE);
+				return EXIT_FAILURE;
 				break;
 		}
 	}
-
-	if (getuid() != 0)
-		EXIT("This programm requires root privileges", EXIT_USAGE);
 	
-	if (cmds.kill && cmds.wait)
-		EXIT("Can't kill and wait at the same time", EXIT_USAGE);
-
-	if (cmds.kill)
+	if (cmdcnt == 0)
+		EXIT("No command given", 1);
+	
+	if (cmdcnt > 1)
+		EXIT("More than one command given", 1);
+	
+	if (opts.xid <= 1)
+		if ((opts.xid = vx_get_task_xid(opts.pid)) <= 1)
+			EXIT("Invalid --xid given", 1);
+	
+	if (cmds.kill) {
 		if (vx_kill(opts.xid, opts.pid, opts.sig) < 0)
-			PEXIT("Failed to kill process/context", EXIT_COMMAND);
+			PEXIT("Failed to kill process/context", 2);
+	}
 	
 	if (cmds.wait)
-		EXIT("--wait not implemented yet...", EXIT_USAGE);
+		EXIT("Not implemented yet...", 1);
 	
-	if (argc > optind)
-		execvp(argv[optind], argv+optind);
-
-	exit(EXIT_SUCCESS);
+	return EXIT_FAILURE;
 }
-
