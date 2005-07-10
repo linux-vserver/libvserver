@@ -28,7 +28,7 @@
 
 #include "vserver.h"
 
-int vc_add_dlimit(xid_t xid, const char *name, uint32_t flags)
+int vx_add_dlimit(xid_t xid, const char *name, uint32_t flags)
 {
 	struct vcmd_ctx_dlimit_base_v0 res;
 
@@ -43,7 +43,7 @@ int vc_add_dlimit(xid_t xid, const char *name, uint32_t flags)
 	return vserver(VCMD_add_dlimit, xid, &res);
 }
 
-int vc_rem_dlimit(xid_t xid, const char *name)
+int vx_rem_dlimit(xid_t xid, const char *name)
 {
 	struct vcmd_ctx_dlimit_base_v0 res;
 
@@ -52,7 +52,7 @@ int vc_rem_dlimit(xid_t xid, const char *name)
 	return vserver(VCMD_rem_dlimit, xid, &res);
 }
 
-int vc_set_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
+int vx_set_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
 {
 	struct vcmd_ctx_dlimit_v0 res;
 
@@ -72,7 +72,7 @@ int vc_set_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
 	return vserver(VCMD_set_dlimit, xid, dlimit);
 }
 
-int vc_get_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
+int vx_get_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
 {
 	struct vcmd_ctx_dlimit_v0 res;
 
