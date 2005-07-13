@@ -24,11 +24,15 @@ svn copy ${svnroot}/trunk ${svnroot}/tags/release-${ver} \
 echo "Running autotools..."
 
 make -f Makefile.cvs &>/dev/null || die "make failed"
-mkdir build &>/dev/null || die "mkdir build failed"
+mkdir build &>/dev/null
 pushd build/ &>/dev/null || die "popd failed"
 
 echo "Make dist tarballs"
 ../configure && make dist || die "make dist failed"
+
+for i in *.tar*; do
+	md5sum $i > $i.md5
+done
 
 echo "Tarball ist at `pwd`"
 
