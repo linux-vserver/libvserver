@@ -1,0 +1,37 @@
+What is it?
+===========
+
+This is a clean implementation of the Linux-VServer 2.0 API using a library
+which handles all vserver syscalls and provides a interface usable in other
+applications such as the tools provided with libvserver.
+The tools directory contains the most basic implementation of the syscall
+commands in user space. High-level programs such as the "vserver" command of 
+util-vserver can use these tools to access the VServer API.
+
+
+What's wrong with libvserver from util-vserver?
+===============================================
+
+Short version:
+
+<Bertl> I guess the main issue is that nobody can read enricos code well enough
+        to fix/change it?
+
+Long version:
+
+The current alpha util-vserver package contains lots of obsoleted legacy code
+and also contains huge wrapper functions to provide access to all previous
+versions of the VServer API though making it quite hard to fix bugs or add new
+features  in an adequate timeframe.
+
+
+What can i do to help?
+======================
+
+Currently all syscalls are implemented in the library though very rough for now.
+Additionally some tools already contain basic implementations of the library
+such as vcontext, vnamespace, vsched and vsignal.
+So you see there's still a lot of work to do...
+
+If you'd like to participate in libvservers development feel free to contact
+me (Hollow) using IRC (irc.oftc.net#vserver) or hollow@gentoo.org
