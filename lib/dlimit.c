@@ -34,11 +34,6 @@ int vx_add_dlimit(xid_t xid, const char *name, uint32_t flags)
 {
 	struct vcmd_ctx_dlimit_base_v0 res;
 
-	if (!name) {
-		errno = EFAULT;
-		return -1;
-	}
-
 	res.name = name;
 	res.flags = flags;
 
@@ -58,11 +53,6 @@ int vx_set_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
 {
 	struct vcmd_ctx_dlimit_v0 res;
 
-	if (!dlimit) {
-		errno = EFAULT;
-		return -1;
-	}
-
 	res.name         = name;
 	res.space_used   = dlimit->space_used;
 	res.space_total  = dlimit->space_total;
@@ -78,15 +68,11 @@ int vx_get_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
 {
 	struct vcmd_ctx_dlimit_v0 res;
 
-	if (!dlimit) {
-		errno = EFAULT;
-		return -1;
-	}
-
 	res.name = name;
-
-	if (vserver(VCMD_get_dlimit, xid, dlimit) < 0)
-		return -1;
+	int rc = vserver(VCMD_get_dlimit, xid, dlimit);
+	
+	if (rc == -1)
+		return rc;
 
 	dlimit->space_used   = res.space_used;
 	dlimit->space_total  = res.space_total;
@@ -95,5 +81,5 @@ int vx_get_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
 	dlimit->reserved     = res.reserved;
 	dlimit->flags        = res.flags;
 
-	return 0;
+	return rc;
 }

@@ -39,18 +39,15 @@ int vx_get_info(xid_t xid, struct vx_info *info)
 {
 	struct vcmd_vx_info_v0 res;
 
-	if (!info) {
-		errno = EFAULT;
-		return -1;
-	}
+	int rc = vserver(VCMD_vx_info, xid, &res);
 
-	if (vserver(VCMD_vx_info, xid, &res) < 0)
-		return -1;
+	if (rc == -1)
+		return rc;
 
 	info->xid     = res.xid;
 	info->initpid = res.initpid;
 
-	return 0;
+	return rc;
 }
 
 int vx_create(xid_t xid, uint64_t flags)
@@ -71,11 +68,6 @@ int vx_set_flags(xid_t xid, struct vx_flags *flags)
 {
 	struct vcmd_ctx_flags_v0 res;
 
-	if (!flags) {
-		errno = EFAULT;
-		return -1;
-	}
-
 	res.flagword = flags->flags;
 	res.mask     = flags->mask;
 
@@ -86,28 +78,20 @@ int vx_get_flags(xid_t xid, struct vx_flags *flags)
 {
 	struct vcmd_ctx_flags_v0 res;
 
-	if (!flags) {
-		errno = EFAULT;
-		return -1;
-	}
+	int rc = vserver(VCMD_get_cflags, xid, &res);
 
-	if (vserver(VCMD_get_cflags, xid, &res))
-		return -1;
+	if (rc == -1)
+		return rc;
 
 	flags->flags = res.flagword;
 	flags->mask  = res.mask;
 
-	return 0;
+	return rc;
 }
 
 int vx_set_caps(xid_t xid, struct vx_caps *caps)
 {
 	struct vcmd_ctx_caps_v0 res;
-
-	if (!caps) {
-		errno = EFAULT;
-		return -1;
-	}
 
 	res.bcaps = caps->bcaps;
 	res.ccaps = caps->ccaps;
@@ -120,17 +104,14 @@ int vx_get_caps(xid_t xid, struct vx_caps *caps)
 {
 	struct vcmd_ctx_caps_v0 res;
 
-	if (!caps) {
-		errno = EFAULT;
-		return -1;
-	}
+	int rc = vserver(VCMD_get_ccaps, xid, &res);
 
-	if (vserver(VCMD_get_ccaps, xid, &res) < 0)
-		return -1;
+	if (rc == -1)
+		return rc;
 
 	caps->bcaps = res.bcaps;
 	caps->ccaps = res.ccaps;
 	caps->cmask = res.cmask;
 
-	return 0;
+	return rc;
 }

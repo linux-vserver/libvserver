@@ -39,18 +39,15 @@ int nx_get_task_nid(pid_t pid)
 int nx_get_info(nid_t nid, struct nx_info *info)
 {
 	struct vcmd_nx_info_v0 res;
+	
+	int rc = vserver(VCMD_nx_info, nid, &res);
 
-	if (!info) {
-		errno = EFAULT;
-		return -1;
-	}
-
-	if (vserver(VCMD_nx_info, nid, &res) < 0)
-		return -1;
+	if (rc == -1)
+		return rc;
 
 	info->nid = res.nid;
 
-	return 0;
+	return rc;
 }
 
 int nx_create(nid_t nid, uint64_t flags)
@@ -71,11 +68,6 @@ int nx_add_addr(nid_t nid, struct nx_addr *net)
 {
 	struct vcmd_net_addr_v0 res;
 
-	if (!net) {
-		errno = EFAULT;
-		return -1;
-	}
-
 	res.type = net->type;
 	res.count = net->count;
 	memcpy(res.ip, net->ip, sizeof(res.ip));
@@ -88,11 +80,6 @@ int nx_rem_addr(nid_t nid, struct nx_addr *net)
 {
 	struct vcmd_net_addr_v0 res;
 
-	if (!net) {
-		errno = EFAULT;
-		return -1;
-	}
-
 	res.type = net->type;
 	res.count = net->count;
 	memcpy(res.ip, net->ip, sizeof(res.ip));
@@ -104,29 +91,21 @@ int nx_rem_addr(nid_t nid, struct nx_addr *net)
 int nx_get_flags(nid_t nid, struct nx_flags *flags)
 {
 	struct vcmd_net_flags_v0 res;
+	
+	int rc = vserver(VCMD_get_nflags, nid, &res);
 
-	if (!flags) {
-		errno = EFAULT;
-		return -1;
-	}
-
-	if (vserver(VCMD_get_nflags, nid, &res) < 0)
-		return -1;
+	if (rc == -1)
+		return rc;
 
 	flags->flags = res.flagword;
 	flags->mask  = res.mask;
 
-	return 0;
+	return rc;
 }
 
 int nx_set_flags(nid_t nid, struct nx_flags *flags)
 {
 	struct vcmd_net_flags_v0 res;
-
-	if (!flags) {
-		errno = EFAULT;
-		return -1;
-	}
 
 	res.flagword = flags->flags;
 	res.mask     = flags->mask;
@@ -137,29 +116,21 @@ int nx_set_flags(nid_t nid, struct nx_flags *flags)
 int nx_get_caps(nid_t nid, struct nx_caps *caps)
 {
 	struct vcmd_net_caps_v0 res;
+	
+	int rc = vserver(VCMD_get_ncaps, nid, &res);
 
-	if (!caps) {
-		errno = EFAULT;
-		return -1;
-	}
-
-	if (vserver(VCMD_get_ncaps, nid, &res) < 0)
-		return -1;
+	if (rc == -1)
+		return rc;
 
 	caps->caps = res.ncaps;
 	caps->mask = res.cmask;
 
-	return 0;
+	return rc;
 }
 
 int nx_set_caps(nid_t nid, struct nx_caps *caps)
 {
 	struct vcmd_net_caps_v0 res;
-
-	if (!caps) {
-		errno = EFAULT;
-		return -1;
-	}
 
 	res.ncaps = caps->caps;
 	res.cmask = caps->mask;

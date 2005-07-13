@@ -34,11 +34,6 @@ int vx_set_sched(xid_t xid, struct vx_sched *sched)
 {
 	struct vcmd_set_sched_v3 res;
 
-	if (!sched) {
-		errno = EFAULT;
-		return -1;
-	}
-
 	res.set_mask      = sched->set_mask;
 	res.fill_rate     = sched->fill_rate;
 	res.interval      = sched->interval;

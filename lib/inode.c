@@ -35,15 +35,16 @@ int vx_get_iattr(const char *name, struct vx_iattr *iattr)
 	struct vcmd_ctx_iattr_v1 res;
 
 	res.name = name;
-
-	if (vserver(VCMD_get_iattr, 0, &res) < 0)
-		return -1;
+	int rc = vserver(VCMD_get_iattr, 0, &res);
+	
+	if (rc == -1)
+		return rc;
 
 	iattr->xid   = res.xid;
 	iattr->flags = res.flags;
 	iattr->mask  = res.mask;
 
-	return 0;
+	return rc;
 }
 
 int vx_set_iattr(const char *name, struct vx_iattr *iattr)
