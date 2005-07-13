@@ -1,0 +1,32 @@
+#!/bin/bash
+
+proj="libvserver"
+svnroot="http://dev.croup.de/repos/${proj}"
+
+usage() {
+	echo "Usage: mkrelease"
+}
+
+die() {
+	echo $1
+	exit ${2:-1}
+}
+
+echo "Creating release tag... "
+
+svn copy ${svnroot}/trunk ${svnroot}/tags/release-${ver} \
+	-m "Tagging the ${ver} release of the libvserver project" &>/dev/null || die "svn copy failed"
+
+
+echo "Running autotools..."
+
+make -f Makefile.cvs &>/dev/null || die "make failed"
+mkdir build &>/dev/null || die "mkdir build failed"
+pushd build/ &>/dev/null || die "popd failed"
+
+echo "Make dist tarballs"
+../configure && make dist || die "make dist failed"
+
+echo "Tarball ist at `pwd`"
+
+popd &>/dev/null || die "popd failed"
