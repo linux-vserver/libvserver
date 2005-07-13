@@ -37,11 +37,14 @@ pushd ${proj}-${ver} &>/dev/null || die "pushd failed"
 echo "Running autotools..."
 
 make -f Makefile.cvs &>/dev/null || die "make failed"
+mkdir build &>/dev/null || die "mkdir build failed"
+pushd build/ &>/dev/null || die "popd failed"
+
+echo "Make dist tarballs"
+../configure && make dist || die "make dist failed"
+
+echo "Tarball ist at ${tmpdir}/${proj}-${ver}/build/${proj}-${ver}.tar.{gz,bz2}"
+
 popd &>/dev/null || die "popd failed"
-
-echo "Creating tarball.."
-tar cjf ${proj}-${ver}.tar.bz2 ${proj}-${ver}/ &>/dev/null || die "tar failed"
-
-echo "Tarball ist at ${tmpdir}/${proj}-${ver}.tar.bz2"
-
+popd &>/dev/null || die "popd failed"
 popd &>/dev/null || die "popd failed"
