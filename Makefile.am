@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = foreign 1.4
 
 SUBDIRS = lib tools
 
-nodist_devtools_DATA = mkrelease
+nodist_data_DATA = mkrelease
 
 nobase_include_HEADERS = \
 	linux/vserver/context_cmd.h \
