@@ -26,7 +26,6 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <errno.h>
 #include <getopt.h>
 
 #include "vserver.h"
@@ -47,6 +46,7 @@ struct option LONG_OPTS[] = {
 };
 
 struct commands {
+	bool set;
 };
 
 struct options {
@@ -81,7 +81,9 @@ int main(int argc, char *argv[])
 	if (getuid() != 0)
 		EXIT("This programm requires root privileges", 1);
 	
-	struct commands cmds = {};
+	struct commands cmds = {
+		.set = 0
+	};
 	
 	struct options opts = {
 		.xid     = XID_SELF,

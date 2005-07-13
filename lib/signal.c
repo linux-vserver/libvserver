@@ -22,7 +22,9 @@
 #include <config.h>
 #endif
 
-#include "syscall-vserver.h"
+#include <stdint.h>
+#include <errno.h>
+
 #include "linux/vserver/switch.h"
 #include "linux/vserver/signal_cmd.h"
 

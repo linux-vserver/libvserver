@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 	struct options opts = {
 		.xid     = XID_SELF,
 		.mount   = 0,
-		.dlimit  = { 0, 0, 0, 0, 0 },
+		.dlimit  = { 0, 0, 0, 0, 0, 0 },
 	};
 
 	int c;

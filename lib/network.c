@@ -22,9 +22,10 @@
 #include <config.h>
 #endif
 
+#include <stdint.h>
+#include <errno.h>
 #include <string.h>
 
-#include "syscall-vserver.h"
 #include "linux/vserver/switch.h"
 #include "linux/vserver/network_cmd.h"
 

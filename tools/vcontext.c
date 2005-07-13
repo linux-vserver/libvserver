@@ -26,7 +26,6 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <errno.h>
 #include <getopt.h>
 #include <sys/types.h>
 

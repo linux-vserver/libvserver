@@ -27,7 +27,6 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
-#include <errno.h>
 #include <getopt.h>
 #include <sys/types.h>
 

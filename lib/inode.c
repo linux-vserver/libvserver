@@ -22,9 +22,9 @@
 #include <config.h>
 #endif
 
-#include <string.h>
+#include <stdint.h>
+#include <errno.h>
 
-#include "syscall-vserver.h"
 #include "linux/vserver/switch.h"
 #include "linux/vserver/inode_cmd.h"
 

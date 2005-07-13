@@ -1,11 +1,12 @@
 # Generic configuration
+AC_PREREQ(2.59)
 AC_INIT(libvserver, 0.2, [http://dev.croup.de/proj/libvserver])
 AC_CONFIG_HEADER([config.h])
-AM_INIT_AUTOMAKE()
+AC_GNU_SOURCE
 
-# Disable shared objects by default
-# until the errno fsck up is fixed
-AC_DISABLE_SHARED
+# Automake
+AM_INIT_AUTOMAKE([1.9 gnits dist-bzip2])
+AM_MAINTAINER_MODE
 
 # Checks for programs.
 AC_PROG_CC
@@ -23,9 +24,10 @@ AC_HEADER_STDBOOL
 AC_CHECK_HEADERS([stdint.h unistd.h])
 
 # Checks for typedefs
-AC_TYPE_UID_T
-AC_TYPE_PID_T
-AC_TYPE_SIZE_T
+AC_CHECK_TYPES([uid_t,
+                gid_t,
+                pid_t,
+                size_t])
 
 # Checks for compiler characteristics.
 AC_C_CONST
@@ -33,6 +35,12 @@ AC_C_INLINE
 
 # Checks for library functions.
 AC_CHECK_FUNCS([strcasecmp strpbrk])
+
+# Compiler settings
+CFLAGS="${CFLAGS} -W -Wall -std=gnu99"
+
+# Site configuration
+ENABLE_ALT_SYSCALL
 
 # Output
 AC_CONFIG_FILES([Makefile
