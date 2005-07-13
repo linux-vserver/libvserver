@@ -4,7 +4,7 @@ proj="libvserver"
 svnroot="http://dev.croup.de/repos/${proj}"
 
 usage() {
-	echo "Usage: mkrelease <ver>"
+	echo "Usage: mkrelease"
 }
 
 die() {
@@ -12,27 +12,11 @@ die() {
 	exit ${2:-1}
 }
 
-if [ "$1" == "" ]; then
-	echo "Missing argument!"
-	usage
-	exit 1
-fi
-
-ver=$1
-
-tmpdir=`mktemp -d`
-pushd ${tmpdir} &>/dev/null || die "pushd failed"
-
 echo "Creating release tag... "
 
 svn copy ${svnroot}/trunk ${svnroot}/tags/release-${ver} \
 	-m "Tagging the ${ver} release of the libvserver project" &>/dev/null || die "svn copy failed"
 
-
-echo "Exporting release..."
-
-svn export ${svnroot}/tags/release-${ver} ${proj}-${ver}/ &>/dev/null || die "svn export failed"
-pushd ${proj}-${ver} &>/dev/null || die "pushd failed"
 
 echo "Running autotools..."
 
@@ -43,8 +27,6 @@ pushd build/ &>/dev/null || die "popd failed"
 echo "Make dist tarballs"
 ../configure && make dist || die "make dist failed"
 
-echo "Tarball ist at ${tmpdir}/${proj}-${ver}/build/${proj}-${ver}.tar.{gz,bz2}"
+echo "Tarball ist at `pwd`"
 
-popd &>/dev/null || die "popd failed"
-popd &>/dev/null || die "popd failed"
 popd &>/dev/null || die "popd failed"
