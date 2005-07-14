@@ -5,7 +5,7 @@ AC_CONFIG_HEADER([config.h])
 AC_GNU_SOURCE
 
 # Automake
-AM_INIT_AUTOMAKE([1.9 gnits dist-bzip2])
+AM_INIT_AUTOMAKE([1.9 gnu dist-bzip2])
 AM_MAINTAINER_MODE
 
 # Checks for programs.
@@ -40,6 +40,7 @@ AC_CHECK_FUNCS([strcasecmp strpbrk])
 CFLAGS="${CFLAGS} -W -Wall -std=gnu99"
 
 # Site configuration
+ENABLE_DIETLIBC
 ENABLE_ALT_SYSCALL
 
 # Output
