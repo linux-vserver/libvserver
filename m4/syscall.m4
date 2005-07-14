@@ -11,9 +11,7 @@ AC_DEFUN([ENABLE_ALT_SYSCALL],
 	if test "$enable_alt_syscall" = yes; then
 		AC_DEFINE(ALT_SYSCALL, 1, [Define to 1 if alternative syscall should be used])
 		AC_MSG_RESULT([yes])
-		if test "$enable_shared" = yes; then
-			AC_MSG_ERROR([alternative syscall needs --disable-shared])
-		fi
+		enable_shared=no
 	else
 		AC_MSG_RESULT([no])
 	fi

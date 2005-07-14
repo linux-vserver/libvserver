@@ -14,6 +14,8 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+ENABLE_DIETLIBC
+ENABLE_ALT_SYSCALL
 AC_PROG_LIBTOOL
 
 # Checks for libraries.
@@ -38,10 +40,6 @@ AC_CHECK_FUNCS([strcasecmp strpbrk])
 
 # Compiler settings
 CFLAGS="${CFLAGS} -W -Wall -std=gnu99"
-
-# Site configuration
-ENABLE_DIETLIBC
-ENABLE_ALT_SYSCALL
 
 # Output
 AC_CONFIG_FILES([Makefile
