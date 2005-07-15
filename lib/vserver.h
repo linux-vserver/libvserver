@@ -104,7 +104,7 @@ enum vhi_name_field {
 };
 #endif
 
-int vx_set_vhi_name(xid_t xid, uint32_t field, const char *name);
+int vx_set_vhi_name(xid_t xid, uint32_t field, char *name);
 int vx_get_vhi_name(xid_t xid, uint32_t field, char *name, size_t len);
 
 /* dlimit.c */

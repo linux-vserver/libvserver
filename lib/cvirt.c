@@ -31,13 +31,13 @@
 
 #include "vserver.h"
 
-int vx_set_vhi_name(xid_t xid, uint32_t field, const char *name)
+int vx_set_vhi_name(xid_t xid, uint32_t field, char *name)
 {
 	struct vcmd_vhi_name_v0 res;
 
 	res.field = field;
-	strncpy(res.name, name, VHI_SIZE-1);
-	res.name[VHI_SIZE] = '\0';
+	strncpy(res.name, name, VHI_SIZE-2);
+	res.name[VHI_SIZE-1] = '\0';
 
 	return vserver(VCMD_set_vhi_name, xid, &res);
 }
@@ -52,8 +52,8 @@ int vx_get_vhi_name(xid_t xid, uint32_t field, char *name, size_t len)
 	if (rc == -1)
 		return rc;
 
-	strncpy(name, res.name, len-1);
-	name[len] = '\0';
+	strncpy(name, res.name, len-2);
+	name[len-1] = '\0';
 
 	return rc;
 }
