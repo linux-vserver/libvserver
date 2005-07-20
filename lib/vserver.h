@@ -18,6 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+/*!
+ * @file vserver.h
+ * @brief Interface to libvserver
+ */
 #ifndef VSERVER_H
 #define VSERVER_H
 
@@ -34,10 +38,12 @@
 #include "syscall-alternative.h"
 #endif
 
-/* Constants */
-#define LIBVSERVER_VERSION "0.1"
+/*!
+ * @brief Current libvserver version
+ */
+#define LIBVSERVER_VERSION "0.2"
 
-/* C/C++ stuff */
+/// @cond
 #undef BEGIN_C_DECLS
 #undef END_C_DECLS
 #ifdef __cplusplus
@@ -49,29 +55,76 @@
 #endif
 
 BEGIN_C_DECLS
+/// @endcond
 
-/* prototypes begin here */
-#define XID_SELF   (xid_t) -1
+
+/*!
+ * @def   XID_SELF
+ * @brief Point to current xid
+ */
+/*!
+ * @def   XID_ADMIN
+ * @brief Admin/Host context id (usually 0)
+ */
+/*!
+ * @def   XID_WATCH
+ * @brief Id of the watch context
+ */
+#define XID_SELF   (xid_t) -1 
 #define XID_ADMIN  (xid_t)  0
 #define XID_WATCH  (xid_t)  1
 
-/* type definitions */
+/*!
+ * @typedef uint32_t xid_t
+ * @brief   Context id type
+ */
+/*!
+ * @typedef uint32_t nid_t
+ * @brief   Network context id type
+ */
 typedef uint32_t xid_t;
 typedef uint32_t nid_t;
 
-/* context.c */
+
+
+/*!
+ * @file  context.c
+ * @brief Context related methods
+ */
+
+/*!
+ * @brief Return context id of process pid
+ */
 int vx_get_task_xid(pid_t pid);
 
+/*!
+ * @brief Structure containing data about a context (context id, initpid)
+ */
 struct vx_info {
 	xid_t xid;
 	pid_t initpid;
 };
 
+/*!
+ * @brief Return information about a context
+ */
 int vx_get_info(xid_t xid, struct vx_info *info);
 
+/*
+ * @brief Create context
+ * 
+ * @param flags Initial context flags
+ */
 int vx_create(xid_t xid, uint64_t flags);
+
+/*!
+ * @brief Migrate to an existing context
+ */
 int vx_migrate(xid_t xid);
 
+/*!
+ * @brief Structure holding context flags
+ */
 struct vx_flags {
 	uint64_t flags;
 	uint64_t mask;
@@ -90,7 +143,7 @@ int vx_set_caps(xid_t xid, struct vx_caps *caps);
 int vx_get_caps(xid_t xid, struct vx_caps *caps);
 
 /* cvirt.c */
-#define VHI_SIZE (size_t) 65
+#define VHI_SIZE 65
 
 #ifndef _VX_CVIRT_CMD_H /* Don't conflict with the kernel definition */
 enum vhi_name_field {
@@ -228,7 +281,9 @@ int vx_wait_exit(xid_t xid);
 /* switch.c */
 int vs_get_version();
 
+/// @cond
 END_C_DECLS
+/// @endcond
 
 /* syscall stuff */
 #if 	defined(__alpha__)
