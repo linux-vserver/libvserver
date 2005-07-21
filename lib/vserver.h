@@ -30,7 +30,6 @@
 #endif
 
 #include <stdint.h>
-#include <errno.h>
 #include <sys/types.h>
 
 /*!
@@ -84,7 +83,6 @@ int vserver(uint32_t cmd, uint32_t id, void *data);
 #define XID_WATCH  (xid_t)  1
 
 /*!
- * @typedef uint32_t xid_t
  * @brief   Context id type
  */
 typedef uint32_t xid_t;
@@ -342,7 +340,6 @@ int vx_set_namespace();
 #define NID_WATCH  (nid_t)  1
 
 /*!
- * @typedef uint32_t nid_t
  * @brief   Network context id type
  */
 typedef uint32_t nid_t;
