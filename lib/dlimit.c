@@ -61,7 +61,7 @@ int vx_set_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
 	res.reserved     = dlimit->reserved;
 	res.flags        = dlimit->flags;
 
-	return vserver(VCMD_set_dlimit, xid, dlimit);
+	return vserver(VCMD_set_dlimit, xid, &res);
 }
 
 int vx_get_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
@@ -69,7 +69,7 @@ int vx_get_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
 	struct vcmd_ctx_dlimit_v0 res;
 
 	res.name = name;
-	int rc = vserver(VCMD_get_dlimit, xid, dlimit);
+	int rc = vserver(VCMD_get_dlimit, xid, &res);
 	
 	if (rc == -1)
 		return rc;
