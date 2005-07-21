@@ -24,21 +24,3 @@ nobase_include_HEADERS = \
 	linux/vserver/signal_cmd.h \
 	linux/vserver/switch.h \
 	linux/vserver/xid.h
-
-# Stuff from our distribution
-CLEANFILES = doxygen.cfg
-EXTRA_DIST = doxygen.cfg.in 
-
-# Remove doxygen/ on clean
-clean-local: doxygen-clean
-
-# Build source docs with doxygen
-.PHONY:
-doxygen: doxygen-clean
-	@sed -e "s:\@PACKAGE_NAME\@:$(PACKAGE):" \
-		 -e "s,\@PACKAGE_VERSION\@,$(VERSION)," doxygen.cfg.in > doxygen.cfg
-	@doxygen doxygen.cfg
-
-# Remove build source-docs
-doxygen-clean:
-	@rm -fr doxygen
