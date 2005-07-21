@@ -52,6 +52,20 @@
 BEGIN_C_DECLS
 /// @endcond
 
+/*!
+ * @file syscall.c
+ * @brief main vserver syscall interface
+ */
+
+/*!
+ * @brief main vserver syscall interface
+ */
+int vserver(uint32_t cmd, uint32_t id, void *data);
+
+/*!
+ * @file  context.c
+ * @brief Context related methods
+ */
 
 /*!
  * @def   XID_SELF
@@ -73,19 +87,7 @@ BEGIN_C_DECLS
  * @typedef uint32_t xid_t
  * @brief   Context id type
  */
-/*!
- * @typedef uint32_t nid_t
- * @brief   Network context id type
- */
 typedef uint32_t xid_t;
-typedef uint32_t nid_t;
-
-
-
-/*!
- * @file  context.c
- * @brief Context related methods
- */
 
 /*!
  * @brief Return context id of process pid
@@ -340,6 +342,12 @@ int vx_set_namespace();
 #define NID_WATCH  (nid_t)  1
 
 /*!
+ * @typedef uint32_t nid_t
+ * @brief   Network context id type
+ */
+typedef uint32_t nid_t;
+
+/*!
  * @brief vx_get_dlimit
  */
 int nx_get_task_nid(pid_t pid);
@@ -515,25 +523,5 @@ int vs_get_version();
 /*! @cond */
 END_C_DECLS
 /*! @endcond */
-
-
-#ifdef ALT_SYSCALL
-
-#include "syscall-alternative.h"
-
-static inline
-_syscall3(int, vserver, uint32_t, cmd, uint32_t, id, void *, data);
-
-#else
-
-#include <unistd.h>
-
-static inline
-int vserver(uint32_t cmd, uint32_t id, void *data)
-{
-	return syscall(__NR_vserver, cmd, id, data);
-}
-
-#endif
 
 #endif /* !VSERVER_H */

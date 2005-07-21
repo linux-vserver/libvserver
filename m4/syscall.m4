@@ -55,6 +55,8 @@ syscall_nr=__NR_vserver
 		AC_DEFINE_UNQUOTED(__NR_vserver, $syscall_nr, [VServer syscall number])
 		AC_MSG_RESULT([$syscall_nr])
 	fi
+	
+	AC_LANG_POP
 ])
 
 
