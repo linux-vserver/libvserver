@@ -32,11 +32,6 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-/*!
- * @brief Current libvserver version
- */
-#define LIBVSERVER_VERSION "0.2"
-
 /// @cond
 #undef BEGIN_C_DECLS
 #undef END_C_DECLS
