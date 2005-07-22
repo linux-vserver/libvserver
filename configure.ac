@@ -38,12 +38,11 @@ AC_C_INLINE
 AC_CHECK_FUNCS([strcasecmp strpbrk])
 
 # Compiler settings
-CFLAGS="${CFLAGS} -W -Wall -std=gnu99"
+CFLAGS="${CFLAGS} -W -Wall -std=c99 -pedantic"
 
 # Site settings
-CHECK_SYSCALL_NR
-ENABLE_DIETLIBC
-ENABLE_ALT_SYSCALL
+VS_CHECK_SYSCALL_NR
+VS_ENABLE_DIETLIBC
 
 
 # Output

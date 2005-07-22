@@ -1,4 +1,4 @@
-AC_DEFUN([ENABLE_DIETLIBC],
+AC_DEFUN([VS_ENABLE_DIETLIBC],
 [
 	AC_MSG_CHECKING([whether to use dietlibc])
 	
@@ -19,8 +19,6 @@ AC_DEFUN([ENABLE_DIETLIBC],
 		dietlibc_version=${dietlibc_version/*dietlibc-}
 		AC_DEFINE(DIETLIBC_VERSION, [$dietlibc_version], [Dietlibc version found on this system])
 		
-		enable_alt_syscall=yes
-		enable_static=no
 		CC="${DIET} ${DIETFLAGS} ${CC}"
 		
 		AC_MSG_RESULT([yes ($dietlibc_version)])

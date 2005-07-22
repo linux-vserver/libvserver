@@ -25,18 +25,6 @@
 #include <stdint.h>
 #include <errno.h>
 
-#ifdef ALT_SYSCALL
 #include "syscall-alternative.h"
-#else
-#include <unistd.h>
-#endif
 
-
-#ifdef ALT_SYSCALL
 _syscall3(int, vserver, uint32_t, cmd, uint32_t, id, void *, data);
-#else
-int vserver(uint32_t cmd, uint32_t id, void *data)
-{
-	return syscall(__NR_vserver, cmd, id, data);
-}
-#endif
