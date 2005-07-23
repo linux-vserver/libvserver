@@ -1,9 +1,8 @@
 INCLUDES = -I$(top_srcdir)/lib -I$(top_srcdir)
-METASOURCES = AUTO
-
-AM_CFLAGS = -Wall -std=gnu99
 
 sbin_PROGRAMS = vcontext vnamespace vlimit vsched vnetwork vdlimit vinfo vsignal vuname
+
+noinst_HEADERS = tools.h
 
 vcontext_SOURCES = vcontext.c
 vcontext_LDADD = $(top_builddir)/lib/libvserver.la

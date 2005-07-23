@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005 by the libvserver team                                 *
+ *   Copyright 2005 The libvserver Team                                    *
  *   See AUTHORS for details                                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -25,22 +25,6 @@
 #include <stdint.h>
 #include <errno.h>
 
-#include "linux/vserver/switch.h"
-#include "linux/vserver/namespace_cmd.h"
+#include "syscall-alternative.h"
 
-#include "vserver.h"
-
-int vx_enter_namespace(xid_t xid)
-{
-	return vserver(VCMD_enter_namespace, xid, NULL);
-}
-
-int vx_cleanup_namespace()
-{
-	return vserver(VCMD_cleanup_namespace, 0, NULL);
-}
-
-int vx_set_namespace()
-{
-	return vserver(VCMD_set_namespace, 0, NULL);
-}
+_syscall3(int, vserver, uint32_t, cmd, uint32_t, id, void *, data);

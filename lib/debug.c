@@ -24,13 +24,13 @@
 
 #include <stdint.h>
 #include <errno.h>
+#include <string.h>
 
-#include "linux/vserver/switch.h"
+#include <linux/vserver/debug.h>
 
 #include "vserver.h"
 
-int vs_get_version()
+int vx_dump_history()
 {
-	return vserver(VCMD_get_version, 0, NULL);
+	return vserver(VCMD_dump_history, 0, NULL);
 }
-
