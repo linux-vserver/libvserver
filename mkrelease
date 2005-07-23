@@ -12,7 +12,7 @@ die() {
 	exit ${2:-1}
 }
 
-ver=`grep AC_INIT configure.in | awk '{ print $2 }'`
+ver=`grep AC_INIT configure.ac | awk '{ print $2 }'`
 ver=${ver/,}
 
 echo "Creating release tag... "
@@ -24,11 +24,16 @@ svn copy ${svnroot}/trunk ${svnroot}/tags/release-${ver} \
 echo "Running autotools..."
 
 make -f Makefile.cvs &>/dev/null || die "make failed"
-mkdir build &>/dev/null || die "mkdir build failed"
+mkdir build &>/dev/null
 pushd build/ &>/dev/null || die "popd failed"
 
 echo "Make dist tarballs"
-../configure && make dist || die "make dist failed"
+../configure &>/dev/null || die "configure failed"
+make dist &>/dev/null || die "make dist failed"
+
+for i in *.tar*; do
+	md5sum $i > $i.md5
+done
 
 echo "Tarball ist at `pwd`"
 

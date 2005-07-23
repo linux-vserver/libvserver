@@ -1,10 +1,5 @@
-# not a GNU package. You can remove this line, if
-# have all needed files, that a GNU package needs
-AUTOMAKE_OPTIONS = foreign 1.4
-
+# Top level makefile
 SUBDIRS = lib tools
-
-nodist_data_DATA = mkrelease
 
 nobase_include_HEADERS = \
 	linux/vserver/context_cmd.h \
@@ -12,6 +7,8 @@ nobase_include_HEADERS = \
 	linux/vserver/cvirt_cmd.h \
 	linux/vserver/cvirt_def.h \
 	linux/vserver/cvirt.h \
+	linux/vserver/debug.h \
+	linux/vserver/debug_cmd.h \
 	linux/vserver/dlimit_cmd.h \
 	linux/vserver/dlimit.h \
 	linux/vserver/inode_cmd.h \

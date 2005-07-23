@@ -18,6 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+/*!
+ * @file vserver.h
+ * @brief Interface to libvserver
+ */
 #ifndef VSERVER_H
 #define VSERVER_H
 
@@ -25,19 +29,10 @@
 #include <config.h>
 #endif
 
-#include <unistd.h>
 #include <stdint.h>
-#include <errno.h>
 #include <sys/types.h>
 
-#ifdef ALT_SYSCALL
-#include "syscall-alternative.h"
-#endif
-
-/* Constants */
-#define LIBVSERVER_VERSION "0.1"
-
-/* C/C++ stuff */
+/// @cond
 #undef BEGIN_C_DECLS
 #undef END_C_DECLS
 #ifdef __cplusplus
@@ -49,49 +44,124 @@
 #endif
 
 BEGIN_C_DECLS
+/// @endcond
 
-/* prototypes begin here */
-#define XID_SELF   (xid_t) -1
+/*!
+ * @file syscall.c
+ * @brief main vserver syscall interface
+ */
+
+/*!
+ * @brief main vserver syscall interface
+ */
+int vserver(uint32_t cmd, uint32_t id, void *data);
+
+/*!
+ * @file  context.c
+ * @brief Context related methods
+ */
+
+/*!
+ * @def   XID_SELF
+ * @brief Point to current xid
+ */
+/*!
+ * @def   XID_ADMIN
+ * @brief Admin/Host context id (usually 0)
+ */
+/*!
+ * @def   XID_WATCH
+ * @brief Id of the watch context
+ */
+#define XID_SELF   (xid_t) -1 
 #define XID_ADMIN  (xid_t)  0
 #define XID_WATCH  (xid_t)  1
 
-/* type definitions */
+/*!
+ * @brief   Context id type
+ */
 typedef uint32_t xid_t;
-typedef uint32_t nid_t;
 
-/* context.c */
+/*!
+ * @brief Return context id of process pid
+ */
 int vx_get_task_xid(pid_t pid);
 
+/*!
+ * @brief Structure containing data about a context (context id, initpid)
+ */
 struct vx_info {
 	xid_t xid;
 	pid_t initpid;
 };
 
+/*!
+ * @brief Return information about a context
+ */
 int vx_get_info(xid_t xid, struct vx_info *info);
 
+/*!
+ * @brief Create context
+ */
 int vx_create(xid_t xid, uint64_t flags);
+
+/*!
+ * @brief Migrate to an existing context
+ */
 int vx_migrate(xid_t xid);
 
+/*!
+ * @brief Structure holding context flags
+ */
 struct vx_flags {
 	uint64_t flags;
 	uint64_t mask;
 };
 
+/*!
+ * @brief vx_set_flags
+ */
 int vx_set_flags(xid_t xid, struct vx_flags *flags);
+
+/*!
+ * @brief vx_get_flags
+ */
 int vx_get_flags(xid_t xid, struct vx_flags *flags);
 
+/*!
+ * @brief vx_caps
+ */
 struct vx_caps {
 	uint64_t bcaps;
 	uint64_t ccaps;
 	uint64_t cmask;
 };
 
+/*!
+ * @brief vx_set_caps
+ */
 int vx_set_caps(xid_t xid, struct vx_caps *caps);
+
+/*!
+ * @brief vx_get_caps
+ */
 int vx_get_caps(xid_t xid, struct vx_caps *caps);
 
-/* cvirt.c */
-#define VHI_SIZE (size_t) 65
 
+
+/*!
+ * @file cvirt.c
+ * @brief Virtual host information related functions
+ */
+
+/*!
+ * @brief Length of VHI name fields
+ */
+#define VHI_SIZE 65
+
+/*!
+ * @brief vhi_name_field
+ */
 #ifndef _VX_CVIRT_CMD_H /* Don't conflict with the kernel definition */
 enum vhi_name_field {
 	VHIN_CONTEXT=0,
@@ -104,13 +174,45 @@ enum vhi_name_field {
 };
 #endif
 
-int vx_set_vhi_name(xid_t xid, uint32_t field, const char *name);
+/*!
+ * @brief vx_set_vhi_name
+ */
+int vx_set_vhi_name(xid_t xid, uint32_t field, char *name);
+
+/*!
+ * @brief vx_get_vhi_name
+ */
 int vx_get_vhi_name(xid_t xid, uint32_t field, char *name, size_t len);
 
-/* dlimit.c */
+
+/*!
+ * @file debug.c
+ * @brief Debugging functions
+ */
+
+/*!
+ * @brief vx_dump_history
+ */
+int vs_dump_history();
+
+/*!
+ * @file dlimit.c
+ * @brief Disk limit related functions
+ */
+
+/*!
+ * @brief vx_add_dlimit
+ */
 int vx_add_dlimit(xid_t xid, const char *name, uint32_t flags);
+
+/*!
+ * @brief vx_rem_dlimit
+ */
 int vx_rem_dlimit(xid_t xid, const char *name);
 
+/*!
+ * @brief vx_dlimit
+ */
 struct vx_dlimit {
 	uint32_t space_used;
 	uint32_t space_total;
@@ -120,58 +222,162 @@ struct vx_dlimit {
 	uint32_t flags;
 };
 
+/*!
+ * @brief vx_set_dlimit
+ */
 int vx_set_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit);
+
+/*!
+ * @brief vx_get_dlimit
+ */
 int vx_get_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit);
 
-/* inode.c */
+
+
+/*!
+ * @file inode.c
+ * @brief XID tagging related functions
+ */
+
+/*!
+ * @brief vx_iattr
+ */
 struct vx_iattr {
 	xid_t xid;
 	uint32_t flags;
 	uint32_t mask;
 };
 
+/*!
+ * @brief vx_get_dlimit
+ */
 int vx_set_iattr(const char *name, struct vx_iattr *iattr);
+
+/*!
+ * @brief vx_get_dlimit
+ */
 int vx_get_iattr(const char *name, struct vx_iattr *iattr);
 
-/* limit.c */
+
+
+/*!
+ * @file limit.c
+ * @brief Resource limits
+ */
+
+/*!
+ * @brief vx_get_dlimit
+ */
 struct vx_rlimit {
 	uint64_t minimum;
 	uint64_t softlimit;
 	uint64_t maximum;
 };
 
+/*!
+ * @brief vx_get_dlimit
+ */
 int vx_set_rlimit(xid_t xid, uint32_t id, struct vx_rlimit *rlimit);
+
+/*!
+ * @brief vx_get_dlimit
+ */
 int vx_get_rlimit(xid_t xid, uint32_t id, struct vx_rlimit *rlimit);
 
+/*!
+ * @brief vx_get_dlimit
+ */
 struct vx_rlimit_mask {
 	uint32_t minimum;
 	uint32_t softlimit;
 	uint32_t maximum;
 };
 
+/*!
+ * @brief vx_get_dlimit
+ */
 int vx_get_rlimit_mask(struct vx_rlimit_mask *rmask);
 
-/* namespace.c */
+
+
+/*!
+ * @file namespace.c
+ * @brief Filesystem Namespaces
+ */
+
+/*!
+ * @brief vx_get_dlimit
+ */
 int vx_enter_namespace(xid_t xid);
+
+/*!
+ * @brief vx_get_dlimit
+ */
 int vx_cleanup_namespace();
+
+/*!
+ * @brief vx_get_dlimit
+ */
 int vx_set_namespace();
 
-/* network.c */
+
+
+/*!
+ * @file network.c
+ * @brief Network contexts
+ */
+
+/*!
+ * @def   NID_SELF
+ * @brief Point to current xid
+ */
+/*!
+ * @def   NID_ADMIN
+ * @brief Point to current xid
+ */
+/*!
+ * @def   NID_WATCH
+ * @brief Point to current xid
+ */
 #define NID_SELF   (nid_t) -1
 #define NID_ADMIN  (nid_t)  0
 #define NID_WATCH  (nid_t)  1
 
+/*!
+ * @brief   Network context id type
+ */
+typedef uint32_t nid_t;
+
+/*!
+ * @brief vx_get_dlimit
+ */
 int nx_get_task_nid(pid_t pid);
 
+/*!
+ * @brief vx_get_dlimit
+ */
 struct nx_info {
 	nid_t nid;
 };
 
+/*!
+ * @brief vx_get_dlimit
+ */
 int nx_get_info(nid_t nid, struct nx_info *info);
 
+/*!
+ * @brief vx_get_dlimit
+ */
 int nx_create(nid_t nid, uint64_t flags);
+
+/*!
+ * @brief vx_get_dlimit
+ */
 int nx_migrate(nid_t nid);
 
+/*!
+ * @brief vx_get_dlimit
+ */
 struct nx_addr {
 	uint16_t type;
 	uint16_t count;
@@ -179,26 +385,83 @@ struct nx_addr {
 	uint32_t mask[4];
 };
 
+/*!
+ * @brief vx_get_dlimit
+ */
 int nx_add_addr(nid_t nid, struct nx_addr *net);
+
+/*!
+ * @brief vx_get_dlimit
+ */
 int nx_rem_addr(nid_t nid, struct nx_addr *net);
 
+/*!
+ * @brief vx_get_dlimit
+ */
 struct nx_flags {
 	uint64_t flags;
 	uint64_t mask;
 };
 
+/*!
+ * @brief vx_get_dlimit
+ */
 int nx_set_flags(nid_t nid, struct nx_flags *flags);
+
+/*!
+ * @brief vx_get_dlimit
+ */
 int nx_get_flags(nid_t nid, struct nx_flags *flags);
 
+/*!
+ * @brief vx_get_dlimit
+ */
 struct nx_caps {
 	uint64_t caps;
 	uint64_t mask;
 };
 
+/*!
+ * @brief vx_get_dlimit
+ */
 int nx_set_caps(nid_t nid, struct nx_caps *caps);
+
+/*!
+ * @brief vx_get_dlimit
+ */
 int nx_get_caps(nid_t nid, struct nx_caps *caps);
 
-/* sched.c */
+
+
+/*!
+ * @file sched.c
+ * @brief Hard CPU scheduler
+ */
+
+/*!
+ * @def   VXSM_FILL_RATE
+ * @brief Point to current xid
+ */
+/*!
+ * @def   VXSM_INTERVAL
+ * @brief Point to current xid
+ */
+/*!
+ * @def   VXSM_TOKENS
+ * @brief Point to current xid
+ */
+/*!
+ * @def   VXSM_TOKENS_MIN
+ * @brief Point to current xid
+ */
+/*!
+ * @def   VXSM_TOKENS_MAX
+ * @brief Point to current xid
+ */
+/*!
+ * @def   VXSM_PRIO_BIAS
+ * @brief Point to current xid
+ */
 #define VXSM_FILL_RATE  0x0001
 #define VXSM_INTERVAL   0x0002
 #define VXSM_TOKENS     0x0010
@@ -206,8 +469,14 @@ int nx_get_caps(nid_t nid, struct nx_caps *caps);
 #define VXSM_TOKENS_MAX 0x0040
 #define VXSM_PRIO_BIAS  0x0100
 
+/*!
+ * @brief Keep scheduler setting
+ */
 #define SCHED_KEEP      (-2)
 
+/*!
+ * @brief vx_get_dlimit
+ */
 struct vx_sched {
 	uint32_t set_mask;
 	int32_t fill_rate;
@@ -218,68 +487,42 @@ struct vx_sched {
 	int32_t priority_bias;
 };
 
+/*!
+ * @brief vx_get_dlimit
+ */
 int vx_set_sched(xid_t xid, struct vx_sched *sched);
 
-/* signal.c */
+
+
+/*!
+ * @file signal.c
+ * @brief Context signals
+ */
+
+/*!
+ * @brief vx_get_dlimit
+ */
 int vx_kill(xid_t xid, pid_t pid, int sig);
 
+/*!
+ * @brief vx_get_dlimit
+ */
 int vx_wait_exit(xid_t xid);
 
-/* switch.c */
+
+
+/*!
+ * @file switch.c
+ * @brief common functions
+ */
+
+/*!
+ * @brief vx_get_dlimit
+ */
 int vs_get_version();
 
+/*! @cond */
 END_C_DECLS
-
-/* syscall stuff */
-#if 	defined(__alpha__)
-#define __NR_vserver	428
-#elif	defined(__arm__)
-#define __NR_vserver	313
-#elif	defined(__cris__)
-#define __NR_vserver	273
-#elif	defined(__frv__)
-#define __NR_vserver	273
-#elif	defined(__h8300__)
-#define __NR_vserver	273
-#elif	defined(__i386__)
-#define __NR_vserver	273
-#elif	defined(__ia64__)
-#define __NR_vserver	1269
-#elif	defined(__m32r__)
-#define __NR_vserver	__m32r_NR_vserver
-#elif	defined(__mc68000__)
-#define __NR_vserver	278
-#elif	defined(__mips__) && (_MIPS_SIM == _MIPS_SIM_ABI32)
-#define __NR_vserver	277
-#elif	defined(__mips__) && (_MIPS_SIM == _MIPS_SIM_ABI64)
-#define __NR_vserver	240
-#elif	defined(__mips__) && (_MIPS_SIM == _MIPS_SIM_NABI32)
-#define __NR_vserver	236
-#elif	defined(__hppa__)
-#define __NR_vserver	__hppa_NR_vserver
-#elif	defined(__powerpc__)
-#define __NR_vserver	257
-#elif	defined(__s390__)
-#define __NR_vserver	263
-#elif	defined(__sh__)
-#define __NR_vserver	273
-#elif	defined(__sparc__)
-#define __NR_vserver	267
-#elif	defined(__v850__)
-#define __NR_vserver	__v850_NR_vserver
-#elif	defined(__x86_64__)
-#define __NR_vserver	236
-#endif
-
-#ifdef ALT_SYSCALL
-static inline
-_syscall3(int, vserver, uint32_t, cmd, uint32_t, id, void *, data);
-#else
-static inline
-int vserver(uint32_t cmd, uint32_t id, void *data)
-{
-	return syscall(__NR_vserver, cmd, id, data);
-}
-#endif
+/*! @endcond */
 
 #endif /* !VSERVER_H */

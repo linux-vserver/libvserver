@@ -24,62 +24,14 @@
 
 #include <stdint.h>
 #include <errno.h>
+#include <string.h>
 
 #include "linux/vserver/switch.h"
-#include "linux/vserver/dlimit_cmd.h"
+#include "linux/vserver/debug_cmd.h"
 
 #include "vserver.h"
 
-int vx_add_dlimit(xid_t xid, const char *name, uint32_t flags)
+int vx_dump_history()
 {
-	struct vcmd_ctx_dlimit_base_v0 res;
-
-	res.name = name;
-	res.flags = flags;
-
-	return vserver(VCMD_add_dlimit, xid, &res);
-}
-
-int vx_rem_dlimit(xid_t xid, const char *name)
-{
-	struct vcmd_ctx_dlimit_base_v0 res;
-
-	res.name = name;
-
-	return vserver(VCMD_rem_dlimit, xid, &res);
-}
-
-int vx_set_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
-{
-	struct vcmd_ctx_dlimit_v0 res;
-
-	res.name         = name;
-	res.space_used   = dlimit->space_used;
-	res.space_total  = dlimit->space_total;
-	res.inodes_used  = dlimit->inodes_used;
-	res.inodes_total = dlimit->inodes_total;
-	res.reserved     = dlimit->reserved;
-	res.flags        = dlimit->flags;
-
-	return vserver(VCMD_set_dlimit, xid, &res);
-}
-
-int vx_get_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
-{
-	struct vcmd_ctx_dlimit_v0 res;
-
-	res.name = name;
-	int rc = vserver(VCMD_get_dlimit, xid, &res);
-	
-	if (rc == -1)
-		return rc;
-
-	dlimit->space_used   = res.space_used;
-	dlimit->space_total  = res.space_total;
-	dlimit->inodes_used  = res.inodes_used;
-	dlimit->inodes_total = res.inodes_total;
-	dlimit->reserved     = res.reserved;
-	dlimit->flags        = res.flags;
-
-	return rc;
+	return vserver(VCMD_dump_history, 0, NULL);
 }
