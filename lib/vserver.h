@@ -185,6 +185,15 @@ int vx_set_vhi_name(xid_t xid, uint32_t field, char *name);
 int vx_get_vhi_name(xid_t xid, uint32_t field, char *name, size_t len);
 
 
+/*!
+ * @file debug.c
+ * @brief Debugging functions
+ */
+
+/*!
+ * @brief vx_dump_history
+ */
+int vs_dump_history();
 
 /*!
  * @file dlimit.c

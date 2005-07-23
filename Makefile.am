@@ -7,6 +7,8 @@ nobase_include_HEADERS = \
 	linux/vserver/cvirt_cmd.h \
 	linux/vserver/cvirt_def.h \
 	linux/vserver/cvirt.h \
+	linux/vserver/debug.h \
+	linux/vserver/debug_cmd.h \
 	linux/vserver/dlimit_cmd.h \
 	linux/vserver/dlimit.h \
 	linux/vserver/inode_cmd.h \
