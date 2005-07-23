@@ -1,6 +1,6 @@
 # Generic configuration
 AC_PREREQ(2.59)
-AC_INIT(libvserver, 0.2, [http://dev.croup.de/proj/libvserver])
+AC_INIT(libvserver, 0.2.1, [http://dev.croup.de/proj/libvserver])
 AC_CONFIG_HEADER([config.h])
 AC_GNU_SOURCE
 
