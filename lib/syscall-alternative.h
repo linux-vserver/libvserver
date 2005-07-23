@@ -9,8 +9,8 @@
 #define	__syscall_retval(v)	do { } while(0)
 #endif
 
-#ifndef	__syscall_error
-#define	__syscall_error(e)	do { errno = (e); } while(0)
+#ifndef	__syscall_errval
+#define	__syscall_errval(e)	do { errno = (e); } while(0)
 #endif
 
 #ifndef	__stringify0
@@ -56,7 +56,6 @@
 #define	__casm_04(v,w,r)	__casm_use(2,r,w)
 #define	__casm_05(v,w,r)	__casm_use(2,r,w)
 #define	__casm_06(v,w,r)	__casm_use(2,r,w)
-#define	__casm_07(v,w,r)	__casm_use(2,r,w)
 
 #define	__casm_10(v,w,r)	__casm_use(1,r,v)
 #define	__casm_11(v,w,r)	__casm_use(1,r,v)
@@ -65,7 +64,6 @@
 #define	__casm_14(v,w,r)	__casm_use(2,r,w)
 #define	__casm_15(v,w,r)	__casm_use(2,r,w)
 #define	__casm_16(v,w,r)	__casm_use(2,r,w)
-#define	__casm_17(v,w,r)	__casm_use(2,r,w)
 
 #define	__casm_20(v,w,r)	__casm_use(1,r,v)
 #define	__casm_21(v,w,r)	__casm_use(1,r,v)
@@ -74,7 +72,6 @@
 #define	__casm_24(v,w,r)	__casm_use(2,r,w)
 #define	__casm_25(v,w,r)	__casm_use(2,r,w)
 #define	__casm_26(v,w,r)	__casm_use(2,r,w)
-#define	__casm_27(v,w,r)	__casm_use(2,r,w)
 
 #define	__casm_30(v,w,r)	__casm_use(1,r,v)
 #define	__casm_31(v,w,r)	__casm_use(1,r,v)
@@ -83,7 +80,6 @@
 #define	__casm_34(v,w,r)	__casm_use(2,r,w)
 #define	__casm_35(v,w,r)	__casm_use(2,r,w)
 #define	__casm_36(v,w,r)	__casm_use(2,r,w)
-#define	__casm_37(v,w,r)	__casm_use(2,r,w)
 
 #define	__casm_40(v,w,r)	__casm_use(1,r,v)
 #define	__casm_41(v,w,r)	__casm_use(1,r,v)
@@ -92,7 +88,6 @@
 #define	__casm_44(v,w,r)	__casm_use(1,r,v)
 #define	__casm_45(v,w,r)	__casm_use(2,r,w)
 #define	__casm_46(v,w,r)	__casm_use(2,r,w)
-#define	__casm_47(v,w,r)	__casm_use(2,r,w)
 
 #define	__casm_50(v,w,r)	__casm_use(1,r,v)
 #define	__casm_51(v,w,r)	__casm_use(1,r,v)
@@ -101,7 +96,6 @@
 #define	__casm_54(v,w,r)	__casm_use(1,r,v)
 #define	__casm_55(v,w,r)	__casm_use(1,r,v)
 #define	__casm_56(v,w,r)	__casm_use(2,r,w)
-#define	__casm_57(v,w,r)	__casm_use(2,r,w)
 
 #define	__casm_60(v,w,r)	__casm_use(1,r,v)
 #define	__casm_61(v,w,r)	__casm_use(1,r,v)
@@ -110,7 +104,6 @@
 #define	__casm_64(v,w,r)	__casm_use(1,r,v)
 #define	__casm_65(v,w,r)	__casm_use(1,r,v)
 #define	__casm_66(v,w,r)	__casm_use(1,r,v)
-#define	__casm_67(v,w,r)	__casm_use(1,r,w)
 
 
 
@@ -135,6 +128,13 @@
 #define	__arg_6(a1,a2,a3,a4,a5,a6)	a6
 
 
+	/* avoid clashes */
+
+#undef	__syscall_return
+#undef	__syscall_errcon
+
+#undef	__syscall_regtype
+#undef	__syscall_reg_con
 
 
 /*	*****************************************
@@ -290,6 +290,7 @@
 #define	__syscall_maxerrno	125
 #define	__syscall_reg_res	"er0"
 
+#define	__syscall_regs		"er1", "er2", "er3", "er4", "er5", "er6"
 #define	__syscall_clobbers	"memory"
 
 #define	____sc_asm_reg(n, ...)	____sc_asm	(			\
@@ -300,7 +301,7 @@
 	__casm(n,5,1,	"mov.l	%4,er5"		,			)\
 	__casm(n,6,1,	"mov.l	er6,@-sp"	,			)\
 	__casm(n,6,1,	"mov.l	%5,er6"		,			)\
-	""::__input_regs(n,__VA_ARGS__))
+	""::__input_regs(n,__VA_ARGS__):__syscall_regs)
 
 #define	____sc_asm_sys(n, name)	____sc_asm_vol	(			\
 	__casm(n,1,1,	"mov.l	%0,er0"		,			)\
@@ -375,8 +376,10 @@
 */
 
 #define	__syscall_maxerrno	129
-#define	__syscall_reg_res	"%%eax"
-#define	__syscall_clobbers	"memory"
+#define	__syscall_reg_res	"eax"
+
+#define	__syscall_regs		"ebx", "ecx", "edx", "esi", "edi", "ebp"
+#define	__syscall_clobbers	__syscall_regs, "eax", "memory"
 
 #define	____sc_asm_reg(n, ...)	____sc_asm	(			\
 	__casm(n,6,1,	"movl	%5,%%eax"	,			)\
@@ -387,7 +390,7 @@
 	__pasm(n,1,1,	"pushl	%%ebx"		,			)\
 	__casm(n,1,1,	"movl	%0,%%ebx"	,			)\
 	__casm(n,6,1,	"pushl	%%ebp"		,			)\
-	""::__input_regs(n,__VA_ARGS__))
+	""::__input_regs(n,__VA_ARGS__):__syscall_regs, "eax")
 
 #define	____sc_asm_sys(n, name)	____sc_asm_vol	(			\
 	__casm(n,6,1,	"movl	%%eax,%%ebp"	,			)\
@@ -398,7 +401,7 @@
 	__pasm(n,1,1,	"popl	%%ebx"		,			)\
 	""::"i"(__NR_##name) : __syscall_clobbers)
 
-#define	__syscall_store(r,a)	"movl "r","a
+#define	__syscall_store(r,a)	"movl %%"r","a
 
 
 /*	*****************************************
@@ -714,8 +717,8 @@
 #define	__syscall_clobbers	__syscall_regs,				\
 	"cc", "r11", "rcx", "memory" 
 
-#define	__syscall_load(r,a)	"movq	"a","r
-#define	__syscall_store(r,a)	"movq	"r","a
+#define	__syscall_load(r,a)	"movq	"a",%%"r
+#define	__syscall_store(r,a)	"movq	%%"r","a
 
 
 #else
@@ -725,8 +728,10 @@
 
 	/* list of all registers */
 
+#ifndef	__syscall_regs
 #define	__syscall_reg_list(x)	x(1), x(2), x(3), x(4), x(5), x(6)
 #define	__syscall_regs		__syscall_reg_list(__syscall_reg)
+#endif
 
 #ifndef	__syscall_regtype
 #define	__syscall_regtype	long
@@ -743,7 +748,7 @@
 	__casm(n,4,1,	__syscall_load(__syscall_reg(4),"%3"),		)\
 	__casm(n,5,1,	__syscall_load(__syscall_reg(5),"%4"),		)\
 	__casm(n,6,1,	__syscall_load(__syscall_reg(6),"%5"),		)\
-	""::__input_regs(n,__VA_ARGS__))
+	""::__input_regs(n,__VA_ARGS__):__syscall_regs)
 #endif
 
 #ifndef	____sc_asm_sys
@@ -810,7 +815,7 @@
 	__syscall_retval(ret);						\
 	if (__syscall_errcon(err)) {					\
 		int __err = (ret);					\
-		__syscall_error(__err);					\
+		__syscall_errval(__err);				\
 		ret = -1;						\
 	}								\
 	return (type)(ret);
@@ -831,7 +836,7 @@
 	__syscall_retval(res);						\
 	if (__syscall_errcon(res)) {					\
 		int __err = -(res);					\
-		__syscall_error(__err);					\
+		__syscall_errval(__err);				\
 		res = -1;						\
 	}								\
 	return (type)(res);
