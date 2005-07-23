@@ -38,7 +38,7 @@ AC_C_INLINE
 AC_CHECK_FUNCS([strcasecmp strpbrk])
 
 # Compiler settings
-CFLAGS="${CFLAGS} -W -Wall -std=c99 -pedantic"
+CFLAGS="${CFLAGS} -W -Wall -std=gnu99 -pedantic"
 
 # Site settings
 VS_CHECK_SYSCALL_NR

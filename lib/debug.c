@@ -26,7 +26,8 @@
 #include <errno.h>
 #include <string.h>
 
-#include <linux/vserver/debug.h>
+#include "linux/vserver/switch.h"
+#include "linux/vserver/debug_cmd.h"
 
 #include "vserver.h"
 
