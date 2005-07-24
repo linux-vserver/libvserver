@@ -48,5 +48,5 @@ VS_ENABLE_DIETLIBC
 # Output
 AC_CONFIG_FILES([Makefile
                  lib/Makefile
-                 tools/Makefile])
+                 util/Makefile])
 AC_OUTPUT

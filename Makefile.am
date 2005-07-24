@@ -1,5 +1,5 @@
 # Top level makefile
-SUBDIRS = lib tools
+SUBDIRS = lib util
 
 nobase_include_HEADERS = \
 	linux/vserver/context_cmd.h \

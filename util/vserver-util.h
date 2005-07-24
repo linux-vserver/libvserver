@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005 by the libvserver team                                 *
+ *   Copyright 2005 The libvserver Team                                    *
  *   See AUTHORS for details                                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,40 +18,39 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#define CMD_VERSION(name, desc) do { \
-	printf("%s -- %s\n", name, desc); \
-	printf("This program is part of %s\n\n", PACKAGE_STRING); \
-	\
-	printf("Copyright (c) 2005 The libvserver Team\n"); \
-	printf("This program is free software; you can redistribute it and/or\n"); \
-	printf("modify it under the terms of the GNU General Public License\n"); \
-	exit(0); \
-}	while(0)
-
-/* exit, silent exit, perror exit
- *
- * exit code conventions:
- * 
- * 0 = OK
- * 1 = Wrong usage
- * 2 = A command failed
- * 3 = An opts specific function failed
+/*!
+ * @file vserver-util.h
+ * @brief Utility library ontop of libvserver
  */
-#define EXIT_USAGE   1
-#define EXIT_COMMAND 2
-#define EXIT_OPTS    3
+#ifndef _VSERVER_UTIL_H_
+#define _VSERVER_UTIL_H_
 
-#define EXIT(MSG,RC) { \
-	printf(MSG"; try '%s --help' for more information\n", argv[0]); \
-	exit(RC); \
-}
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
-#define SEXIT(MSG,RC) { \
-	printf(MSG"\n"); \
-	exit(RC); \
-}
+#include <stdint.h>
+#include <sys/types.h>
 
-#define PEXIT(MSG,RC) { \
-	perror(MSG); \
-	exit(RC); \
-}
+/*! @cond */
+#undef BEGIN_C_DECLS
+#undef END_C_DECLS
+#ifdef __cplusplus
+# define BEGIN_C_DECLS extern "C" {
+# define END_C_DECLS }
+#else
+# define BEGIN_C_DECLS /* empty */
+# define END_C_DECLS /* empty */
+#endif
+
+BEGIN_C_DECLS
+/*! @endcond */
+
+
+
+/*! @cond */
+END_C_DECLS
+/*! @endcond */
+
+
+#endif /*_VSERVER_UTIL_H_*/
