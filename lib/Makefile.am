@@ -2,7 +2,7 @@
 INCLUDES = $(all_includes) -I$(top_srcdir)
 
 # the library search path.
-noinst_HEADERS = syscall-alternative.h
+noinst_HEADERS = syscall.h
 include_HEADERS = vserver.h
 
 lib_LTLIBRARIES = libvserver.la
