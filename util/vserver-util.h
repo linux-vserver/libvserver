@@ -30,7 +30,7 @@
 #endif
 
 #include <stdint.h>
-#include <sys/types.h>
+#include <linux/types.h>
 
 /*! @cond */
 #undef BEGIN_C_DECLS
@@ -46,11 +46,57 @@
 BEGIN_C_DECLS
 /*! @endcond */
 
+/*!
+ * @file flagparser.c
+ * @brief Parse flag strings
+ */
 
+/*!
+ * @brief vs_flagparser_uint32_t
+ */
+int flagparser_uint32_t(const char *str, size_t len, const char delim,
+                        uint32_t *flag, uint32_t *mask,
+                        uint32_t (*strhandler)(const char *));
+
+int flagparser_uint64_t(const char *str, size_t len, const char delim,
+                        uint64_t *flag, uint64_t *mask,
+                        uint64_t (*strhandler)(const char *));
+
+/*!
+ * @file ccaps.c
+ * @brief Context capabilities
+ */
+
+uint64_t bcaps_list_search(const char *key);
+
+int bcaps_list_parse(const char *str, const char delim, 
+                     uint64_t *flag, uint64_t *mask);
+
+
+uint64_t ccaps_list_search(const char *key);
+
+int ccaps_list_parse(const char *str, const char delim, 
+                     uint64_t *flag, uint64_t *mask);
+
+uint64_t cflags_list_search(const char *key);
+
+int cflags_list_parse(const char *str, const char delim, 
+                      uint64_t *flag, uint64_t *mask);
+
+
+uint32_t iattr_list_search(const char *key);
+
+int iattr_list_parse(const char *str, const char delim, 
+                      uint32_t *flag, uint32_t *mask);
+
+
+uint64_t nflags_list_search(const char *key);
+
+int nflags_list_parse(const char *str, const char delim, 
+                      uint64_t *flag, uint64_t *mask);
 
 /*! @cond */
 END_C_DECLS
 /*! @endcond */
-
 
 #endif /*_VSERVER_UTIL_H_*/
