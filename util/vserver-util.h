@@ -54,13 +54,9 @@ BEGIN_C_DECLS
 /*!
  * @brief vs_flagparser_uint32_t
  */
-int flagparser_uint32_t(const char *str, size_t len, const char delim,
-                        uint32_t *flag, uint32_t *mask,
-                        uint32_t (*strhandler)(const char *));
-
-int flagparser_uint64_t(const char *str, size_t len, const char delim,
-                        uint64_t *flag, uint64_t *mask,
-                        uint64_t (*strhandler)(const char *));
+int flagparser(const char *str, size_t len, const char delim,
+               uint64_t *flag, uint64_t *mask,
+               uint64_t (*strhandler)(const char *));
 
 /*!
  * @file ccaps.c
@@ -84,10 +80,10 @@ int cflags_list_parse(const char *str, const char delim,
                       uint64_t *flag, uint64_t *mask);
 
 
-uint32_t iattr_list_search(const char *key);
+uint64_t iattr_list_search(const char *key);
 
 int iattr_list_parse(const char *str, const char delim, 
-                      uint32_t *flag, uint32_t *mask);
+                      uint64_t *flag, uint64_t *mask);
 
 
 uint64_t nflags_list_search(const char *key);

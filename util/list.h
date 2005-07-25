@@ -29,10 +29,10 @@
 
 
 /* declare list structure */
-#define LIST_DECL(NAME, TYPE)                                                  \
+#define LIST_DECL(NAME)                                                        \
 struct NAME ## _list_entry {                                                   \
-	const char *key;                                                           \
-	TYPE value;                                                                \
+	const char *key;                                                       \
+	uint64_t value;                                                        \
 };
 
 /* start list */
@@ -53,39 +53,39 @@ size_t NAME ## _cnt = (sizeof NAME ## _list / sizeof NAME ## _list[0]);
 static inline                                                                  \
 int NAME ## _list_keycmp(const void *a, const void *b)                         \
 {                                                                              \
-	return strcmp(((struct NAME ## _list_entry *)a)->key,                      \
-	              ((struct NAME ## _list_entry *)b)->key);                     \
+	return strcmp(((struct NAME ## _list_entry *)a)->key,                  \
+	              ((struct NAME ## _list_entry *)b)->key);                 \
 }
 
 /* default str2value function */
-#define LIST_SEARCH(NAME, TYPE)                                                \
-TYPE NAME ## _list_search(const char *key)                                     \
+#define LIST_SEARCH(NAME)                                                      \
+uint64_t NAME ## _list_search(const char *key)                                 \
 {                                                                              \
-	struct NAME ## _list_entry needle, *res;                                   \
-	needle.key = key;                                                          \
-	res = lsearch(&needle,                                                     \
-	              &NAME ## _list,                                              \
-	              &NAME ## _cnt,                                               \
-	              sizeof needle,                                               \
-	              NAME ## _list_keycmp);                                       \
-	                                                                           \
-	if (res)                                                                   \
-		return res->value;                                                     \
-	                                                                           \
-	return 0;                                                                  \
+	struct NAME ## _list_entry needle, *res;                               \
+	needle.key = key;                                                      \
+	res = lsearch(&needle,                                                 \
+	              &NAME ## _list,                                          \
+	              &NAME ## _cnt,                                           \
+	              sizeof needle,                                           \
+	              NAME ## _list_keycmp);                                   \
+	                                                                       \
+	if (res)                                                               \
+		return res->value;                                             \
+	                                                                       \
+	return 0;                                                              \
 }
 
 /* default flagparser */
-#define LIST_FLAGPARSER(NAME, TYPE)                                            \
+#define LIST_FLAGPARSER(NAME)                                                  \
 int NAME ## _list_parse(const char *str, const char delim,                     \
-                        TYPE *flag, TYPE *mask)                                \
+                        uint64_t *flag, uint64_t *mask)                        \
 {                                                                              \
-	return flagparser_ ## TYPE(str,                                            \
-	                           strlen(str),                                    \
-	                           delim,                                          \
-	                           flag,                                           \
-	                           mask,                                           \
-	                           NAME ## _list_search);                          \
+	return flagparser(str,                                                 \
+	                  strlen(str),                                         \
+	                  delim,                                               \
+	                  flag,                                                \
+	                  mask,                                                \
+	                  NAME ## _list_search);                               \
 }
 
 #endif /*_LIST_H_*/

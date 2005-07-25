@@ -22,14 +22,16 @@
 #include <config.h>
 #endif
 
-#include <linux/vserver/inode.h>
+#include "linux/vserver/inode.h"
 #include "vserver-util.h"
 
 #include "list.h"
 
-LIST_DECL(iattr, uint32_t)
+#define LIST_NAME iattr
 
-LIST_START(iattr)
+LIST_DECL(LIST_NAME)
+
+LIST_START(LIST_NAME)
 
 LIST_ENTRY(IATTR, XID)
 LIST_ENTRY(IATTR, ADMIN)
@@ -40,10 +42,10 @@ LIST_ENTRY(IATTR, BARRIER)
 LIST_ENTRY(IATTR, IUNLINK)
 LIST_ENTRY(IATTR, IMMUTABLE)
 
-LIST_END(iattr)
+LIST_END(LIST_NAME)
 
-LIST_CMP_HANDLER(iattr)
+LIST_CMP_HANDLER(LIST_NAME)
 
-LIST_SEARCH(iattr, uint32_t)
+LIST_SEARCH(LIST_NAME)
 
-LIST_FLAGPARSER(iattr, uint32_t)
+LIST_FLAGPARSER(LIST_NAME)

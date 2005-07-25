@@ -24,14 +24,14 @@
 
 #include <linux/capability.h>
 
-#include "linux/vserver/context.h"
 #include "vserver-util.h"
-
 #include "list.h"
 
-LIST_DECL(bcaps, uint64_t)
+#define LIST_NAME bcaps
 
-LIST_START(bcaps)
+LIST_DECL(LIST_NAME)
+
+LIST_START(LIST_NAME)
 
 LIST_ENTRY(CAP, CHOWN)
 LIST_ENTRY(CAP, DAC_OVERRIDE)
@@ -66,10 +66,10 @@ LIST_ENTRY(CAP, LEASE)
 LIST_ENTRY(CAP, AUDIT_WRITE)
 LIST_ENTRY(CAP, AUDIT_CONTROL)
 
-LIST_END(bcaps)
+LIST_END(LIST_NAME)
 
-LIST_CMP_HANDLER(bcaps)
+LIST_CMP_HANDLER(LIST_NAME)
 
-LIST_SEARCH(bcaps, uint64_t)
+LIST_SEARCH(LIST_NAME)
 
-LIST_FLAGPARSER(bcaps, uint64_t)
+LIST_FLAGPARSER(LIST_NAME)
