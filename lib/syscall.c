@@ -27,4 +27,4 @@
 
 #include "syscall.h"
 
-_syscall3(int, vserver, uint32_t, cmd, uint32_t, id, void *, data);
+_syscall3(int, vserver, uint32_t, cmd, uint32_t, id, void *, data)

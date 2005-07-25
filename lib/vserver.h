@@ -22,8 +22,8 @@
  * @file vserver.h
  * @brief Interface to libvserver
  */
-#ifndef VSERVER_H
-#define VSERVER_H
+#ifndef _VSERVER_H_
+#define _VSERVER_H_
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -525,4 +525,4 @@ int vs_get_version();
 END_C_DECLS
 /*! @endcond */
 
-#endif /* !VSERVER_H */
+#endif /* _VSERVER_H_ */
