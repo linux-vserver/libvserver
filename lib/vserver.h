@@ -133,6 +133,7 @@ int vx_get_flags(xid_t xid, struct vx_flags *flags);
  */
 struct vx_caps {
 	uint64_t bcaps;
+	uint64_t bmask;
 	uint64_t ccaps;
 	uint64_t cmask;
 };

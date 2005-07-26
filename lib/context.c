@@ -93,7 +93,7 @@ int vx_set_caps(xid_t xid, struct vx_caps *caps)
 {
 	struct vcmd_ctx_caps_v0 res;
 
-	res.bcaps = caps->bcaps;
+	res.bcaps = caps->bcaps | caps->bmask;
 	res.ccaps = caps->ccaps;
 	res.cmask = caps->cmask;
 
