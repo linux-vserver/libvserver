@@ -18,7 +18,7 @@ ver=${ver/,}
 echo "Creating release tag... "
 
 svn copy ${svnroot}/trunk ${svnroot}/tags/release-${ver} \
-	-m "Tagging the ${ver} release of the libvserver project" &>/dev/null || die "svn copy failed"
+	-m "Tagging the ${ver} release of the ${proj} project" &>/dev/null || die "svn copy failed"
 
 
 echo "Running autotools..."
@@ -27,7 +27,7 @@ make -f Makefile.cvs &>/dev/null || die "make failed"
 mkdir build &>/dev/null
 pushd build/ &>/dev/null || die "popd failed"
 
-echo "Make dist tarballs"
+echo "Make dist tarball..."
 ../configure &>/dev/null || die "configure failed"
 make dist &>/dev/null || die "make dist failed"
 
