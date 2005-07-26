@@ -21,23 +21,85 @@
 #ifndef _LIST_H_
 #define _LIST_H_
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <search.h>
 #include <string.h>
+#include <sys/types.h>
 
 #include "vserver-util.h"
 
+static inline
+int listparser(const char *str, size_t len, const char delim,
+               uint64_t *flag, uint64_t *mask,
+               uint64_t (*cmphandler)(char const *))
+{
+	if (len == 0)
+		len = strlen(str);
+	
+	for (; len > 0;) {
+		const char *ptr     = strchr(str, delim); /* get pointer to next delim */
+		size_t     cnt      = 0;
+		uint64_t   num_flag = 0;
+		bool       clear    = false;
+		
+		cnt = ptr ? (size_t) (ptr - str) : len; /* save delim position */
+		
+		if (cnt == 0) { /* empty field */
+			len--;
+			str = ++ptr;
+			continue;
+		}
+		
+		if (cnt >= len) { /* check end of list */
+			cnt = len;
+			len = 0;
+		}
+		else
+			len -= (cnt+1); /* skip token + delim */
+		
+		if (*str == '~') { /* remove flag */
+			clear = true;
+			cnt--;
+			str++;
+		}
+		
+		char *substr = malloc(cnt);
+		strncpy(substr, str, cnt);
+		num_flag = (*cmphandler)(substr); /* get flag for token */
+		
+		if (num_flag == 0) { /* invalid token */
+			continue;
+		}
+
+		if (clear) {
+			*flag &= ~num_flag; /* clear flag */
+			*mask |=  num_flag; /* set mask */
+		}
+		else {
+			*flag |=  num_flag; /* set flag */
+			*mask |=  num_flag; /* set mask */
+		}
+
+		if (ptr == 0) /* no more tokens */
+			break;
+
+		str = ++ptr; /* skip token + delim */
+	}
+
+	return 0;
+}
 
 /* declare list structure */
 #define LIST_DECL(NAME)                                                        \
 struct NAME ## _list_entry {                                                   \
 	const char *key;                                                       \
 	uint64_t value;                                                        \
-};
+};                                                                             \
 
 /* start list */
 #define LIST_START(NAME)                                                       \
-struct NAME ## _list_entry NAME ## _list[] = {
+struct NAME ## _list_entry NAME ## _list[] = {                                 \
 
 /* add list entry */
 #define LIST_ENTRY(TYPE, NAME) { #NAME, TYPE ## _ ## NAME },
@@ -46,7 +108,7 @@ struct NAME ## _list_entry NAME ## _list[] = {
 #define LIST_END(NAME)                                                         \
 };                                                                             \
                                                                                \
-size_t NAME ## _cnt = (sizeof NAME ## _list / sizeof NAME ## _list[0]);
+size_t NAME ## _cnt = (sizeof NAME ## _list / sizeof NAME ## _list[0]);        \
 
 /* default list comparision handler */
 #define LIST_CMP_HANDLER(NAME)                                                 \
@@ -55,7 +117,7 @@ int NAME ## _list_keycmp(const void *a, const void *b)                         \
 {                                                                              \
 	return strcmp(((struct NAME ## _list_entry *)a)->key,                  \
 	              ((struct NAME ## _list_entry *)b)->key);                 \
-}
+}                                                                              \
 
 /* default str2value function */
 #define LIST_SEARCH(NAME)                                                      \
@@ -73,19 +135,19 @@ uint64_t NAME ## _list_search(const char *key)                                 \
 		return res->value;                                             \
 	                                                                       \
 	return 0;                                                              \
-}
+}                                                                              \
 
 /* default flagparser */
 #define LIST_FLAGPARSER(NAME)                                                  \
 int NAME ## _list_parse(const char *str, const char delim,                     \
                         uint64_t *flag, uint64_t *mask)                        \
 {                                                                              \
-	return flagparser(str,                                                 \
+	return listparser(str,                                                 \
 	                  strlen(str),                                         \
 	                  delim,                                               \
 	                  flag,                                                \
 	                  mask,                                                \
 	                  NAME ## _list_search);                               \
-}
+}                                                                              \
 
 #endif /*_LIST_H_*/

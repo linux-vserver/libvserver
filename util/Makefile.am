@@ -10,7 +10,6 @@ lib_LTLIBRARIES = libvserver-util.la
 libvserver_util_la_SOURCES = bcaps-list.c \
                              ccaps-list.c \
                              cflags-list.c \
-                             flagparser.c \
                              iattr-list.c \
                              nflags-list.c
 
