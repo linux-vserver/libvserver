@@ -22,28 +22,31 @@
 #include <config.h>
 #endif
 
-#include "linux/vserver/context.h"
 #include "vserver-util.h"
+#include "linux/vserver/context.h"
 
-#include "list.h"
+LIST_DATA_ALLOC_TYPE(ccaps, uint64_t)
 
-LIST_DECL(ccaps)
-
-LIST_START(ccaps)
-
-LIST_ENTRY(VXC, SET_UTSNAME)
-LIST_ENTRY(VXC, SET_RLIMIT)
-LIST_ENTRY(VXC, RAW_ICMP)
-LIST_ENTRY(VXC, SYSLOG)
-LIST_ENTRY(VXC, SECURE_MOUNT)
-LIST_ENTRY(VXC, SECURE_REMOUNT)
-LIST_ENTRY(VXC, BINARY_MOUNT)
-LIST_ENTRY(VXC, QUOTA_CTL)
-
-LIST_END(ccaps)
-
-LIST_CMP_HANDLER(ccaps)
-
-LIST_SEARCH(ccaps)
-
-LIST_FLAGPARSER(ccaps)
+#define LIST_ADD(TYPE, VALUE) \
+list_set(p->node+(i++), \
+         list_key_alloc(#VALUE), \
+         ccaps_list_data_alloc(TYPE ## _ ## VALUE));
+	
+list_t *ccaps_list_init()
+{
+	size_t np      = 8;
+	list_t *p = list_alloc(np);
+	
+	int i = 0;
+	
+	LIST_ADD(VXC, SET_UTSNAME)
+	LIST_ADD(VXC, SET_RLIMIT)
+	LIST_ADD(VXC, RAW_ICMP)
+	LIST_ADD(VXC, SYSLOG)
+	LIST_ADD(VXC, SECURE_MOUNT)
+	LIST_ADD(VXC, SECURE_REMOUNT)
+	LIST_ADD(VXC, BINARY_MOUNT)
+	LIST_ADD(VXC, QUOTA_CTL)
+	
+	return p;
+}

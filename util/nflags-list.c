@@ -22,24 +22,26 @@
 #include <config.h>
 #endif
 
-#include "linux/vserver/network.h"
 #include "vserver-util.h"
+#include "linux/vserver/network.h"
 
-#include "list.h"
+LIST_DATA_ALLOC_TYPE(nflags, uint64_t)
 
-LIST_DECL(nflags)
-
-LIST_START(nflags)
-
-LIST_ENTRY(NXF, STATE_SETUP)
-LIST_ENTRY(NXF, STATE_HELPER)
-LIST_ENTRY(NXF, ONE_TIME)
-LIST_ENTRY(NXF, INIT_SET)
-
-LIST_END(nflags)
-
-LIST_CMP_HANDLER(nflags)
-
-LIST_SEARCH(nflags)
-
-LIST_FLAGPARSER(nflags)
+#define LIST_ADD(TYPE, VALUE) \
+list_set(p->node+(i++), \
+         list_key_alloc(#VALUE), \
+         nflags_list_data_alloc(TYPE ## _ ## VALUE));
+	
+list_t *nflags_list_init()
+{
+	size_t np = 8;
+	list_t *p = list_alloc(np);
+	
+	int i = 0;
+	LIST_ADD(NXF, STATE_SETUP)
+	LIST_ADD(NXF, STATE_HELPER)
+	LIST_ADD(NXF, ONE_TIME)
+	LIST_ADD(NXF, INIT_SET)
+	
+	return p;
+}

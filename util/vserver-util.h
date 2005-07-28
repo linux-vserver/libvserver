@@ -29,8 +29,9 @@
 #include <config.h>
 #endif
 
+#include <sys/types.h>
 #include <stdint.h>
-#include <linux/types.h>
+#include <stdlib.h>
 
 /*! @cond */
 #undef BEGIN_C_DECLS
@@ -47,49 +48,46 @@ BEGIN_C_DECLS
 /*! @endcond */
 
 /*!
- * @file flagparser.c
- * @brief Parse flag strings
+ * @file list.c
  */
+typedef struct list_node_s {
+	char *key;  /* unique key identifier */
+	void *data; /* any data associated with key */
+} list_node_t;
 
-/*!
- * @brief vs_flagparser_uint32_t
- */
-int flagparser(const char *str, size_t len, const char delim,
-               uint64_t *flag, uint64_t *mask,
-               uint64_t (*strhandler)(const char *));
+typedef struct list_s {
+	list_node_t *node; /* first node */
+	size_t n;          /* number of nodes */
+} list_t;
 
-/*!
- * @file ccaps.c
- * @brief Context capabilities
- */
+typedef struct list_link_s {
+	list_t *p; /* prisitine list */
+	list_t *d; /* descending list */
+} list_link_t;
 
-uint64_t bcaps_list_search(const char *key);
+/* macro for data allocation using TYPE as data type */
+#define LIST_DATA_ALLOC_TYPE(NAME, TYPE) \
+static inline \
+TYPE *NAME ## _list_data_alloc(TYPE value) \
+{ \
+	TYPE *data = (TYPE *)malloc(sizeof(TYPE)); \
+	*data = value; \
+	return data; \
+}
 
-int bcaps_list_parse(const char *str, const char delim, 
-                     uint64_t *flag, uint64_t *mask);
-
-
-uint64_t ccaps_list_search(const char *key);
-
-int ccaps_list_parse(const char *str, const char delim, 
-                     uint64_t *flag, uint64_t *mask);
-
-uint64_t cflags_list_search(const char *key);
-
-int cflags_list_parse(const char *str, const char delim, 
-                      uint64_t *flag, uint64_t *mask);
-
-
-uint64_t iattr_list_search(const char *key);
-
-int iattr_list_parse(const char *str, const char delim, 
-                      uint64_t *flag, uint64_t *mask);
-
-
-uint64_t nflags_list_search(const char *key);
-
-int nflags_list_parse(const char *str, const char delim, 
-                      uint64_t *flag, uint64_t *mask);
+/* TODO: doc! */
+list_t *list_alloc(size_t n);
+void list_dealloc(list_t *list);
+char *list_key_alloc(char *str);
+void list_set(list_node_t *node, char *key, void *data);
+size_t list_ntokens(const char *str, const char delim);
+char *list_parse(const char **str, const char delim);
+list_t *list_parse_hash(const char *str, const char delim, const char kvdelim);
+list_t *list_parse_list(const char *str, const char delim);
+list_node_t *list_search(list_t *list, char *key);
+int list_validate_flag(list_link_t *link, const char clmod);
+int list_validate(list_link_t *link);
+void list_list2flags(list_link_t *link, char clmod, uint64_t *flags, uint64_t *mask);
 
 /*! @cond */
 END_C_DECLS

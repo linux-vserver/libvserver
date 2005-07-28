@@ -22,28 +22,30 @@
 #include <config.h>
 #endif
 
-#include "linux/vserver/inode.h"
 #include "vserver-util.h"
+#include "linux/vserver/inode.h"
 
-#include "list.h"
+LIST_DATA_ALLOC_TYPE(iattr, uint64_t)
 
-LIST_DECL(iattr)
-
-LIST_START(iattr)
-
-LIST_ENTRY(IATTR, XID)
-LIST_ENTRY(IATTR, ADMIN)
-LIST_ENTRY(IATTR, WATCH)
-LIST_ENTRY(IATTR, HIDE)
-LIST_ENTRY(IATTR, FLAGS)
-LIST_ENTRY(IATTR, BARRIER)
-LIST_ENTRY(IATTR, IUNLINK)
-LIST_ENTRY(IATTR, IMMUTABLE)
-
-LIST_END(iattr)
-
-LIST_CMP_HANDLER(iattr)
-
-LIST_SEARCH(iattr)
-
-LIST_FLAGPARSER(iattr)
+#define LIST_ADD(TYPE, VALUE) \
+list_set(p->node+(i++), \
+         list_key_alloc(#VALUE), \
+         iattr_list_data_alloc(TYPE ## _ ## VALUE));
+	
+list_t *iattr_list_init()
+{
+	size_t np = 8;
+	list_t *p = list_alloc(np);
+	
+	int i = 0;
+	LIST_ADD(IATTR, XID)
+	LIST_ADD(IATTR, ADMIN)
+	LIST_ADD(IATTR, WATCH)
+	LIST_ADD(IATTR, HIDE)
+	LIST_ADD(IATTR, FLAGS)
+	LIST_ADD(IATTR, BARRIER)
+	LIST_ADD(IATTR, IUNLINK)
+	LIST_ADD(IATTR, IMMUTABLE)
+	
+	return p;
+}
