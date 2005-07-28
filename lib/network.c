@@ -22,14 +22,12 @@
 #include <config.h>
 #endif
 
-#include <stdint.h>
-#include <errno.h>
-#include <string.h>
-
 #include "linux/vserver/switch.h"
 #include "linux/vserver/network_cmd.h"
 
 #include "vserver.h"
+
+#include <string.h>
 
 int nx_get_task_nid(pid_t pid)
 {
@@ -50,11 +48,11 @@ int nx_get_info(nid_t nid, struct nx_info *info)
 	return rc;
 }
 
-int nx_create(nid_t nid, uint64_t flags)
+int nx_create(nid_t nid, struct nx_create *create)
 {
 	struct vcmd_net_create res;
 
-	res.flagword = flags;
+	res.flagword = create->flags;
 
 	return vserver(VCMD_net_create, nid, &res);
 }
@@ -70,8 +68,8 @@ int nx_add_addr(nid_t nid, struct nx_addr *net)
 
 	res.type = net->type;
 	res.count = net->count;
-	memcpy(res.ip, net->ip, sizeof(res.ip));
-	memcpy(res.mask, net->mask, sizeof(res.mask));
+	memcpy(res.ip, net->ip, sizeof res.ip);
+	memcpy(res.mask, net->mask, sizeof res.mask);
 
 	return vserver(VCMD_net_add, nid, &res);
 }
@@ -82,10 +80,20 @@ int nx_rem_addr(nid_t nid, struct nx_addr *net)
 
 	res.type = net->type;
 	res.count = net->count;
-	memcpy(res.ip, net->ip, sizeof(res.ip));
-	memcpy(res.mask, net->mask, sizeof(res.mask));
+	memcpy(res.ip, net->ip, sizeof res.ip);
+	memcpy(res.mask, net->mask, sizeof res.mask);
 
 	return vserver(VCMD_net_remove, nid, &res);
+}
+
+int nx_set_flags(nid_t nid, struct nx_flags *flags)
+{
+	struct vcmd_net_flags_v0 res;
+
+	res.flagword = flags->flags;
+	res.mask     = flags->mask;
+
+	return vserver(VCMD_set_nflags, nid, &res);
 }
 
 int nx_get_flags(nid_t nid, struct nx_flags *flags)
@@ -103,14 +111,14 @@ int nx_get_flags(nid_t nid, struct nx_flags *flags)
 	return rc;
 }
 
-int nx_set_flags(nid_t nid, struct nx_flags *flags)
+int nx_set_caps(nid_t nid, struct nx_caps *caps)
 {
-	struct vcmd_net_flags_v0 res;
+	struct vcmd_net_caps_v0 res;
 
-	res.flagword = flags->flags;
-	res.mask     = flags->mask;
+	res.ncaps = caps->caps;
+	res.cmask = caps->mask;
 
-	return vserver(VCMD_set_nflags, nid, &res);
+	return vserver(VCMD_get_ncaps, nid, &res);
 }
 
 int nx_get_caps(nid_t nid, struct nx_caps *caps)
@@ -126,14 +134,4 @@ int nx_get_caps(nid_t nid, struct nx_caps *caps)
 	caps->mask = res.cmask;
 
 	return rc;
-}
-
-int nx_set_caps(nid_t nid, struct nx_caps *caps)
-{
-	struct vcmd_net_caps_v0 res;
-
-	res.ncaps = caps->caps;
-	res.cmask = caps->mask;
-
-	return vserver(VCMD_get_ncaps, nid, &res);
 }

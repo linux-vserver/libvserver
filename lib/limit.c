@@ -22,19 +22,28 @@
 #include <config.h>
 #endif
 
-#include <stdint.h>
-#include <errno.h>
-
 #include "linux/vserver/switch.h"
 #include "linux/vserver/limit_cmd.h"
 
 #include "vserver.h"
 
-int vx_get_rlimit(xid_t xid, uint32_t id, struct vx_rlimit *rlimit)
+int vx_set_rlimit(xid_t xid, struct vx_rlimit *rlimit)
 {
 	struct vcmd_ctx_rlimit_v0 res;
 
-	res.id = id;
+	res.id        = rlimit->id;
+	res.minimum   = rlimit->minimum;
+	res.softlimit = rlimit->softlimit;
+	res.maximum   = rlimit->maximum;
+
+	return vserver(VCMD_set_rlimit, xid, &res);
+}
+
+int vx_get_rlimit(xid_t xid, struct vx_rlimit *rlimit)
+{
+	struct vcmd_ctx_rlimit_v0 res;
+
+	res.id = rlimit->id;
 	int rc = vserver(VCMD_get_rlimit, xid, &res);
 	
 	if (rc == -1)
@@ -45,18 +54,6 @@ int vx_get_rlimit(xid_t xid, uint32_t id, struct vx_rlimit *rlimit)
 	rlimit->maximum   = res.maximum;
 
 	return rc;
-}
-
-int vx_set_rlimit(xid_t xid, uint32_t id, struct vx_rlimit *rlimit)
-{
-	struct vcmd_ctx_rlimit_v0 res;
-
-	res.id        = id;
-	res.minimum   = rlimit->minimum;
-	res.softlimit = rlimit->softlimit;
-	res.maximum   = rlimit->maximum;
-
-	return vserver(VCMD_set_rlimit, xid, &res);
 }
 
 int vx_get_rlimit_mask(struct vx_rlimit_mask *rmask)

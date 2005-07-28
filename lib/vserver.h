@@ -30,7 +30,7 @@
 #endif
 
 #include <stdint.h>
-#include <sys/types.h>
+#include <linux/types.h>
 
 /// @cond
 #undef BEGIN_C_DECLS
@@ -101,9 +101,16 @@ struct vx_info {
 int vx_get_info(xid_t xid, struct vx_info *info);
 
 /*!
+ * @brief Structure containing data about a context (context id, initpid)
+ */
+struct vx_create {
+	uint64_t flags;
+};
+
+/*!
  * @brief Create context
  */
-int vx_create(xid_t xid, uint64_t flags);
+int vx_create(xid_t xid, struct vx_create *create);
 
 /*!
  * @brief Migrate to an existing context
@@ -176,14 +183,22 @@ enum vhi_name_field {
 #endif
 
 /*!
+ * @brief vx_vhi_name
+ */
+struct vx_vhi_name {
+	uint32_t field;
+	char name[65];
+};
+
+/*!
  * @brief vx_set_vhi_name
  */
-int vx_set_vhi_name(xid_t xid, uint32_t field, char *name);
+int vx_set_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name);
 
 /*!
  * @brief vx_get_vhi_name
  */
-int vx_get_vhi_name(xid_t xid, uint32_t field, char *name, size_t len);
+int vx_get_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name);
 
 
 /*!
@@ -202,19 +217,28 @@ int vs_dump_history();
  */
 
 /*!
+ * @brief vx_dlimit_base
+ */
+struct vx_dlimit_base {
+	const char *filename;
+	uint32_t flags;
+};
+
+/*!
  * @brief vx_add_dlimit
  */
-int vx_add_dlimit(xid_t xid, const char *name, uint32_t flags);
+int vx_add_dlimit(xid_t xid, struct vx_dlimit_base *dlimit_base);
 
 /*!
  * @brief vx_rem_dlimit
  */
-int vx_rem_dlimit(xid_t xid, const char *name);
+int vx_rem_dlimit(xid_t xid, struct vx_dlimit_base *dlimit_base);
 
 /*!
  * @brief vx_dlimit
  */
 struct vx_dlimit {
+	const char *filename;
 	uint32_t space_used;
 	uint32_t space_total;
 	uint32_t inodes_used;
@@ -226,12 +250,12 @@ struct vx_dlimit {
 /*!
  * @brief vx_set_dlimit
  */
-int vx_set_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit);
+int vx_set_dlimit(xid_t xid, struct vx_dlimit *dlimit);
 
 /*!
  * @brief vx_get_dlimit
  */
-int vx_get_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit);
+int vx_get_dlimit(xid_t xid, struct vx_dlimit *dlimit);
 
 
 
@@ -244,6 +268,7 @@ int vx_get_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit);
  * @brief vx_iattr
  */
 struct vx_iattr {
+	const char *filename;
 	xid_t xid;
 	uint32_t flags;
 	uint32_t mask;
@@ -252,12 +277,12 @@ struct vx_iattr {
 /*!
  * @brief vx_get_dlimit
  */
-int vx_set_iattr(const char *name, struct vx_iattr *iattr);
+int vx_set_iattr(struct vx_iattr *iattr);
 
 /*!
  * @brief vx_get_dlimit
  */
-int vx_get_iattr(const char *name, struct vx_iattr *iattr);
+int vx_get_iattr(struct vx_iattr *iattr);
 
 
 
@@ -270,6 +295,7 @@ int vx_get_iattr(const char *name, struct vx_iattr *iattr);
  * @brief vx_get_dlimit
  */
 struct vx_rlimit {
+	uint32_t id;
 	uint64_t minimum;
 	uint64_t softlimit;
 	uint64_t maximum;
@@ -278,12 +304,12 @@ struct vx_rlimit {
 /*!
  * @brief vx_get_dlimit
  */
-int vx_set_rlimit(xid_t xid, uint32_t id, struct vx_rlimit *rlimit);
+int vx_set_rlimit(xid_t xid, struct vx_rlimit *rlimit);
 
 /*!
  * @brief vx_get_dlimit
  */
-int vx_get_rlimit(xid_t xid, uint32_t id, struct vx_rlimit *rlimit);
+int vx_get_rlimit(xid_t xid, struct vx_rlimit *rlimit);
 
 /*!
  * @brief vx_get_dlimit
@@ -369,7 +395,14 @@ int nx_get_info(nid_t nid, struct nx_info *info);
 /*!
  * @brief vx_get_dlimit
  */
-int nx_create(nid_t nid, uint64_t flags);
+struct nx_create {
+	uint64_t flags;
+};
+
+/*!
+ * @brief vx_get_dlimit
+ */
+int nx_create(nid_t nid, struct nx_create *create);
 
 /*!
  * @brief vx_get_dlimit
@@ -503,12 +536,28 @@ int vx_set_sched(xid_t xid, struct vx_sched *sched);
 /*!
  * @brief vx_get_dlimit
  */
-int vx_kill(xid_t xid, pid_t pid, int sig);
+struct vx_kill {
+	int32_t pid;
+	int32_t sig;
+};
 
 /*!
  * @brief vx_get_dlimit
  */
-int vx_wait_exit(xid_t xid);
+int vx_kill(xid_t xid, struct vx_kill *kill);
+
+/*!
+ * @brief vx_get_dlimit
+ */
+struct vx_wait {
+	int32_t a;
+	int32_t b;
+};
+
+/*!
+ * @brief vx_get_dlimit
+ */
+int vx_wait_exit(xid_t xid, struct vx_wait *wait);
 
 
 

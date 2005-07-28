@@ -22,19 +22,28 @@
 #include <config.h>
 #endif
 
-#include <stdint.h>
-#include <errno.h>
-
 #include "linux/vserver/switch.h"
 #include "linux/vserver/inode_cmd.h"
 
 #include "vserver.h"
 
-int vx_get_iattr(const char *name, struct vx_iattr *iattr)
+int vx_set_iattr(struct vx_iattr *iattr)
 {
 	struct vcmd_ctx_iattr_v1 res;
 
-	res.name = name;
+	res.name  = iattr->filename;
+	res.xid   = iattr->xid;
+	res.flags = iattr->flags;
+	res.mask  = iattr->mask;
+
+	return vserver(VCMD_set_iattr, 0, &res);
+}
+
+int vx_get_iattr(struct vx_iattr *iattr)
+{
+	struct vcmd_ctx_iattr_v1 res;
+
+	res.name = iattr->filename;
 	int rc = vserver(VCMD_get_iattr, 0, &res);
 	
 	if (rc == -1)
@@ -45,16 +54,4 @@ int vx_get_iattr(const char *name, struct vx_iattr *iattr)
 	iattr->mask  = res.mask;
 
 	return rc;
-}
-
-int vx_set_iattr(const char *name, struct vx_iattr *iattr)
-{
-	struct vcmd_ctx_iattr_v1 res;
-
-	res.name = name;
-	res.xid   = iattr->xid;
-	res.flags = iattr->flags;
-	res.mask  = iattr->mask;
-
-	return vserver(VCMD_set_iattr, 0, &res);
 }

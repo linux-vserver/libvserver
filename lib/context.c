@@ -22,9 +22,6 @@
 #include <config.h>
 #endif
 
-#include <stdint.h>
-#include <errno.h>
-
 #include "linux/vserver/switch.h"
 #include "linux/vserver/context_cmd.h"
 
@@ -50,11 +47,11 @@ int vx_get_info(xid_t xid, struct vx_info *info)
 	return rc;
 }
 
-int vx_create(xid_t xid, uint64_t flags)
+int vx_create(xid_t xid, struct vx_create *create)
 {
 	struct vcmd_ctx_create res;
 
-	res.flagword = flags;
+	res.flagword = create->flags;
 
 	return vserver(VCMD_ctx_create, xid, &res);
 }

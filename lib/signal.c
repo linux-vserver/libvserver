@@ -22,25 +22,27 @@
 #include <config.h>
 #endif
 
-#include <stdint.h>
-#include <errno.h>
-
 #include "linux/vserver/switch.h"
 #include "linux/vserver/signal_cmd.h"
 
 #include "vserver.h"
 
-int vx_kill(xid_t xid, pid_t pid, int sig)
+int vx_kill(xid_t xid, struct vx_kill *kill)
 {
 	struct vcmd_ctx_kill_v0 res;
 
-	res.pid = pid;
-	res.sig = sig;
+	res.pid = kill->pid;
+	res.sig = kill->sig;
 
 	return vserver(VCMD_ctx_kill, xid, &res);
 }
 
-int vx_wait_exit(xid_t xid)
+int vx_wait_exit(xid_t xid, struct vx_wait *wait)
 {
-	return vserver(VCMD_wait_exit, xid, NULL);
+	struct vcmd_wait_exit_v0 res;
+	
+	res.a = wait->a;
+	res.b = wait->b;
+	
+	return vserver(VCMD_wait_exit, xid, &res);
 }

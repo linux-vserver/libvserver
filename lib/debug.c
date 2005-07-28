@@ -22,10 +22,6 @@
 #include <config.h>
 #endif
 
-#include <stdint.h>
-#include <errno.h>
-#include <string.h>
-
 #include "linux/vserver/switch.h"
 #include "linux/vserver/debug_cmd.h"
 

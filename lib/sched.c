@@ -22,9 +22,6 @@
 #include <config.h>
 #endif
 
-#include <stdint.h>
-#include <errno.h>
-
 #include "linux/vserver/switch.h"
 #include "linux/vserver/sched_cmd.h"
 

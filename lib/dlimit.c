@@ -22,38 +22,35 @@
 #include <config.h>
 #endif
 
-#include <stdint.h>
-#include <errno.h>
-
 #include "linux/vserver/switch.h"
 #include "linux/vserver/dlimit_cmd.h"
 
 #include "vserver.h"
 
-int vx_add_dlimit(xid_t xid, const char *name, uint32_t flags)
+int vx_add_dlimit(xid_t xid, struct vx_dlimit_base *dlimit_base)
 {
 	struct vcmd_ctx_dlimit_base_v0 res;
 
-	res.name = name;
-	res.flags = flags;
+	res.name  = dlimit_base->filename;
+	res.flags = dlimit_base->flags;
 
 	return vserver(VCMD_add_dlimit, xid, &res);
 }
 
-int vx_rem_dlimit(xid_t xid, const char *name)
+int vx_rem_dlimit(xid_t xid, struct vx_dlimit_base *dlimit_base)
 {
 	struct vcmd_ctx_dlimit_base_v0 res;
 
-	res.name = name;
+	res.name = dlimit_base->filename;
 
 	return vserver(VCMD_rem_dlimit, xid, &res);
 }
 
-int vx_set_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
+int vx_set_dlimit(xid_t xid, struct vx_dlimit *dlimit)
 {
 	struct vcmd_ctx_dlimit_v0 res;
 
-	res.name         = name;
+	res.name         = dlimit->filename;
 	res.space_used   = dlimit->space_used;
 	res.space_total  = dlimit->space_total;
 	res.inodes_used  = dlimit->inodes_used;
@@ -64,11 +61,11 @@ int vx_set_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
 	return vserver(VCMD_set_dlimit, xid, &res);
 }
 
-int vx_get_dlimit(xid_t xid, const char *name, struct vx_dlimit *dlimit)
+int vx_get_dlimit(xid_t xid, struct vx_dlimit *dlimit)
 {
 	struct vcmd_ctx_dlimit_v0 res;
 
-	res.name = name;
+	res.name = dlimit->filename;
 	int rc = vserver(VCMD_get_dlimit, xid, &res);
 	
 	if (rc == -1)

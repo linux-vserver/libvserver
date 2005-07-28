@@ -22,38 +22,34 @@
 #include <config.h>
 #endif
 
-#include <stdint.h>
-#include <errno.h>
-#include <string.h>
-
 #include "linux/vserver/switch.h"
 #include "linux/vserver/cvirt_cmd.h"
 
 #include "vserver.h"
 
-int vx_set_vhi_name(xid_t xid, uint32_t field, char *name)
+#include <string.h>
+
+int vx_set_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name)
 {
 	struct vcmd_vhi_name_v0 res;
 
-	res.field = field;
-	strncpy(res.name, name, VHI_SIZE-2);
-	res.name[VHI_SIZE-1] = '\0';
+	res.field = vhi_name->field;
+	memcpy(res.name, vhi_name->name, sizeof res.name);
 
 	return vserver(VCMD_set_vhi_name, xid, &res);
 }
 
-int vx_get_vhi_name(xid_t xid, uint32_t field, char *name, size_t len)
+int vx_get_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name)
 {
 	struct vcmd_vhi_name_v0 res;
 
-	res.field = field;
+	res.field = vhi_name->field;
 	int rc = vserver(VCMD_get_vhi_name, xid, &res);
 	
 	if (rc == -1)
 		return rc;
 
-	strncpy(name, res.name, len-2);
-	name[len-1] = '\0';
+	memcpy(vhi_name->name, res.name, sizeof vhi_name->name);
 
 	return rc;
 }
