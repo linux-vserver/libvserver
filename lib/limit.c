@@ -36,7 +36,7 @@ int vx_set_rlimit(xid_t xid, struct vx_rlimit *rlimit)
 	res.softlimit = rlimit->softlimit;
 	res.maximum   = rlimit->maximum;
 
-	return vserver(VCMD_set_rlimit, xid, &res);
+	return sys_vserver(VCMD_set_rlimit, xid, &res);
 }
 
 int vx_get_rlimit(xid_t xid, struct vx_rlimit *rlimit)
@@ -44,7 +44,7 @@ int vx_get_rlimit(xid_t xid, struct vx_rlimit *rlimit)
 	struct vcmd_ctx_rlimit_v0 res;
 
 	res.id = rlimit->id;
-	int rc = vserver(VCMD_get_rlimit, xid, &res);
+	int rc = sys_vserver(VCMD_get_rlimit, xid, &res);
 	
 	if (rc == -1)
 		return rc;
@@ -60,7 +60,7 @@ int vx_get_rlimit_mask(struct vx_rlimit_mask *rmask)
 {
 	struct vcmd_ctx_rlimit_mask_v0 res;
 	
-	int rc = vserver(VCMD_get_rlimit_mask, 0, &res);
+	int rc = sys_vserver(VCMD_get_rlimit_mask, 0, &res);
 
 	if (rc == -1)
 		return rc;

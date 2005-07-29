@@ -28,6 +28,6 @@
 
 int vs_get_version(void)
 {
-	return vserver(VCMD_get_version, 0, NULL);
+	return sys_vserver(VCMD_get_version, 0, NULL);
 }
 

@@ -36,7 +36,7 @@ int vx_set_iattr(struct vx_iattr *iattr)
 	res.flags = iattr->flags;
 	res.mask  = iattr->mask;
 
-	return vserver(VCMD_set_iattr, 0, &res);
+	return sys_vserver(VCMD_set_iattr, 0, &res);
 }
 
 int vx_get_iattr(struct vx_iattr *iattr)
@@ -44,7 +44,7 @@ int vx_get_iattr(struct vx_iattr *iattr)
 	struct vcmd_ctx_iattr_v1 res;
 
 	res.name = iattr->filename;
-	int rc = vserver(VCMD_get_iattr, 0, &res);
+	int rc = sys_vserver(VCMD_get_iattr, 0, &res);
 	
 	if (rc == -1)
 		return rc;

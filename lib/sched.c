@@ -39,6 +39,6 @@ int vx_set_sched(xid_t xid, struct vx_sched *sched)
 	res.tokens_max    = sched->tokens_max;
 	res.priority_bias = sched->priority_bias;
 
-	return vserver(VCMD_set_sched, xid, &res);
+	return sys_vserver(VCMD_set_sched, xid, &res);
 }
 

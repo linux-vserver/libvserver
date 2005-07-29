@@ -29,5 +29,5 @@
 
 int vs_dump_history(void)
 {
-	return vserver(VCMD_dump_history, 0, NULL);
+	return sys_vserver(VCMD_dump_history, 0, NULL);
 }

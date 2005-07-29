@@ -36,7 +36,7 @@ int vx_set_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name)
 	res.field = vhi_name->field;
 	memcpy(res.name, vhi_name->name, sizeof res.name);
 
-	return vserver(VCMD_set_vhi_name, xid, &res);
+	return sys_vserver(VCMD_set_vhi_name, xid, &res);
 }
 
 int vx_get_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name)
@@ -44,7 +44,7 @@ int vx_get_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name)
 	struct vcmd_vhi_name_v0 res;
 
 	res.field = vhi_name->field;
-	int rc = vserver(VCMD_get_vhi_name, xid, &res);
+	int rc = sys_vserver(VCMD_get_vhi_name, xid, &res);
 	
 	if (rc == -1)
 		return rc;

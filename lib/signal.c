@@ -34,7 +34,7 @@ int vx_kill(xid_t xid, struct vx_kill *kill)
 	res.pid = kill->pid;
 	res.sig = kill->sig;
 
-	return vserver(VCMD_ctx_kill, xid, &res);
+	return sys_vserver(VCMD_ctx_kill, xid, &res);
 }
 
 int vx_wait_exit(xid_t xid, struct vx_wait *wait)
@@ -44,5 +44,5 @@ int vx_wait_exit(xid_t xid, struct vx_wait *wait)
 	res.a = wait->a;
 	res.b = wait->b;
 	
-	return vserver(VCMD_wait_exit, xid, &res);
+	return sys_vserver(VCMD_wait_exit, xid, &res);
 }

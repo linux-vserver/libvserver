@@ -1,7 +1,7 @@
 #ifndef	__SYSCALL_NEW_H
 #define	__SYSCALL_NEW_H
 
-/*	Copyright (C) 2005 Herbert Pötzl
+/*	Copyright (C) 2005 Herbert Poetzl
 
 		global config options
 
@@ -1031,34 +1031,34 @@
 
 
 #define _syscall0(type, name)						\
-type name(void)								\
+type sys_ ## name(void)								\
 __sc_body(0, type, name, *)
 
 #define _syscall1(type, name, type1, arg1)				\
-type name(type1 arg1)							\
+type sys_ ## name(type1 arg1)							\
 __sc_body(1, type, name, arg1)
 
 #define _syscall2(type, name, type1, arg1, type2, arg2)			\
-type name(type1 arg1, type2 arg2)					\
+type sys_ ## name(type1 arg1, type2 arg2)					\
 __sc_body(2, type, name, arg1, arg2)
 
 #define _syscall3(type, name, type1, arg1, type2, arg2, type3, arg3)	\
-type name(type1 arg1, type2 arg2, type3 arg3)				\
+type sys_ ## name(type1 arg1, type2 arg2, type3 arg3)				\
 __sc_body(3, type, name, arg1, arg2, arg3)
 
 #define _syscall4(type, name, type1, arg1, type2, arg2, type3, arg3,	\
 			      type4, arg4)				\
-type name(type1 arg1, type2 arg2, type3 arg3, type4 arg4)		\
+type sys_ ## name(type1 arg1, type2 arg2, type3 arg3, type4 arg4)		\
 __sc_body(4, type, name, arg1, arg2, arg3, arg4)
 
 #define _syscall5(type, name, type1, arg1, type2, arg2, type3, arg3,	\
     			      type4, arg4, type5, arg5)			\
-type name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5)	\
+type sys_ ## name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5)	\
 __sc_body(5, type, name, arg1, arg2, arg3, arg4, arg5)
 
 #define _syscall6(type, name, type1, arg1, type2, arg2, type3, arg3,	\
 			type4, arg4, type5, arg5, type6, arg6)		\
-type name(type1 arg1, type2 arg2, type3 arg3,				\
+type sys_ ## name(type1 arg1, type2 arg2, type3 arg3,				\
 	  type4 arg4, type5 arg5, type6 arg6)				\
 __sc_body(6, type, name, arg1, arg2, arg3, arg4, arg5, arg6)
 

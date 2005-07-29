@@ -29,14 +29,14 @@
 
 int vx_get_task_xid(pid_t pid)
 {
-	return vserver(VCMD_task_xid, pid, NULL);
+	return sys_vserver(VCMD_task_xid, pid, NULL);
 }
 
 int vx_get_info(xid_t xid, struct vx_info *info)
 {
 	struct vcmd_vx_info_v0 res;
 
-	int rc = vserver(VCMD_vx_info, xid, &res);
+	int rc = sys_vserver(VCMD_vx_info, xid, &res);
 
 	if (rc == -1)
 		return rc;
@@ -53,12 +53,12 @@ int vx_create(xid_t xid, struct vx_create *create)
 
 	res.flagword = create->flags;
 
-	return vserver(VCMD_ctx_create, xid, &res);
+	return sys_vserver(VCMD_ctx_create, xid, &res);
 }
 
 int vx_migrate(xid_t xid)
 {
-	return vserver(VCMD_ctx_migrate, xid, NULL);
+	return sys_vserver(VCMD_ctx_migrate, xid, NULL);
 }
 
 int vx_set_flags(xid_t xid, struct vx_flags *flags)
@@ -68,14 +68,14 @@ int vx_set_flags(xid_t xid, struct vx_flags *flags)
 	res.flagword = flags->flags;
 	res.mask     = flags->mask;
 
-	return vserver(VCMD_set_cflags, xid, &res);
+	return sys_vserver(VCMD_set_cflags, xid, &res);
 }
 
 int vx_get_flags(xid_t xid, struct vx_flags *flags)
 {
 	struct vcmd_ctx_flags_v0 res;
 
-	int rc = vserver(VCMD_get_cflags, xid, &res);
+	int rc = sys_vserver(VCMD_get_cflags, xid, &res);
 
 	if (rc == -1)
 		return rc;
@@ -94,14 +94,14 @@ int vx_set_caps(xid_t xid, struct vx_caps *caps)
 	res.ccaps = caps->ccaps;
 	res.cmask = caps->cmask;
 
-	return vserver(VCMD_set_ccaps, xid, &res);
+	return sys_vserver(VCMD_set_ccaps, xid, &res);
 }
 
 int vx_get_caps(xid_t xid, struct vx_caps *caps)
 {
 	struct vcmd_ctx_caps_v0 res;
 
-	int rc = vserver(VCMD_get_ccaps, xid, &res);
+	int rc = sys_vserver(VCMD_get_ccaps, xid, &res);
 
 	if (rc == -1)
 		return rc;

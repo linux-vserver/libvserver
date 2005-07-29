@@ -34,7 +34,7 @@ int vx_add_dlimit(xid_t xid, struct vx_dlimit_base *dlimit_base)
 	res.name  = dlimit_base->filename;
 	res.flags = dlimit_base->flags;
 
-	return vserver(VCMD_add_dlimit, xid, &res);
+	return sys_vserver(VCMD_add_dlimit, xid, &res);
 }
 
 int vx_rem_dlimit(xid_t xid, struct vx_dlimit_base *dlimit_base)
@@ -43,7 +43,7 @@ int vx_rem_dlimit(xid_t xid, struct vx_dlimit_base *dlimit_base)
 
 	res.name = dlimit_base->filename;
 
-	return vserver(VCMD_rem_dlimit, xid, &res);
+	return sys_vserver(VCMD_rem_dlimit, xid, &res);
 }
 
 int vx_set_dlimit(xid_t xid, struct vx_dlimit *dlimit)
@@ -58,7 +58,7 @@ int vx_set_dlimit(xid_t xid, struct vx_dlimit *dlimit)
 	res.reserved     = dlimit->reserved;
 	res.flags        = dlimit->flags;
 
-	return vserver(VCMD_set_dlimit, xid, &res);
+	return sys_vserver(VCMD_set_dlimit, xid, &res);
 }
 
 int vx_get_dlimit(xid_t xid, struct vx_dlimit *dlimit)
@@ -66,7 +66,7 @@ int vx_get_dlimit(xid_t xid, struct vx_dlimit *dlimit)
 	struct vcmd_ctx_dlimit_v0 res;
 
 	res.name = dlimit->filename;
-	int rc = vserver(VCMD_get_dlimit, xid, &res);
+	int rc = sys_vserver(VCMD_get_dlimit, xid, &res);
 	
 	if (rc == -1)
 		return rc;

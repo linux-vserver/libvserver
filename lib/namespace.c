@@ -29,15 +29,15 @@
 
 int vx_enter_namespace(xid_t xid)
 {
-	return vserver(VCMD_enter_namespace, xid, NULL);
+	return sys_vserver(VCMD_enter_namespace, xid, NULL);
 }
 
 int vx_cleanup_namespace(void)
 {
-	return vserver(VCMD_cleanup_namespace, 0, NULL);
+	return sys_vserver(VCMD_cleanup_namespace, 0, NULL);
 }
 
 int vx_set_namespace(void)
 {
-	return vserver(VCMD_set_namespace, 0, NULL);
+	return sys_vserver(VCMD_set_namespace, 0, NULL);
 }

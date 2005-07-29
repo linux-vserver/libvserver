@@ -55,7 +55,20 @@
  *   </a>
  * \endhtmlonly
  */
-int vserver(uint32_t cmd, uint32_t id, void *data);
+int sys_vserver(uint32_t cmd, uint32_t id, void *data);
+
+/*!
+ * @brief Linux personality syscall interface
+ * 
+ * @param pers Personality type
+ * 
+ * @see \htmlonly
+ *   <a class="el" href="file:///usr/include/linux/personality.h">
+ *     &lt;linux/personality.h&gt;
+ *   </a>
+ * \endhtmlonly
+ */
+int sys_personality(uint32_t cmd, uint32_t id, void *data);
 
 /*!
  * @defgroup syscall_context Context commands
