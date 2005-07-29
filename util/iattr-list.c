@@ -27,25 +27,28 @@
 
 LIST_DATA_ALLOC_TYPE(iattr, uint64_t)
 
-#define LIST_ADD(TYPE, VALUE) \
+/*!
+ * @brief Macro for iattr list allocation
+ * @ingroup list_defaults
+ */
+#define LIST_ADD_IATTR(TYPE, VALUE) \
 list_set(p->node+(i++), \
          list_key_alloc(#VALUE), \
          iattr_list_data_alloc(TYPE ## _ ## VALUE));
 	
-list_t *iattr_list_init()
+list_t *iattr_list_init(void)
 {
-	size_t np = 8;
-	list_t *p = list_alloc(np);
+	list_t *p = list_alloc(8);
 	
 	int i = 0;
-	LIST_ADD(IATTR, XID)
-	LIST_ADD(IATTR, ADMIN)
-	LIST_ADD(IATTR, WATCH)
-	LIST_ADD(IATTR, HIDE)
-	LIST_ADD(IATTR, FLAGS)
-	LIST_ADD(IATTR, BARRIER)
-	LIST_ADD(IATTR, IUNLINK)
-	LIST_ADD(IATTR, IMMUTABLE)
+	LIST_ADD_IATTR(IATTR, XID)
+	LIST_ADD_IATTR(IATTR, ADMIN)
+	LIST_ADD_IATTR(IATTR, WATCH)
+	LIST_ADD_IATTR(IATTR, HIDE)
+	LIST_ADD_IATTR(IATTR, FLAGS)
+	LIST_ADD_IATTR(IATTR, BARRIER)
+	LIST_ADD_IATTR(IATTR, IUNLINK)
+	LIST_ADD_IATTR(IATTR, IMMUTABLE)
 	
 	return p;
 }

@@ -27,26 +27,28 @@
 
 LIST_DATA_ALLOC_TYPE(ccaps, uint64_t)
 
-#define LIST_ADD(TYPE, VALUE) \
+/*!
+ * @brief Macro for ccaps list allocation
+ * @ingroup list_defaults
+ */
+#define LIST_ADD_CCAP(TYPE, VALUE) \
 list_set(p->node+(i++), \
          list_key_alloc(#VALUE), \
          ccaps_list_data_alloc(TYPE ## _ ## VALUE));
 	
-list_t *ccaps_list_init()
+list_t *ccaps_list_init(void)
 {
-	size_t np      = 8;
-	list_t *p = list_alloc(np);
+	list_t *p = list_alloc(8);
 	
 	int i = 0;
-	
-	LIST_ADD(VXC, SET_UTSNAME)
-	LIST_ADD(VXC, SET_RLIMIT)
-	LIST_ADD(VXC, RAW_ICMP)
-	LIST_ADD(VXC, SYSLOG)
-	LIST_ADD(VXC, SECURE_MOUNT)
-	LIST_ADD(VXC, SECURE_REMOUNT)
-	LIST_ADD(VXC, BINARY_MOUNT)
-	LIST_ADD(VXC, QUOTA_CTL)
+	LIST_ADD_CCAP(VXC, SET_UTSNAME)
+	LIST_ADD_CCAP(VXC, SET_RLIMIT)
+	LIST_ADD_CCAP(VXC, RAW_ICMP)
+	LIST_ADD_CCAP(VXC, SYSLOG)
+	LIST_ADD_CCAP(VXC, SECURE_MOUNT)
+	LIST_ADD_CCAP(VXC, SECURE_REMOUNT)
+	LIST_ADD_CCAP(VXC, BINARY_MOUNT)
+	LIST_ADD_CCAP(VXC, QUOTA_CTL)
 	
 	return p;
 }

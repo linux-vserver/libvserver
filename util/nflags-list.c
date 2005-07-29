@@ -27,21 +27,24 @@
 
 LIST_DATA_ALLOC_TYPE(nflags, uint64_t)
 
-#define LIST_ADD(TYPE, VALUE) \
+/*!
+ * @brief Macro for nflags list allocation
+ * @ingroup list_defaults
+ */
+#define LIST_ADD_NFLAG(TYPE, VALUE) \
 list_set(p->node+(i++), \
          list_key_alloc(#VALUE), \
          nflags_list_data_alloc(TYPE ## _ ## VALUE));
 	
-list_t *nflags_list_init()
+list_t *nflags_list_init(void)
 {
-	size_t np = 8;
-	list_t *p = list_alloc(np);
+	list_t *p = list_alloc(4);
 	
 	int i = 0;
-	LIST_ADD(NXF, STATE_SETUP)
-	LIST_ADD(NXF, STATE_HELPER)
-	LIST_ADD(NXF, ONE_TIME)
-	LIST_ADD(NXF, INIT_SET)
+	LIST_ADD_NFLAG(NXF, STATE_SETUP)
+	LIST_ADD_NFLAG(NXF, STATE_HELPER)
+	LIST_ADD_NFLAG(NXF, ONE_TIME)
+	LIST_ADD_NFLAG(NXF, INIT_SET)
 	
 	return p;
 }

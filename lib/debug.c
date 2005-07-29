@@ -27,7 +27,7 @@
 
 #include "vserver.h"
 
-int vx_dump_history()
+int vs_dump_history(void)
 {
 	return vserver(VCMD_dump_history, 0, NULL);
 }

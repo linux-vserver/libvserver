@@ -29,37 +29,29 @@
 #include <errno.h>
 #include <stdbool.h>
 
-/*
- * List initialisation
- */
-
-/* allocate memory for a list with n nodes */
 list_t *list_alloc(size_t n)
 {
 	list_t *list      = malloc(sizeof(list_t));
 	list_node_t *node = malloc(sizeof(list_node_t)*n);
 	
 	list->node = node;
-	list->n = n;
+	list->n    = n;
 	
 	return list;
 }
 
-/* deallocate list memory */
 void list_dealloc(list_t *list)
 {
 	unsigned int i;
-	
 	for (i = 0; i < list->n; i++) {
-		free(((list->node)+i)->key);
-		free(((list->node)+i)->data);
+		free((list->node+i)->key);
+		free((list->node+i)->data);
 	}
 	
 	free(list->node);
 	free(list);
 }
 
-/* allocate memory for a list key (see also data alloc macro) */
 char *list_key_alloc(char *value)
 {
 	char *key = malloc(sizeof(char)*strlen(value));
@@ -67,19 +59,12 @@ char *list_key_alloc(char *value)
 	return key;
 }
 
-/* set key/data pair at current position of list */
 void list_set(list_node_t *node, char *key, void *data)
 {
 	node->key  = key;
 	node->data = data;
 }
 
-
-/*
- * Token string parser
- */
-
-/* count tokens in str seperated by delim */
 size_t list_ntokens(const char *str, const char delim)
 {
 	size_t ntokens = strlen(str) ? 1 : 0;
@@ -92,7 +77,6 @@ size_t list_ntokens(const char *str, const char delim)
 	return ntokens;
 }
 
-/* extract token from str and modify str to point to next token */
 char *list_parse(const char **str, const char delim)
 {
 	const char *ptr  = strchr(*str, delim); /* get pointer to next delim */
@@ -114,7 +98,6 @@ char *list_parse(const char **str, const char delim)
 	return token;
 }
 
-/* extract key/value pairs, seperated by kvdelim from a token string seperated by delim */
 list_t *list_parse_hash(const char *str, const char delim, const char kvdelim)
 {
 	list_t *list = list_alloc(list_ntokens(str, delim));
@@ -146,7 +129,7 @@ list_t *list_parse_hash(const char *str, const char delim, const char kvdelim)
 		memcpy(val, ptr, vallen);
 		val[vallen] = '\0';
 		
-		list_set((list->node)+i, key, val);
+		list_set(list->node+i, key, val);
 		
 		free(token);
 	}
@@ -154,14 +137,13 @@ list_t *list_parse_hash(const char *str, const char delim, const char kvdelim)
 	return list;
 }
 
-/* extract tokens seperated by delim from a token string */
 list_t *list_parse_list(const char *str, const char delim)
 {
 	list_t *list = list_alloc(list_ntokens(str, delim));
 	
 	unsigned int i;
 	for(i = 0; i < list->n; i++) {
-		list_set((list->node)+i,
+		list_set(list->node+i,
 		         list_parse(&str, delim),
 		         NULL);
 	}
@@ -169,36 +151,23 @@ list_t *list_parse_list(const char *str, const char delim)
 	return list;
 }
 
-
-/*
- * Search functions
- */
-
-/* find the first occurance of key in list */
 list_node_t *list_search(list_t *list, char *key)
 {
 	unsigned int i;
 	for (i = 0; i < list->n; i++) {
-		if(strcmp(key, ((list->node)+i)->key) == 0)
-			return (list->node)+i;
+		if(strcasecmp(key, (list->node+i)->key) == 0)
+			return list->node+i;
 	}
 	
 	return NULL;
 }
 
-
-/*
- * List validation
- */
-
-/* validate a token based flag list, optionally prefixed with 
-   the clear modifier clmod against a pristine copy */
 int list_validate_flag(list_link_t *link, const char clmod)
 {
 	unsigned int i;
 	for (i = 0; i < link->d->n; i++) {
 		list_node_t *ptr = link->d->node+i;
-		int skip       = *ptr->key == clmod ? 1 : 0;
+		int skip         = *ptr->key == clmod ? 1 : 0;
 		
 		if(list_search(link->p, ptr->key+skip) == NULL) {
 			errno = EINVAL;
@@ -209,22 +178,14 @@ int list_validate_flag(list_link_t *link, const char clmod)
 	return 0;
 }
 
-/* validate a token based list against a pristine copy */
 int list_validate(list_link_t *link)
 {
 	const char clmod = '\0';
 	return list_validate_flag(link, clmod);
 }
 
-
-/*
- * list converter
- */
-
-/* convert a token based flag list, optionally prefixed with
-   the clear modifier clmod, to flags and a set mask, using a
-   pristine copy as token converter list */
-void list_list2flags(list_link_t *link, char clmod, uint64_t *flags, uint64_t *mask)
+void list_list2flags(list_link_t *link, char clmod,
+                     uint64_t *flags, uint64_t *mask)
 {
 	unsigned int i;
 	for (i = 0; i < link->d->n; i++) {

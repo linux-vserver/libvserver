@@ -20,7 +20,7 @@
 
 /*!
  * @file vserver-util.h
- * @brief Utility library ontop of libvserver
+ * @brief Interface to libvserver utility library
  */
 #ifndef _VSERVER_UTIL_H_
 #define _VSERVER_UTIL_H_
@@ -33,39 +33,76 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-/*! @cond */
-#undef BEGIN_C_DECLS
-#undef END_C_DECLS
-#ifdef __cplusplus
-# define BEGIN_C_DECLS extern "C" {
-# define END_C_DECLS }
-#else
-# define BEGIN_C_DECLS /* empty */
-# define END_C_DECLS /* empty */
-#endif
+/*!
+ * @defgroup list List functions
+ * @{
+ */
+/*! 
+ * @brief List node
+ */
+typedef struct list_node_s {
+	char *key;  /*!< unique key identifier */
+	void *data; /*!< any data associated with key */
+} list_node_t;
 
-BEGIN_C_DECLS
-/*! @endcond */
+/*!
+ * @brief List
+ */
+typedef struct list_s {
+	list_node_t *node; /*!< first node */
+	size_t n;          /*!< number of nodes */
+} list_t;
+
+/*!
+ * @brief Linked lists
+ */
+typedef struct list_link_s {
+	list_t *p; /*!< prisitine list */
+	list_t *d; /*!< descending list */
+} list_link_t;
 
 /*!
  * @file list.c
+ * @brief List handling and parsing functions
  */
-typedef struct list_node_s {
-	char *key;  /* unique key identifier */
-	void *data; /* any data associated with key */
-} list_node_t;
+/*!
+ * @defgroup list_alloc List allocation
+ * @{
+ */
+/*!
+ * @brief Allocate memory for a list
+ * 
+ * @param n Number of nodes
+ * 
+ * @return Pointer to empty list
+ */
+list_t *list_alloc(size_t n);
 
-typedef struct list_s {
-	list_node_t *node; /* first node */
-	size_t n;          /* number of nodes */
-} list_t;
+/*!
+ * @brief Deallocate list memory
+ * 
+ * @param list List pointer
+ */
+void list_dealloc(list_t *list);
 
-typedef struct list_link_s {
-	list_t *p; /* prisitine list */
-	list_t *d; /* descending list */
-} list_link_t;
+/*!
+ * @brief Allocate memory for a list key
+ * 
+ * @param str Key to be allocated
+ * 
+ * @return Pointer to allocated memory
+ * 
+ * @see LIST_DATA_ALLOC_TYPE
+ * @see list_set
+ */
+char *list_key_alloc(char *str);
 
-/* macro for data allocation using TYPE as data type */
+/*!
+ * @brief allocate memory for list data using TYPE
+ * 
+ * @see list_key_alloc
+ * @see list_set
+ */
 #define LIST_DATA_ALLOC_TYPE(NAME, TYPE) \
 static inline \
 TYPE *NAME ## _list_data_alloc(TYPE value) \
@@ -75,22 +112,216 @@ TYPE *NAME ## _list_data_alloc(TYPE value) \
 	return data; \
 }
 
-/* TODO: doc! */
-list_t *list_alloc(size_t n);
-void list_dealloc(list_t *list);
-char *list_key_alloc(char *str);
+/*!
+ * @brief Set key/data pair
+ * 
+ * @param node Current list node
+ * @param key  Key to be set
+ * @param data Data to be set
+ * 
+ * @see list_key_alloc
+ * @see LIST_DATA_ALLOC_TYPE
+ */
 void list_set(list_node_t *node, char *key, void *data);
-size_t list_ntokens(const char *str, const char delim);
-char *list_parse(const char **str, const char delim);
-list_t *list_parse_hash(const char *str, const char delim, const char kvdelim);
-list_t *list_parse_list(const char *str, const char delim);
-list_node_t *list_search(list_t *list, char *key);
-int list_validate_flag(list_link_t *link, const char clmod);
-int list_validate(list_link_t *link);
-void list_list2flags(list_link_t *link, char clmod, uint64_t *flags, uint64_t *mask);
+/*! @} list_alloc */
 
-/*! @cond */
-END_C_DECLS
-/*! @endcond */
+/*!
+ * @defgroup list_parse Token parser
+ * @{
+ */
+/*!
+ * @brief Count tokens
+ * 
+ * @param str   Token string
+ * @param delim Token delimiter
+ * 
+ * @return Number of tokens
+ */
+size_t list_ntokens(const char *str, const char delim);
+
+/*!
+ * @brief Extract token and modify str to point to next token
+ * 
+ * @param str   Token string
+ * @param delim Token delimiter 
+ * 
+ * @return Current token
+ */
+char *list_parse(const char **str, const char delim);
+
+/*!
+ * @brief Extract key/value pairs
+ * 
+ * @param str     Token string
+ * @param delim   Token delimiter
+ * @param kvdelim key/value delimiter
+ * 
+ * @return Token list pointer
+ */
+list_t *list_parse_hash(const char *str, const char delim, const char kvdelim);
+
+/*!
+ * @brief Extract tokens
+ * 
+ * @param str   Token string
+ * @param delim Token delimiter
+ * 
+ * @return Token list pointer
+ */
+list_t *list_parse_list(const char *str, const char delim);
+/*! @} list_parse */
+
+/*!
+ * @defgroup list_search List search
+ * @{
+ */
+/*!
+ * @brief Perform a linear search
+ * 
+ * @param list List pointer
+ * @param key  Key to search for in \a list
+ * 
+ * @return Matching node pointer
+ */
+list_node_t *list_search(list_t *list, char *key);
+/*! @} list_search */
+
+/*!
+ * @defgroup list_validate List validation
+ * @{
+ */
+/*!
+ * @brief Validate a token based flag list
+ * 
+ * @param link  Pointer to a linked flag list
+ * @param clmod Clear flag modifier
+ * 
+ * @return 0 on success, -1 otherwise; errno will be set
+ */
+int list_validate_flag(list_link_t *link, const char clmod);
+
+/*!
+ * @brief Validate a token based list
+ * 
+ * @param link Pointer to a linked list
+ * 
+ * @return 0 on success, -1 otherwise; errno will be set
+ */
+int list_validate(list_link_t *link);
+/*! @} list_validate */
+
+/*!
+ * @defgroup list_convert List converters
+ * @{
+ */
+/*!
+ * @brief Convert a token based flag list to flags and a set mask
+ * 
+ * @param link  Pointer to a linked list
+ * @param clmod Clear flag modifier
+ * @param flags Pointer to flags integer
+ * @param mask  Pointer to mask integer
+ */
+void list_list2flags(list_link_t *link, char clmod,
+                     uint64_t *flags, uint64_t *mask);
+/*! @} list_convert */
+
+/*!
+ * @defgroup list_defaults Default lists
+ * @brief Default lists
+ * 
+ * @see list_alloc
+ * @see list_key_alloc
+ * @see LIST_DATA_ALLOC_TYPE
+ * 
+ * @{
+ */
+/*!
+ * @file bcaps-list.c
+ * @brief System capability list
+ */
+/*!
+ * @brief Initialise system capability list
+ * 
+ * @see \htmlonly
+ *   <a class="el" href="file:///usr/include/linux/capability.h">
+ *     &lt;linux/capability.h&gt;
+ *   </a>
+ * \endhtmlonly
+ * 
+ * @return List of all system capabilities
+ */
+list_t *bcaps_list_init(void);
+
+/*!
+ * @file ccaps-list.c
+ * @brief Context capability list
+ */
+/*!
+ * @brief Initialise context capability list
+ * 
+ * @see \htmlonly
+ *   <a class="el" href="file:///usr/include/linux/vserver/context.h">
+ *     &lt;linux/vserver/context.h&gt;
+ *   </a>
+ * \endhtmlonly
+ * 
+ * @return List of all context capabilities
+ */
+list_t *ccaps_list_init(void);
+
+/*!
+ * @file cflags-list.c
+ * @brief Context flag list
+ */
+/*!
+ * @brief Initialise context flag list
+ * 
+ * @see \htmlonly
+ *   <a class="el" href="file:///usr/include/linux/vserver/context.h">
+ *     &lt;linux/vserver/context.h&gt;
+ *   </a>
+ * \endhtmlonly
+ * 
+ * @return List of all context flags
+ */
+list_t *cflags_list_init(void);
+
+/*!
+ * @file iattr-list.c
+ * @brief Inode attribute list
+ */
+/*!
+ * @brief Initialise inode attribute list
+ * 
+ * @see \htmlonly
+ *   <a class="el" href="file:///usr/include/linux/vserver/inode.h">
+ *     &lt;linux/vserver/inode.h&gt;
+ *   </a>
+ * \endhtmlonly
+ * 
+ * @return List of all inode attributes
+ */
+list_t *iattr_list_init(void);
+
+/*!
+ * @file nflags-list.c
+ * @brief Network context flag list
+ */
+/*!
+ * @brief Initialise network context flag list
+ * 
+ * @see \htmlonly
+ *   <a class="el" href="file:///usr/include/linux/vserver/network.h">
+ *     &lt;linux/vserver/network.h&gt;
+ *   </a>
+ * \endhtmlonly
+ * 
+ * @return List of all network context flags
+ */
+list_t *nflags_list_init(void);
+/* @} list_defaults */
+
+/*! @} list */
 
 #endif /*_VSERVER_UTIL_H_*/
