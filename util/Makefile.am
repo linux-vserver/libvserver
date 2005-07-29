@@ -11,6 +11,8 @@ libvserver_util_la_SOURCES = list.c \
                              ccaps-list.c \
                              cflags-list.c \
                              iattr-list.c \
-                             nflags-list.c
+                             nflags-list.c \
+                             personalityflag-list.c \
+                             personality-list.c
 
 libvserver_util_la_LDFLAGS = -version-info 0:0:0
