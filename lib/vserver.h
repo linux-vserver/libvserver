@@ -115,8 +115,8 @@ struct vx_create_flags {
 /*!
  * @brief Create context
  * 
- * @param xid    Context ID
- * @param create Initial create data
+ * @param xid          Context ID
+ * @param create_flags Initial create data
  */
 int vx_create(xid_t xid, struct vx_create_flags *create_flags);
 
@@ -467,8 +467,8 @@ struct nx_create_flags {
 /*!
  * @brief Create context
  * 
- * @param nid    Context ID
- * @param create Initial create data
+ * @param nid          Context ID
+ * @param create_flags Initial create data
  */
 int nx_create(nid_t nid, struct nx_create_flags *create_flags);
 
@@ -607,8 +607,8 @@ struct vx_kill_opts {
 /*!
  * @brief Kill a process
  * 
- * @param xid Context ID
- * @param kill Kill options
+ * @param xid       Context ID
+ * @param kill_opts Kill options
  */
 int vx_kill(xid_t xid, struct vx_kill_opts *kill_opts);
 
@@ -623,8 +623,8 @@ struct vx_wait_opts {
 /*!
  * @brief Wait for processes
  * 
- * @param xid Context ID
- * @param wait Wait options
+ * @param xid       Context ID
+ * @param wait_opts Wait options
  */
 int vx_wait(xid_t xid, struct vx_wait_opts *wait_opts);
 /*! @} syscall_signal */
