@@ -47,11 +47,11 @@ int vx_get_info(xid_t xid, struct vx_info *info)
 	return rc;
 }
 
-int vx_create(xid_t xid, struct vx_create *create)
+int vx_create(xid_t xid, struct vx_create *create_flags)
 {
 	struct vcmd_ctx_create res;
 
-	res.flagword = create->flags;
+	res.flagword = create_flags->flags;
 
 	return sys_vserver(VCMD_ctx_create, xid, &res);
 }

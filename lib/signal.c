@@ -27,22 +27,22 @@
 
 #include "vserver.h"
 
-int vx_kill(xid_t xid, struct vx_kill *kill)
+int vx_kill(xid_t xid, struct vx_kill_opts *kill_opts)
 {
 	struct vcmd_ctx_kill_v0 res;
 
-	res.pid = kill->pid;
-	res.sig = kill->sig;
+	res.pid = kill_opts->pid;
+	res.sig = kill_opts->sig;
 
 	return sys_vserver(VCMD_ctx_kill, xid, &res);
 }
 
-int vx_wait_exit(xid_t xid, struct vx_wait *wait)
+int vx_wait(xid_t xid, struct vx_wait_opts *wait_opts)
 {
 	struct vcmd_wait_exit_v0 res;
 	
-	res.a = wait->a;
-	res.b = wait->b;
+	res.a = wait_opts->a;
+	res.b = wait_opts->b;
 	
 	return sys_vserver(VCMD_wait_exit, xid, &res);
 }

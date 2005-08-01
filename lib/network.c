@@ -48,11 +48,11 @@ int nx_get_info(nid_t nid, struct nx_info *info)
 	return rc;
 }
 
-int nx_create(nid_t nid, struct nx_create *create)
+int nx_create(nid_t nid, struct nx_create_flags *create_flags)
 {
 	struct vcmd_net_create res;
 
-	res.flagword = create->flags;
+	res.flagword = create_flags->flags;
 
 	return sys_vserver(VCMD_net_create, nid, &res);
 }

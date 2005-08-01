@@ -108,7 +108,7 @@ int vx_get_info(xid_t xid, struct vx_info *info);
 /*!
  * @brief Initial Context flags
  */
-struct vx_create {
+struct vx_create_flags {
 	uint64_t flags; /*!< Context flags */
 };
 
@@ -118,7 +118,7 @@ struct vx_create {
  * @param xid    Context ID
  * @param create Initial create data
  */
-int vx_create(xid_t xid, struct vx_create *create);
+int vx_create(xid_t xid, struct vx_create_flag *create_flags);
 
 /*!
  * @brief Migrate to an existing context
@@ -460,7 +460,7 @@ int nx_get_info(nid_t nid, struct nx_info *info);
 /*!
  * @brief Initial Context flags
  */
-struct nx_create {
+struct nx_create_flags {
 	uint64_t flags;  /*!< Context flags */
 };
 
@@ -470,7 +470,7 @@ struct nx_create {
  * @param nid    Context ID
  * @param create Initial create data
  */
-int nx_create(nid_t nid, struct nx_create *create);
+int nx_create(nid_t nid, struct nx_create_flags *create_flags);
 
 /*!
  * @brief Migrate to an existing context
@@ -599,7 +599,7 @@ int vx_set_sched(xid_t xid, struct vx_sched *sched);
 /*!
  * @brief Kill options
  */
-struct vx_kill {
+struct vx_kill_opts {
 	int32_t pid; /*!< Process ID */
 	int32_t sig; /*!< Process signal */
 };
@@ -610,12 +610,12 @@ struct vx_kill {
  * @param xid Context ID
  * @param kill Kill options
  */
-int vx_kill(xid_t xid, struct vx_kill *kill);
+int vx_kill(xid_t xid, struct vx_kill_opts *kill_opts);
 
 /*!
  * @brief Wait options
  */
-struct vx_wait {
+struct vx_wait_opts {
 	int32_t a; /*!< Process A */
 	int32_t b; /*!< Process B */
 };
@@ -626,7 +626,7 @@ struct vx_wait {
  * @param xid Context ID
  * @param wait Wait options
  */
-int vx_wait_exit(xid_t xid, struct vx_wait *wait);
+int vx_wait(xid_t xid, struct vx_wait_opts *wait_opts);
 /*! @} syscall_signal */
 
 
