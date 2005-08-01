@@ -47,7 +47,7 @@ int vx_get_info(xid_t xid, struct vx_info *info)
 	return rc;
 }
 
-int vx_create(xid_t xid, struct vx_create *create_flags)
+int vx_create(xid_t xid, struct vx_create_flags *create_flags)
 {
 	struct vcmd_ctx_create res;
 

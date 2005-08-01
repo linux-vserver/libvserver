@@ -118,7 +118,7 @@ struct vx_create_flags {
  * @param xid    Context ID
  * @param create Initial create data
  */
-int vx_create(xid_t xid, struct vx_create_flag *create_flags);
+int vx_create(xid_t xid, struct vx_create_flags *create_flags);
 
 /*!
  * @brief Migrate to an existing context
