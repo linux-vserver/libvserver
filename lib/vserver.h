@@ -25,10 +25,6 @@
 #ifndef _VSERVER_H_
 #define _VSERVER_H_
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <stdint.h>
 #include <linux/types.h>
 
