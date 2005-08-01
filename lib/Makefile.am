@@ -20,4 +20,4 @@ libvserver_la_SOURCES = context.c \
                         switch.c \
                         syscall.c
 
-libvserver_la_LDFLAGS = -version-info 0:2:0
+libvserver_la_LDFLAGS = -version-info 1:0:0
