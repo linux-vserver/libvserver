@@ -1,1 +1,12 @@
-20 Jun 2005: News? Yep, this all is new ;)
+01 Aug 2005: First stable release of libvserver
+
+I'm pleased to announce libvserver 0.3, the first release considered more or
+less stable. This release supports the complete API of the Linux-VServer 2.0
+kernel patches (libvserver.so) and provides additional helper functions such as
+capability lists (libvserver-util.so). As of now, the public interface to
+libvserver.so is not subject of change anymore.
+
+An API doc is also available via doxygen, just use the provided Doxyfile or go
+to http://dev.gentoo.org/~hollow/vserver/libvserver/doc/ for the latest API doc.
+
+Have fun!
