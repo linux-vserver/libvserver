@@ -184,7 +184,7 @@ int list_validate(list_link_t *link)
 	return list_validate_flag(link, clmod);
 }
 
-void list_list2flags(list_link_t *link, char clmod,
+void list_list2flags(list_link_t *link, const char clmod,
                      uint64_t *flags, uint64_t *mask)
 {
 	unsigned int i;
@@ -194,7 +194,7 @@ void list_list2flags(list_link_t *link, char clmod,
 		
 		list_node_t *ptr = link->d->node+i;
 		
-		if (*(char *)ptr->key == clmod) {
+		if (*(const char *)ptr->key == clmod) {
 			clear = true;
 			key   = ptr->key+1;
 		}
@@ -203,6 +203,8 @@ void list_list2flags(list_link_t *link, char clmod,
 		}
 		
 		list_node_t *node = list_search(link->p, key);
+		
+		if (!node) break;
 		
 		uint64_t num_flag = *(uint64_t *)node->data;
 		

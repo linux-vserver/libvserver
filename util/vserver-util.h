@@ -222,7 +222,7 @@ int list_validate(list_link_t *link);
  * @param flags Pointer to flags integer
  * @param mask  Pointer to mask integer
  */
-void list_list2flags(list_link_t *link, char clmod,
+void list_list2flags(list_link_t *link, const char clmod,
                      uint64_t *flags, uint64_t *mask);
 /*! @} list_convert */
 
