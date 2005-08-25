@@ -26,6 +26,7 @@
 #define _VSERVER_H_
 
 #include <stdint.h>
+#include <stdlib.h>
 #include <linux/types.h>
 
 /*!
@@ -74,10 +75,6 @@ int sys_personality(int pers);
  * @file  context.c
  * @brief Context commands
  */
-#define XID_SELF   (xid_t) -1 /*!< Point to current context ID */
-#define XID_ADMIN  (xid_t)  0 /*!< Context ID of the admin context */
-#define XID_WATCH  (xid_t)  1 /*!< Context ID of the observer context */
-
 typedef uint32_t xid_t; /*!< Context ID type */
 
 /*!
@@ -187,22 +184,12 @@ int vx_get_caps(xid_t xid, struct vx_caps *caps);
  * @file cvirt.c
  * @brief Virtualization commands
  */
-#define VHILEN 65 /*!< Maximum VHI string length */
-
-#define VHIN_CONTEXT    0 /*!< Context name */
-#define VHIN_SYSNAME    1 /*!< System name */
-#define VHIN_NODENAME   2 /*!< Network node hostname */
-#define VHIN_RELEASE    3 /*!< Kernel release */
-#define VHIN_VERSION    4 /*!< Kernel version */
-#define VHIN_MACHINE    5 /*!< Machine hardware name */
-#define VHIN_DOMAINNAME 6 /*!< Network node domainname */
-
 /*!
  * @brief VHI name information
  */
 struct vx_vhi_name {
-	uint32_t field;    /*!< Name field */
-	char name[VHILEN]; /*!< Name value */
+	uint32_t field; /*!< Name field */
+	char name[65];  /*!< Name value */
 };
 
 /*!
@@ -427,10 +414,6 @@ int vx_set_namespace(void);
  * @file network.c
  * @brief Network context commands
  */
-#define NID_SELF   (nid_t) -1 /*!< Point to current context ID */
-#define NID_ADMIN  (nid_t)  0 /*!< Context ID of the admin context */
-#define NID_WATCH  (nid_t)  1 /*!< Context ID of the observer context */
-
 typedef uint32_t nid_t; /*!< Network context ID type */
 
 /*!
@@ -563,8 +546,6 @@ int nx_get_caps(nid_t nid, struct nx_caps *caps);
  * @file sched.c
  * @brief CPU scheduler commands
  */
-#define SCHED_KEEP (-2) /*!< Keep scheduler setting */
-
 /*!
  * @brief Scheduler values
  */
