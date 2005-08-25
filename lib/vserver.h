@@ -27,7 +27,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <linux/types.h>
+#include <sys/types.h>
 
 /*!
  * @defgroup syscall System calls

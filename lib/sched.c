@@ -22,10 +22,10 @@
 #include <config.h>
 #endif
 
+#include "vserver.h"
+
 #include "linux/vserver/switch.h"
 #include "linux/vserver/sched_cmd.h"
-
-#include "vserver.h"
 
 int vx_set_sched(xid_t xid, struct vx_sched *sched)
 {

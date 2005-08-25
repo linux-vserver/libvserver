@@ -22,10 +22,10 @@
 #include <config.h>
 #endif
 
+#include "vserver.h"
+
 #include "linux/vserver/switch.h"
 #include "linux/vserver/context_cmd.h"
-
-#include "vserver.h"
 
 int vx_get_task_xid(pid_t pid)
 {
@@ -90,7 +90,7 @@ int vx_set_caps(xid_t xid, struct vx_caps *caps)
 {
 	struct vcmd_ctx_caps_v0 res;
 
-	res.bcaps = caps->bcaps | caps->bmask;
+	res.bcaps = caps->bcaps;
 	res.ccaps = caps->ccaps;
 	res.cmask = caps->cmask;
 

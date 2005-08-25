@@ -22,10 +22,10 @@
 #include <config.h>
 #endif
 
+#include "vserver.h"
+
 #include "linux/vserver/switch.h"
 #include "linux/vserver/signal_cmd.h"
-
-#include "vserver.h"
 
 int vx_kill(xid_t xid, struct vx_kill_opts *kill_opts)
 {
