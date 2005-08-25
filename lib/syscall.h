@@ -1,7 +1,7 @@
-#ifndef	__SYSCALL_NEW_H
-#define	__SYSCALL_NEW_H
+#ifndef	__SYSCALL_H
+#define	__SYSCALL_H
 
-/*	Copyright (C) 2005 Herbert Poetzl
+/*	Copyright (C) 2005 Herbert Pötzl
 
 		global config options
 
@@ -52,12 +52,12 @@
 /*	*****************************************
 	ALPHA	ALPHA	ALPHA	ALPHA		*
 	alpha kernel interface 			*/
-	
+
 #if 	defined(__alpha__)
 
-/*	The Alpha calling convention doesn't use the stack until 
+/*	The Alpha calling convention doesn't use the stack until
 	after the first six arguments have been passed in registers.
-	
+
 	scnr:	v0($0)
 	args:	a1($16), a2($17), a3($18), a4($19), a5($20), a6($21)
 	sret:	r0($0)
@@ -78,8 +78,6 @@
 	"$1", "$2", "$3", "$4", "$5", "$6", "$7", "$8",			\
 	"$22", "$23", "$24", "$25", "$27", "$28", "memory"		\
 
-#warning syscall arch alpha not tested yet
-
 
 
 /*	*****************************************
@@ -92,7 +90,7 @@
 	but the Linux kernel gets up to seven arguments in registers.
 	
 	scnr:	imm
-	args:	a1(r0), a2(r1), a3(r2), a4(r3), a5(r4), a6(r5), 
+	args:	a1(r0), a2(r1), a3(r2), a4(r3), a5(r4), a6(r5),
 	sret:	r0(r0)
 	serr:	(sret >= (unsigned)-EMAXERRNO)
 	call:	swi
@@ -120,9 +118,9 @@
 
 /*	The Cris calling convention uses stack args after four arguments
 	but the Linux kernel gets up to six arguments in registers.
-	
+
 	scnr:	id(r9)
-	args:	a1(r10), a2(r11), a3(r12), a4(r13), a5(mof), a6(srp), 
+	args:	a1(r10), a2(r11), a3(r12), a4(r13), a5(mof), a6(srp),
 	sret:	r0(r10)
 	serr:	(sret >= (unsigned)-EMAXERRNO)
 	call:	break 13
@@ -157,7 +155,7 @@
 	stack. the linux kernel syscall interface does so too.
 	
 	scnr:	id(gr7)
-	args:	a1(gr8), a2(gr9), a3(gr10), a4(gr11), a5(gr12), a6(gr13) 
+	args:	a1(gr8), a2(gr9), a3(gr10), a4(gr11), a5(gr12), a6(gr13)
 	sret:	r0(gr8)
 	serr:	(sret >= (unsigned)-EMAXERRNO)
 	call:	tra gr0,gr0
@@ -184,13 +182,13 @@
 
 #elif	defined(__H8300__)
 
-/*	The H8/300 C calling convention passes the first three 
+/*	The H8/300 C calling convention passes the first three
 	arguments in registers. However the linux kernel calling
 	convention passes the first six arguments in registers
 	er1-er6
-	
+
 	scnr:	id(er0)
-	args:	a1(er1), a2(er2), a3(er3), a4(er4), a5(er5), a6(er6) 
+	args:	a1(er1), a2(er2), a3(er3), a4(er4), a5(er5), a6(er6)
 	sret:	r0(er0)
 	serr:	(sret >= (unsigned)-EMAXERRNO)
 	call:	trapa #0
@@ -232,12 +230,12 @@
 /*	The hppa calling convention uses r26-r23 for the first 4
 	arguments, the rest is spilled onto the stack. However the
 	Linux kernel passes the first six arguments in the registers
-	r26-r21. 
-	
-	The system call number MUST ALWAYS be loaded in the delay 
-	slot of the ble instruction, or restarting system calls 
+	r26-r21.
+
+	The system call number MUST ALWAYS be loaded in the delay
+	slot of the ble instruction, or restarting system calls
 	WILL NOT WORK.
-	
+
 	scnr:	id(r20)
 	args:	a1(r26), a2(r25), a3(r24), a4(r23), a5(r22), a6(r21)
 	sret:	r0(r28)
@@ -256,7 +254,7 @@
 #define	__sysc_cmd_fin	"ldi %0,%%r20"
 
 #define	__sysc_clobber	__sysc_regs,					\
-	"r1", "r2", "r4", "r20", "r29", "r31", "memory" 
+	"r1", "r2", "r4", "r20", "r29", "r31", "memory"
 
 #warning syscall arch hppa not tested yet
 
@@ -284,7 +282,11 @@
 #define	__sysc_reg_res	"eax"
 #define	__sysc_cmd_sys	"int	$0x80"
 
+#ifndef	__PIC__
+#define	__sysc_regs	"ebx", "ecx", "edx", "esi", "edi"
+#else
 #define	__sysc_regs	"ecx", "edx", "esi", "edi"
+#endif
 
 #define	__sc_asmload(n,N,...)	__sc_asm	(			\
 	__casm(n,6,1,	"movl	%5,%%eax"	,			)\
@@ -316,9 +318,9 @@
 
 /*	The ia64 calling convention uses out0-out7 to pass the first
 	eight arguments (mapped via register windows).
-	
+
 	scnr:	id(r15)
-	args:	a1(out0), a2(out1), ... a5(out4), a6(out5) 
+	args:	a1(out0), a2(out1), ... a5(out4), a6(out5)
 	sret:	r0(r8)
 	serr:	e0(r10)
 	call:	break 0x100000
@@ -356,9 +358,9 @@
 
 /*	The m32r calling convention uses r0-r7 to pass the first
 	eight arguments (mapped via register windows).
-	
+
 	scnr:	id(r0)
-	args:	a1(r1), a2(r2), a3(r3), a4(r4), a5(r5), a6(r6) 
+	args:	a1(r1), a2(r2), a3(r3), a4(r4), a5(r5), a6(r6)
 	sret:	r0(r0)
 	serr:	(sret >= (unsigned)-EMAXERRNO)
 	call:	trap #2
@@ -385,7 +387,7 @@
 
 #elif	defined(__m68000__)
 
-#warning syscall arch m68k not implemented yet
+#error syscall arch m68k not implemented yet
 
 
 
@@ -395,7 +397,7 @@
 
 #elif	defined(__mips__)
 
-#warning syscall arch mips not implemented yet
+#error syscall arch mips not implemented yet
 
 
 
@@ -432,8 +434,6 @@
 #define	__sysc_clobber	__sysc_regs,					\
 	"r9", "r10", "r11", "r12", "cr0", "ctr", "memory"
 
-#warning syscall arch ppc not tested yet
-
 
 
 /*	*****************************************
@@ -443,7 +443,7 @@
 #elif	defined(__s390__)
 
 /*	The s390x calling convention passes the first five arguments
-	in r2-r6, the remainder is spilled onto the stack. However 
+	in r2-r6, the remainder is spilled onto the stack. However
 	the Linux kernel passes the first six arguments in r2-r7.
 	
 	scnr:	imm, id(r1)
@@ -464,9 +464,7 @@
 #define	__sysc_reg(n)	__arg_##n\
 	("r2", "r3", "r4", "r5", "r6", "r7")
 
-#define	__sysc_clobber	__sysc_regs, "memory" 
-
-#warning syscall arch s390 not tested yet
+#define	__sysc_clobber	__sysc_regs, "memory"
 
 
 
@@ -477,9 +475,9 @@
 #elif	defined(__sh__) && !defined(__SH5__)
 
 /*	The SuperH calling convention passes the first four arguments
-	in r4-r7, the remainder is spilled onto the stack. However 
+	in r4-r7, the remainder is spilled onto the stack. However
 	the Linux kernel passes the remainder in r0-r2.
-	
+
 	scnr:	id(r3)
 	args:	a1(r4), a2(r5), a3(r6), a4(r7), a5(r0), a6(r1)
 	sret:	r0(r0)
@@ -500,7 +498,7 @@
 #define	__rep_6(x)	x x x x x x
 #define	__sysc_cmd_fin	__rep_6("or	r0,r0\n\t")
 
-#define	__sysc_clobber	__sysc_regs, "memory" 
+#define	__sysc_clobber	__sysc_regs, "memory"
 
 #warning syscall arch sh not tested yet
 
@@ -514,7 +512,7 @@
 
 /*	The SuperH-5 calling convention passes the first eight
 	arguments in r2-r9
-	
+
 	scnr:	id(r9)
 	args:	a1(r2), a2(r3), a3(r4), a4(r5), a5(r6), a6(r7)
 	sret:	r0(r9)
@@ -535,7 +533,7 @@
 	__casm(n,0,1,	__sc_cmds(n,N)		,			)\
 	""::"i"(__sc_id(N) | 0x1##n << 16) : __sysc_clobber)
 
-#define	__sysc_clobber	__sysc_regs, "memory" 
+#define	__sysc_clobber	__sysc_regs, "memory"
 
 #warning syscall arch sh64 not tested yet
 
@@ -549,9 +547,9 @@
 
 /*	The sparc/64 calling convention uses o0-o5 to pass the first
 	six arguments (mapped via register windows).
-	
+
 	scnr:	id(g1)
-	args:	a1(o0), a2(o1), a3(o2), a4(o3), a5(o4), a6(o5) 
+	args:	a1(o0), a2(o1), a3(o2), a4(o3), a5(o4), a6(o5)
 	sret:	r0(o0)
 	serr:	(carry)
 	call:	ta 0x6d, t 0x10
@@ -583,7 +581,7 @@
 	"f25", "f26", "f27", "f28", "f29", "f30", "f31", "f32",		\
 	"f34", "f36", "f38", "f40", "f42", "f44", "f46", "f48",		\
 	"f50", "f52", "f54", "f56", "f58", "f60", "f62",		\
-	"cc", "memory" 
+	"cc", "memory"
 
 #warning syscall arch sparc not tested yet
 
@@ -598,9 +596,9 @@
 /*	The V850 calling convention passes the first four arguments
 	in registers r6-r9, the rest is spilled onto the stack.
 	but the Linux kernel interface uses r6-r9 and r13/14.
-	
+
 	scnr:	id(r12)
-	args:	a1(r6), a2(r7), a3(r8), a4(r9), a5(r13), a6(r14) 
+	args:	a1(r6), a2(r7), a3(r8), a4(r9), a5(r13), a6(r14)
 	sret:	r0(r10)
 	serr:	(sret >= (unsigned)-EMAXERRNO)
 	call:	trap 0, trap 1
@@ -619,6 +617,8 @@
 #define	__sysc_clobber	__sysc_regs,					\
 	"r1", "r5", "r11", "r15", "r16", "r17", "r18", "r19", "memory"
 
+#warning syscall arch v850 not tested yet
+
 
 
 /*	*****************************************
@@ -631,7 +631,7 @@
 	but the Linux kernel interface uses rdi, rsi, rdx, r10, r8, r9.
 	
 	scnr:	id(rax)
-	args:	a1(rdi), a2(rsi), a3(rdx), a4(r10), a5(r8), a6(r9) 
+	args:	a1(rdi), a2(rsi), a3(rdx), a4(r10), a5(r8), a6(r9)
 	sret:	r0(rax)
 	serr:	(err= sret > (unsigned)-EMAXERRNO)
 	call:	syscall
@@ -647,13 +647,12 @@
 	("rdi", "rsi", "rdx", "r10", "r8", "r9")
 
 #define	__sysc_clobber	__sysc_regs,					\
-	"cc", "r11", "rcx", "memory" 
+	"cc", "r11", "rcx", "memory"
 
 
 #else
 #error unknown kernel arch
 #endif
-
 
 
 
@@ -681,7 +680,7 @@
 
 	/* argument selection */
 
-#define	__arg_0(...)			
+#define	__arg_0(...)
 #define	__arg_1(a1,...)			a1
 #define	__arg_2(a1,a2,...)		a2
 #define	__arg_3(a1,a2,a3,...)		a3
@@ -1063,4 +1062,4 @@ type sys_ ## name(type1 arg1, type2 arg2, type3 arg3,				\
 __sc_body(6, type, name, arg1, arg2, arg3, arg4, arg5, arg6)
 
 
-#endif	/* __SYSCALL_NEW_H */
+#endif	/* __SYSCALL_H */
