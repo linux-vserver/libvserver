@@ -236,6 +236,10 @@ int vs_dump_history(void);
  * @file dlimit.c
  * @brief Disk limit commands
  */
+#define CDLIM_UNSET     (0U)
+#define CDLIM_INFINITY (~0U)
+#define CDLIM_KEEP     (~1U)
+
 /*!
  * @brief Disk limit information
  */
