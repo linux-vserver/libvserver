@@ -320,8 +320,38 @@ list_t *iattr_list_init(void);
  * @return List of all network context flags
  */
 list_t *nflags_list_init(void);
-/* @} list_defaults */
+
+/*!
+ * @file sched-list.c
+ * @brief Scheduler mask list
+ */
+/*!
+ * @brief Initialise scheduler mask list
+ * 
+ * @see \htmlonly
+ *   <a class="el" href="file:///usr/include/linux/vserver/sched_cmd.h">
+ *     &lt;linux/vserver/network.h&gt;
+ *   </a>
+ * \endhtmlonly
+ * 
+ * @return List of all scheduler masks
+ */
+list_t *sched_list_init(void);
+/*! @} list_defaults */
+
+/*!
+ * @defgroup list_iter List iteration
+ * @brief Iterate through a list
+ * 
+ * @{
+ */
+/*!
+ * @brief Iterate through LIST using IDX as counter
+ */
+#define list_foreach(LIST, IDX) for (size_t IDX = 0; IDX < (LIST)->n; IDX++)
+/*! @} list_iter */
 
 /*! @} list */
+
 
 #endif /*_VSERVER_UTIL_H_*/

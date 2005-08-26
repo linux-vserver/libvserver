@@ -169,7 +169,7 @@ int list_validate_flag(list_link_t *link, const char clmod)
 		list_node_t *ptr = link->d->node+i;
 		int skip         = *ptr->key == clmod ? 1 : 0;
 		
-		if(list_search(link->p, ptr->key+skip) == NULL) {
+		if (list_search(link->p, ptr->key+skip) == NULL) {
 			errno = EINVAL;
 			return -1;
 		}
