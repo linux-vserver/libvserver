@@ -22,8 +22,8 @@
  * @file vserver-util.h
  * @brief Interface to libvserver utility library
  */
-#ifndef _VSERVER_UTIL_H_
-#define _VSERVER_UTIL_H_
+#ifndef _VSERVER_UTIL_H
+#define _VSERVER_UTIL_H
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>

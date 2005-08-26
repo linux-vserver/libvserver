@@ -22,8 +22,8 @@
  * @file vserver.h
  * @brief Interface to libvserver
  */
-#ifndef _VSERVER_H_
-#define _VSERVER_H_
+#ifndef _VSERVER_H
+#define _VSERVER_H
 
 #include <stdint.h>
 #include <stdlib.h>
