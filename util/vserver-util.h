@@ -330,13 +330,30 @@ list_t *nflags_list_init(void);
  * 
  * @see \htmlonly
  *   <a class="el" href="file:///usr/include/linux/vserver/sched_cmd.h">
- *     &lt;linux/vserver/network.h&gt;
+ *     &lt;linux/vserver/sched_cmd.h&gt;
  *   </a>
  * \endhtmlonly
  * 
  * @return List of all scheduler masks
  */
 list_t *sched_list_init(void);
+
+/*!
+ * @file vhi-list.c
+ * @brief VHI name list
+ */
+/*!
+ * @brief Initialise VHI name list
+ * 
+ * @see \htmlonly
+ *   <a class="el" href="file:///usr/include/linux/vserver/cvirt_cmd.h">
+ *     &lt;linux/vserver/cvirt_cmd.h&gt;
+ *   </a>
+ * \endhtmlonly
+ * 
+ * @return List of all VHI names
+ */
+list_t *vhi_list_init(void);
 /*! @} list_defaults */
 
 /*!

@@ -1,5 +1,5 @@
-#ifndef	_SYSCALL_H
-#define	_SYSCALL_H
+#ifndef	__SYSCALL_H
+#define	__SYSCALL_H
 
 /*	Copyright (C) 2005 Herbert Pötzl
 
@@ -1062,4 +1062,4 @@ type sys_ ## name(type1 arg1, type2 arg2, type3 arg3,				\
 __sc_body(6, type, name, arg1, arg2, arg3, arg4, arg5, arg6)
 
 
-#endif	/* _SYSCALL_H */
+#endif	/* __SYSCALL_H */

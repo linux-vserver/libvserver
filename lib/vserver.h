@@ -186,14 +186,6 @@ int vx_get_caps(xid_t xid, struct vx_caps *caps);
  */
 #define VHILEN 65 /*!< Maximum VHI string length */
 
-#define VHIN_CONTEXT    0 /*!< Context name */
-#define VHIN_SYSNAME    1 /*!< System name */
-#define VHIN_NODENAME   2 /*!< Network node hostname */
-#define VHIN_RELEASE    3 /*!< Kernel release */
-#define VHIN_VERSION    4 /*!< Kernel version */
-#define VHIN_MACHINE    5 /*!< Machine hardware name */
-#define VHIN_DOMAINNAME 6 /*!< Network node domainname */
-
 /*!
  * @brief VHI name information
  */
