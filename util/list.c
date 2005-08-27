@@ -28,6 +28,7 @@
 #include <string.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 list_t *list_alloc(size_t n)
 {
@@ -54,8 +55,8 @@ void list_dealloc(list_t *list)
 
 char *list_key_alloc(char *value)
 {
-	char *key = malloc(sizeof(char)*strlen(value));
-	memcpy(key, value, strlen(value));
+	char *key = malloc(strlen(value)+1);
+	strncpy(key, value, strlen(value));
 	return key;
 }
 
@@ -90,8 +91,7 @@ char *list_parse(const char **str, const char delim)
 	}
 	
 	char *token = malloc(len+1);
-	memcpy(token, *str, len);
-	token[len] = '\0';
+	strncpy(token, *str, len);
 	
 	*str = ++ptr;
 	
