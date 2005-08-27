@@ -86,7 +86,7 @@ char *list_parse(const char **str, const char delim)
 	
 	if (len == 0) { /* empty token */
 		*str = ++(*str);
-		return '\0';
+		return "";
 	}
 	
 	char *token = malloc(len+1);
