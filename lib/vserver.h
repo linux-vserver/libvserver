@@ -26,7 +26,6 @@
 #define _VSERVER_H
 
 #include <stdint.h>
-#include <stdlib.h>
 #include <sys/types.h>
 
 /*!
@@ -337,6 +336,10 @@ int vx_get_iattr(struct vx_iattr *iattr);
  * @file limit.c
  * @brief Resource limit commands
  */
+#define CRLIM_UNSET     (0ULL)
+#define CRLIM_INFINITY (~0ULL)
+#define CRLIM_KEEP     (~1ULL)
+
 /*!
  * @brief Resource limits
  */
