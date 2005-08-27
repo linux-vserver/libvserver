@@ -14,6 +14,7 @@ libvserver_util_la_SOURCES = list.c \
                              nflags-list.c \
                              personalityflag-list.c \
                              personality-list.c \
+                             rlimit-list.c \
                              sched-list.c \
                              vhi-list.c
 

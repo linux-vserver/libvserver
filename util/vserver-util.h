@@ -322,6 +322,28 @@ list_t *iattr_list_init(void);
 list_t *nflags_list_init(void);
 
 /*!
+ * @file rlimit-list.c
+ * @brief Resource limit list
+ */
+/*!
+ * @brief Initialise resource limit list
+ * 
+ * @see \htmlonly
+ *   <a class="el" href="file:///usr/include/linux/vserver/limit.h">
+ *     &lt;linux/vserver/limit.h&gt;
+ *   </a>
+ * \endhtmlonly
+ * @see \htmlonly
+ *   <a class="el" href="file:///usr/include/sys/resource.h">
+ *     &lt;sys/resource.h&gt;
+ *   </a>
+ * \endhtmlonly
+ * 
+ * @return List of all resource limits
+ */
+list_t *rlimit_list_init(void);
+
+/*!
  * @file sched-list.c
  * @brief Scheduler mask list
  */
