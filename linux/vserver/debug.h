@@ -24,7 +24,9 @@ extern unsigned int vx_debug_nid;
 extern unsigned int vx_debug_net;
 extern unsigned int vx_debug_limit;
 extern unsigned int vx_debug_dlim;
+extern unsigned int vx_debug_quota;
 extern unsigned int vx_debug_cvirt;
+extern unsigned int vx_debug_misc;
 
 
 #define VX_LOGLEVEL	"vxD: "
@@ -179,7 +181,7 @@ static inline void __name(struct vx_info *vxi)	\
 	entry->sc.data = data
 
 #define VXH_DATA(__name, __type)		\
-static inline 					\
+static inline					\
 void __name(struct vx_info *vxi, void *data)	\
 {						\
 	__VXH_BODY(__type, __VXH_DATA)		\
@@ -191,7 +193,7 @@ void __name(struct vx_info *vxi, void *data)	\
 	entry->ll.arg = arg
 
 #define VXH_LARG(__name, __type)		\
-static inline 					\
+static inline					\
 void __name(struct vx_info *vxi, long arg)	\
 {						\
 	__VXH_BODY(__type, __VXH_LARG)		\
