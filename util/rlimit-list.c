@@ -29,12 +29,6 @@
 
 LIST_DATA_ALLOC_TYPE(rlimit, uint64_t)
 
-/* FIXME */
-#define VLIMIT_NSOCK	16
-#define VLIMIT_OPENFD	17
-#define VLIMIT_ANON	18
-#define VLIMIT_SHMEM	19
-
 /*!
  * @brief Macro for rlimit list allocation
  * @ingroup list_defaults
