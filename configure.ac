@@ -41,7 +41,6 @@ AC_CHECK_FUNCS([strcasecmp strpbrk])
 CFLAGS="${CFLAGS} -W -Wall -std=gnu99 -pedantic"
 
 # Site settings
-VS_CHECK_KERNEL_HEADERS
 VS_CHECK_SYSCALL_NR
 VS_ENABLE_DIETLIBC
 
