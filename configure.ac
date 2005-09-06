@@ -43,9 +43,7 @@ CFLAGS="${CFLAGS} -W -Wall -std=gnu99 -pedantic"
 # Site settings
 VS_CHECK_SYSCALL_NR
 
-
 # Output
 AC_CONFIG_FILES([Makefile
-                 lib/Makefile
-                 util/Makefile])
+                 src/Makefile])
 AC_OUTPUT
