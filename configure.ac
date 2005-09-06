@@ -21,21 +21,14 @@ AC_PROG_EGREP
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_HEADER_STDBOOL
-AC_CHECK_HEADERS([stdint.h unistd.h])
+AC_CHECK_HEADERS([stdint.h string.h])
 
-# Checks for typedefs
-AC_CHECK_TYPES([uid_t,
-                gid_t,
-                pid_t,
-                size_t])
-
-# Checks for compiler characteristics.
+# Checks for typedefs, structures, and compiler characteristics.
+AC_TYPE_PID_T
 AC_C_CONST
 AC_C_INLINE
 
 # Checks for library functions.
-AC_CHECK_FUNCS([strcasecmp strpbrk])
 
 # Compiler settings
 CFLAGS="${CFLAGS} -W -Wall -std=gnu99 -pedantic"
