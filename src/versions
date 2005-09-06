@@ -6,7 +6,7 @@ LIBVSERVER_0.3.0 {
 		vx_get_flags;
 		vx_get_info;
 		vx_get_task_xid;
-		vx_mirgate;
+		vx_migrate;
 		vx_set_caps;
 		vx_set_flags;
 		
