@@ -20,4 +20,6 @@ libvserver_la_SOURCES = context.c \
                         switch.c \
                         syscall.c
 
-libvserver_la_LDFLAGS = -version-info 1:0:0
+libvserver_la_LDFLAGS = -version-info 1:0:0 \
+                        -Wl,--version-script,$(srcdir)/versions -Wl,-O1 \
+                        -export-dynamic
