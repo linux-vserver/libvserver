@@ -74,6 +74,45 @@ int sys_personality(int pers);
  * @file  context.c
  * @brief Context commands
  */
+
+/* context flags */
+#define VXF_INFO_LOCK    0x00000001
+#define VXF_INFO_SCHED   0x00000002
+#define VXF_INFO_NPROC   0x00000004
+#define VXF_INFO_PRIVATE 0x00000008
+#define VXF_INFO_INIT    0x00000010
+#define VXF_INFO_HIDE    0x00000020
+#define VXF_INFO_ULIMIT  0x00000040
+#define VXF_INFO_NSPACE  0x00000080
+#define VXF_SCHED_HARD   0x00000100
+#define VXF_SCHED_PRIO   0x00000200
+#define VXF_SCHED_PAUSE  0x00000400
+#define VXF_VIRT_MEM     0x00010000
+#define VXF_VIRT_UPTIME  0x00020000
+#define VXF_VIRT_CPU     0x00040000
+#define VXF_VIRT_LOAD    0x00080000
+#define VXF_HIDE_MOUNT   0x01000000
+#define VXF_HIDE_NETIF   0x02000000
+#define VXF_STATE_SETUP  (1ULL<<32)
+#define VXF_STATE_INIT   (1ULL<<33)
+#define VXF_STATE_HELPER (1ULL<<36)
+#define VXF_FORK_RSS     (1ULL<<48)
+#define VXF_PROLIFIC     (1ULL<<49)
+#define VXF_IGNEG_NICE   (1ULL<<52)
+#define VXF_ONE_TIME     (0x0003ULL<<32)
+#define VXF_INIT_SET     (VXF_STATE_SETUP|VXF_STATE_INIT)
+
+/* context caps */
+#define	VXC_CAP_MASK       0x00000000
+#define VXC_SET_UTSNAME    0x00000001
+#define VXC_SET_RLIMIT     0x00000002
+#define VXC_RAW_ICMP       0x00000100
+#define VXC_SYSLOG         0x00001000
+#define VXC_SECURE_MOUNT   0x00010000
+#define VXC_SECURE_REMOUNT 0x00020000
+#define VXC_BINARY_MOUNT   0x00040000
+#define VXC_QUOTA_CTL      0x00100000
+
 typedef uint32_t xid_t; /*!< Context ID type */
 
 /*!
@@ -185,6 +224,17 @@ int vx_get_caps(xid_t xid, struct vx_caps *caps);
  */
 #define VHILEN 65 /*!< Maximum VHI string length */
 
+/* field types */
+enum vhi_name_field {
+	VHIN_CONTEXT=0,
+	VHIN_SYSNAME,
+	VHIN_NODENAME,
+	VHIN_RELEASE,
+	VHIN_VERSION,
+	VHIN_MACHINE,
+	VHIN_DOMAINNAME,
+};
+
 /*!
  * @brief VHI name information
  */
@@ -235,6 +285,8 @@ int vs_dump_history(void);
  * @file dlimit.c
  * @brief Disk limit commands
  */
+
+/* special disk limit values */
 #define CDLIM_UNSET     (0U)
 #define CDLIM_INFINITY (~0U)
 #define CDLIM_KEEP     (~1U)
@@ -302,6 +354,17 @@ int vx_get_dlimit(xid_t xid, struct vx_dlimit *dlimit);
  * @file inode.c
  * @brief XID Inode attribute commands
  */
+
+/* inode attributes */
+#define IATTR_XID       0x01000000
+#define IATTR_ADMIN     0x00000001
+#define IATTR_WATCH     0x00000002
+#define IATTR_HIDE      0x00000004
+#define IATTR_FLAGS     0x00000007
+#define IATTR_BARRIER   0x00010000
+#define IATTR_IUNLINK   0x00020000
+#define IATTR_IMMUTABLE 0x00040000
+
 /*!
  * @brief Inode attributes
  */
@@ -336,6 +399,8 @@ int vx_get_iattr(struct vx_iattr *iattr);
  * @file limit.c
  * @brief Resource limit commands
  */
+
+/* special resource limit values */
 #define CRLIM_UNSET     (0ULL)
 #define CRLIM_INFINITY (~0ULL)
 #define CRLIM_KEEP     (~1ULL)
@@ -423,6 +488,19 @@ int vx_set_namespace(void);
  * @file network.c
  * @brief Network context commands
  */
+
+/* network flags */
+#define NXF_STATE_SETUP  (1ULL<<32)
+#define NXF_STATE_HELPER (1ULL<<36)
+#define NXF_ONE_TIME     (0x0001ULL<<32)
+#define NXF_INIT_SET     (0)
+
+/* address types */
+#define NXA_TYPE_IPV4 1
+#define NXA_TYPE_IPV6 2
+#define NXA_MOD_BCAST (1<<8)
+#define NXA_TYPE_ANY  (~0)
+
 typedef uint32_t nid_t; /*!< Network context ID type */
 
 /*!
@@ -555,6 +633,15 @@ int nx_get_caps(nid_t nid, struct nx_caps *caps);
  * @file sched.c
  * @brief CPU scheduler commands
  */
+
+/* set mask */
+#define VXSM_FILL_RATE  0x0001
+#define VXSM_INTERVAL   0x0002
+#define VXSM_TOKENS     0x0010
+#define VXSM_TOKENS_MIN 0x0020
+#define VXSM_TOKENS_MAX 0x0040
+#define VXSM_PRIO_BIAS  0x0100
+
 /*!
  * @brief Scheduler values
  */

@@ -11,18 +11,6 @@ struct	vcmd_vhi_name_v0 {
 	char name[65];
 };
 
-
-enum vhi_name_field {
-	VHIN_CONTEXT=0,
-	VHIN_SYSNAME,
-	VHIN_NODENAME,
-	VHIN_RELEASE,
-	VHIN_VERSION,
-	VHIN_MACHINE,
-	VHIN_DOMAINNAME,
-};
-
-
 #ifdef	__KERNEL__
 
 #include <linux/compiler.h>

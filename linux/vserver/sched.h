@@ -1,6 +1,16 @@
 #ifndef _VX_SCHED_H
 #define _VX_SCHED_H
 
+#define VXSM_FILL_RATE		0x0001
+#define VXSM_INTERVAL		0x0002
+#define VXSM_TOKENS		0x0010
+#define VXSM_TOKENS_MIN		0x0020
+#define VXSM_TOKENS_MAX		0x0040
+#define VXSM_PRIO_BIAS		0x0100
+
+#define SCHED_KEEP		(-2)
+
+
 #ifdef	__KERNEL__
 
 struct timespec;

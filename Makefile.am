@@ -1,7 +1,7 @@
 # Top level makefile
 SUBDIRS = src
 
-nobase_include_HEADERS = \
+noinst_HEADERS = \
 	linux/vserver/context_cmd.h \
 	linux/vserver/context.h \
 	linux/vserver/cvirt_cmd.h \
