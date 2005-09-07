@@ -1,6 +1,6 @@
 /* Swig interface to libvserver */
 
-%module vserver
+%module libvserver
 
 %{
 #include "vserver.h"
