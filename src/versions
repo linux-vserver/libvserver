@@ -1,4 +1,4 @@
-LIBVSERVER_0.3.0 {
+LIBVSERVER_0.4 {
 	global:
 		# context.c
 		vx_create;
