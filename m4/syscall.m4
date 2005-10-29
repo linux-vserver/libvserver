@@ -19,7 +19,7 @@ AC_DEFUN([VS_CHECK_SYSCALL_NR],
 #elif	defined(__ia64__)
 #define __NR_vserver	1269
 #elif	defined(__m32r__)
-#define __NR_vserver	__m32r_NR_vserver
+#define __NR_vserver	*
 #elif	defined(__mc68000__)
 #define __NR_vserver	278
 #elif	defined(__mips__) && (_MIPS_SIM == _MIPS_SIM_ABI32)
@@ -29,7 +29,7 @@ AC_DEFUN([VS_CHECK_SYSCALL_NR],
 #elif	defined(__mips__) && (_MIPS_SIM == _MIPS_SIM_NABI32)
 #define __NR_vserver	236
 #elif	defined(__hppa__)
-#define __NR_vserver	__hppa_NR_vserver
+#define __NR_vserver	273
 #elif	defined(__powerpc__)
 #define __NR_vserver	257
 #elif	defined(__s390__)
@@ -39,7 +39,7 @@ AC_DEFUN([VS_CHECK_SYSCALL_NR],
 #elif	defined(__sparc__)
 #define __NR_vserver	267
 #elif	defined(__v850__)
-#define __NR_vserver	__v850_NR_vserver
+#define __NR_vserver	*
 #elif	defined(__x86_64__)
 #define __NR_vserver	236
 #endif
