@@ -65,6 +65,7 @@ int sys_vserver(uint32_t cmd, uint32_t id, void *data);
  * \endhtmlonly
  */
 int sys_personality(int pers);
+/*! @} syscall_context */
 
 /*!
  * @defgroup syscall_context Context commands
