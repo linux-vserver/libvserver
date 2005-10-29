@@ -1,16 +1,6 @@
 #ifndef _VX_CVIRT_H
 #define _VX_CVIRT_H
 
-enum vhi_name_field {
-	VHIN_CONTEXT=0,
-	VHIN_SYSNAME,
-	VHIN_NODENAME,
-	VHIN_RELEASE,
-	VHIN_VERSION,
-	VHIN_MACHINE,
-	VHIN_DOMAINNAME,
-};
-
 #ifdef	__KERNEL__
 
 struct timespec;
