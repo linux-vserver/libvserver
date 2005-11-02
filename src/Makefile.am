@@ -31,6 +31,7 @@ libvserver_la_SOURCES = context.c \
                         debug.c \
                         dlimit.c \
                         inode.c \
+                        legacy.c \
                         limit.c \
                         namespace.c \
                         network.c \

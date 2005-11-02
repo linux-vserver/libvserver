@@ -96,6 +96,14 @@ int vc_get_dlimit(const char *filename, xid_t xid, uint_least32_t flags, struct 
 int vc_get_iattr(const char *filename, xid_t * xid, uint_least32_t *flags, uint_least32_t *mask);
 int vc_set_iattr(const char *filename, xid_t xid, uint_least32_t flags, uint_least32_t mask);
 
+/* legacy.c */
+struct vc_ip_mask_pair {
+	uint32_t ip;
+	uint32_t mask;
+};
+
+int vc_new_s_context(xid_t ctx, unsigned int remove_cap, unsigned int flags);
+int vc_set_ipv4root(uint32_t bcast, size_t nb, struct vc_ip_mask_pair const *ips);
 
 /* limit.c */
 typedef uint_least64_t vc_limit_t;

@@ -50,6 +50,10 @@ LIBVSERVER_1.0 {
 		vc_get_iattr;
 		vc_set_iattr;
 		
+		# legacy.c
+		vc_new_s_context;
+		vc_set_ipv4root;
+		
 		# limit.c
 		vc_get_rlimit;
 		vc_get_rlimit_mask;

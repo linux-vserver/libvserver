@@ -29,6 +29,7 @@ nobase_include_HEADERS = linux/vserver/context_cmd.h \
                          linux/vserver/dlimit.h \
                          linux/vserver/inode_cmd.h \
                          linux/vserver/inode.h \
+                         linux/vserver/legacy.h \
                          linux/vserver/limit_cmd.h \
                          linux/vserver/limit_def.h \
                          linux/vserver/limit.h \
