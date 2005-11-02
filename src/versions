@@ -1,4 +1,22 @@
-LIBVSERVER_0.4 {
+# Copyright 2005 The util-vserver Developers
+# See AUTHORS for details
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by  *
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the
+# Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+LIBVSERVER_1.0 {
 	global:
 		# syscall.c
 		sys_vserver;
@@ -63,6 +81,40 @@ LIBVSERVER_0.4 {
 		
 		# switch.c
 		vc_get_version;
+		
+		# list/bcaps.c
+		vc_text2bcap;
+		vc_bcap2text;
+		vc_list2bcap;
+		
+		# list/ccaps.c
+		vc_text2ccap;
+		vc_ccap2text;
+		vc_list2ccap;
+		
+		# list/cflags.c
+		vc_text2cflag;
+		vc_cflag2text;
+		vc_list2cflag;
+		
+		# list/ncaps.c
+		vc_text2ncap;
+		vc_ncap2text;
+		vc_list2ncap;
+		
+		# list/nflags.c
+		vc_text2nflag;
+		vc_nflag2text;
+		vc_list2nflag;
+		
+		# list/personality.c
+		vc_text2personality;
+		vc_personality2text;
+		vc_list2personality;
+		
+		# list/personalitytype.c
+		vc_text2personalitytype;
+		vc_personalitytype2text;
 		
 	local:
 		*;

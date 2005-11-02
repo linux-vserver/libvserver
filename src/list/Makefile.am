@@ -16,31 +16,21 @@
 # Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-SUBDIRS = list
+SUBDIRS = val2text listparser
 
-INCLUDES = -I$(top_srcdir)
+INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/src
 
-noinst_HEADERS = syscall.h
+noinst_HEADERS = dimof.h
 
-include_HEADERS = vserver.h
+noinst_LTLIBRARIES = liblist.la
 
-lib_LTLIBRARIES = libvserver.la
+liblist_la_SOURCES = bcaps.c \
+                     ccaps.c \
+                     cflags.c \
+                     ncaps.c \
+                     nflags.c \
+                     personality.c \
+                     personalitytype.c
 
-libvserver_la_SOURCES = context.c \
-                        cvirt.c \
-                        debug.c \
-                        dlimit.c \
-                        inode.c \
-                        limit.c \
-                        namespace.c \
-                        network.c \
-                        sched.c \
-                        signal.c \
-                        switch.c \
-                        syscall.c
-
-libvserver_la_LIBADD = list/liblist.la
-
-libvserver_la_LDFLAGS = -version-info 2:0:0 \
-                        -Wl,--version-script,$(srcdir)/versions -Wl,-O1 \
-                        -export-dynamic
+liblist_la_LIBADD = val2text/libval2text.la \
+                    listparser/liblistparser.la
