@@ -62,9 +62,9 @@ uint_least32_t vc_text2personalitytype(const char *str, size_t len)
 	return VALUES[idx].val;
 }
 
-char const *vc_personalitytype2text(uint_least64_t *val)
+char const *vc_personalitytype2text(uint_least32_t *val)
 {
-	ssize_t idx = val2text_uint64(val, VALUES, DIM_OF(VALUES));
+	ssize_t idx = val2text_uint32(val, VALUES, DIM_OF(VALUES));
 	
 	if (idx == -1) return 0;
 	

@@ -1,4 +1,22 @@
-AC_DEFUN([VS_CHECK_SYSCALL_NR],
+# Copyright 2005 The util-vserver Developers
+# See AUTHORS for details
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by  *
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the
+# Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+AC_DEFUN([AC_LV_SYSCALL_NR],
 [
 	AC_MSG_CHECKING([for vserver syscall number])
 	
@@ -44,16 +62,16 @@ AC_DEFUN([VS_CHECK_SYSCALL_NR],
 #define __NR_vserver	236
 #endif
 
-syscall_nr=__NR_vserver
+ac_lv_syscall_nr=__NR_vserver
 	])
 	
-	eval $(${CPP} conftest.c | ${EGREP} '^syscall_nr=.*$')
+	eval $(${CPP} conftest.c | ${EGREP} '^ac_lv_syscall_nr=.*$')
 	
-	if test x"$syscall_nr" = x; then
+	if test x"$ac_lv_syscall_nr" = x; then
 		AC_MSG_ERROR([Cannot determine vserver syscall number])
 	else
-		AC_DEFINE_UNQUOTED(__NR_vserver, $syscall_nr, [VServer syscall number])
-		AC_MSG_RESULT([$syscall_nr])
+		AC_DEFINE_UNQUOTED(__NR_vserver, $ac_lv_syscall_nr, [VServer syscall number])
+		AC_MSG_RESULT([$ac_lv_syscall_nr])
 	fi
 	
 	AC_LANG_POP

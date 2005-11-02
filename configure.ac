@@ -1,6 +1,24 @@
+# Copyright 2005 The util-vserver Developers
+# See AUTHORS for details
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by  *
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the
+# Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 # Generic configuration
 AC_PREREQ(2.59)
-AC_INIT(libvserver, 0.4, [http://dev.croup.de/proj/libvserver])
+AC_INIT(libvserver, 1.0, [http://dev.croup.de/proj/libvserver])
 AC_CONFIG_HEADER([config.h])
 AC_GNU_SOURCE
 
@@ -34,9 +52,12 @@ AC_C_INLINE
 CFLAGS="${CFLAGS} -W -Wall -std=gnu99 -pedantic"
 
 # Site settings
-VS_CHECK_SYSCALL_NR
+AC_LV_SYSCALL_NR
 
 # Output
-AC_CONFIG_FILES([Makefile
-                 src/Makefile])
+AC_CONFIG_FILES([src/list/listparser/Makefile
+                 src/list/val2text/Makefile
+                 src/list/Makefile
+                 src/Makefile
+                 Makefile])
 AC_OUTPUT
