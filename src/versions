@@ -1,68 +1,69 @@
 LIBVSERVER_0.4 {
 	global:
-		# context.c
-		vx_create;
-		vx_get_caps;
-		vx_get_flags;
-		vx_get_info;
-		vx_get_task_xid;
-		vx_migrate;
-		vx_set_caps;
-		vx_set_flags;
-		
-		# cvirt.c
-		vx_get_vhi_name;
-		vx_set_vhi_name;
-		
-		# debug.c
-		vs_dump_history;
-		
-		# dlimit.c
-		vx_add_dlimit;
-		vx_get_dlimit;
-		vx_rem_dlimit;
-		vx_set_dlimit;
-		
-		# inode.c
-		vx_get_iattr;
-		vx_set_iattr;
-		
-		# limit.c
-		vx_get_rlimit;
-		vx_get_rlimit_mask;
-		vx_set_rlimit;
-		
-		# namespace.c
-		vx_cleanup_namespace;
-		vx_enter_namespace;
-		vx_set_namespace;
-		
-		# network.c
-		nx_add_addr;
-		nx_create;
-		nx_get_caps;
-		nx_get_flags;
-		nx_get_info;
-		nx_get_task_nid;
-		nx_migrate;
-		nx_rem_addr;
-		nx_set_caps;
-		nx_set_flags;
-		
-		# sched.c
-		vx_set_sched;
-		
-		# signal.c
-		vx_kill;
-		vx_wait;
-		
-		# switch.c
-		vs_get_version;
-		
 		# syscall.c
 		sys_vserver;
 		sys_personality;
+		sys_clone;
 	
+		# context.c
+		vc_get_task_xid;
+		vc_get_vx_info;
+		vc_ctx_create;
+		vc_ctx_migrate;
+		vc_get_cflags;
+		vc_set_cflags;
+		vc_get_ccaps;
+		vc_set_ccaps;
+		
+		# cvirt.c
+		vc_set_vhi_name;
+		vc_get_vhi_name;
+		
+		# debug.c
+		vc_dump_history;
+		
+		# dlimit.c
+		vc_add_dlimit;
+		vc_rem_dlimit;
+		vc_set_dlimit;
+		vc_get_dlimit;
+		
+		# inode.c
+		vc_get_iattr;
+		vc_set_iattr;
+		
+		# limit.c
+		vc_get_rlimit;
+		vc_get_rlimit_mask;
+		vc_set_rlimit;
+		
+		# namespace.c
+		vc_enter_namespace;
+		vc_cleanup_namespace;
+		vc_set_namespace;
+		
+		# network.c
+		vc_get_task_nid;
+		vc_get_nx_info;
+		vc_net_create;
+		vc_net_migrate;
+		vc_net_add;
+		vc_net_remove;
+		vc_get_nflags;
+		vc_set_nflags;
+		vc_get_ncaps;
+		vc_set_ncaps;
+		
+		# sched.c
+		vc_set_sched;
+		
+		# signal.c
+		vc_ctx_kill;
+		vc_wait_exit;
+		
+		# switch.c
+		vc_get_version;
+		
 	local:
 		*;
 };

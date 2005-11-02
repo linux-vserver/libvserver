@@ -1,8 +1,25 @@
-# set the include path found by configure
+# Copyright 2005 The util-vserver Developers
+# See AUTHORS for details
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by  *
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the
+# Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 INCLUDES = $(all_includes) -I$(top_srcdir)
 
-# the library search path.
 noinst_HEADERS = syscall.h
+
 include_HEADERS = vserver.h
 
 lib_LTLIBRARIES = libvserver.la
@@ -20,6 +37,6 @@ libvserver_la_SOURCES = context.c \
                         switch.c \
                         syscall.c
 
-libvserver_la_LDFLAGS = -version-info 1:0:0 \
+libvserver_la_LDFLAGS = -version-info 2:0:0 \
                         -Wl,--version-script,$(srcdir)/versions -Wl,-O1 \
                         -export-dynamic
