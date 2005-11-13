@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005 by the libvserver team                                 *
+ *   Copyright 2005 The libvserver Team                                    *
  *   See AUTHORS for details                                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -23,35 +23,36 @@
 #endif
 
 #include "vserver.h"
+#include "linux/vserver/limit.h"
 
-#include "linux/vserver/switch.h"
-#include "linux/vserver/inode_cmd.h"
+#include <sys/resource.h>
 
-int vx_set_iattr(struct vx_iattr *iattr)
-{
-	struct vcmd_ctx_iattr_v1 res;
+LIST_DATA_ALLOC_TYPE(rlimit, uint64_t)
 
-	res.name  = iattr->filename;
-	res.xid   = iattr->xid;
-	res.flags = iattr->flags;
-	res.mask  = iattr->mask;
-
-	return sys_vserver(VCMD_set_iattr, 0, &res);
-}
-
-int vx_get_iattr(struct vx_iattr *iattr)
-{
-	struct vcmd_ctx_iattr_v1 res;
-
-	res.name = iattr->filename;
-	int rc = sys_vserver(VCMD_get_iattr, 0, &res);
+/*!
+ * @brief Macro for rlimit list allocation
+ * @ingroup list_defaults
+ */
+#define LIST_ADD_RLIMIT(TYPE, VALUE) \
+list_set(p->node+(i++), \
+         list_key_alloc(#VALUE), \
+         rlimit_list_data_alloc(TYPE ## _ ## VALUE));
 	
-	if (rc == -1)
-		return rc;
-
-	iattr->xid   = res.xid;
-	iattr->flags = res.flags;
-	iattr->mask  = res.mask;
-
-	return rc;
+list_t *rlimit_list_init(void)
+{
+	list_t *p = list_alloc(9);
+	
+	int i = 0;
+	LIST_ADD_RLIMIT(RLIMIT, RSS)
+	LIST_ADD_RLIMIT(RLIMIT, NPROC)
+	LIST_ADD_RLIMIT(RLIMIT, NOFILE)
+	LIST_ADD_RLIMIT(RLIMIT, MEMLOCK)
+	LIST_ADD_RLIMIT(RLIMIT, AS)
+	
+	LIST_ADD_RLIMIT(VLIMIT, NSOCK)
+	LIST_ADD_RLIMIT(VLIMIT, OPENFD)
+	LIST_ADD_RLIMIT(VLIMIT, ANON)
+	LIST_ADD_RLIMIT(VLIMIT, SHMEM)
+	
+	return p;
 }

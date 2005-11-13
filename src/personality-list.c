@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005 by the libvserver team                                 *
+ *   Copyright 2005 The libvserver Team                                    *
  *   See AUTHORS for details                                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -23,35 +23,47 @@
 #endif
 
 #include "vserver.h"
+#include <linux/personality.h>
 
-#include "linux/vserver/switch.h"
-#include "linux/vserver/inode_cmd.h"
+LIST_DATA_ALLOC_TYPE(pers, uint64_t)
 
-int vx_set_iattr(struct vx_iattr *iattr)
-{
-	struct vcmd_ctx_iattr_v1 res;
-
-	res.name  = iattr->filename;
-	res.xid   = iattr->xid;
-	res.flags = iattr->flags;
-	res.mask  = iattr->mask;
-
-	return sys_vserver(VCMD_set_iattr, 0, &res);
-}
-
-int vx_get_iattr(struct vx_iattr *iattr)
-{
-	struct vcmd_ctx_iattr_v1 res;
-
-	res.name = iattr->filename;
-	int rc = sys_vserver(VCMD_get_iattr, 0, &res);
+/*!
+ * @brief Macro for bcaps list allocation
+ * @ingroup list_defaults
+ */
+#define LIST_ADD_PERS(TYPE, VALUE) \
+list_set(p->node+(i++), \
+         list_key_alloc(#VALUE), \
+         pers_list_data_alloc(TYPE ## _ ## VALUE));
 	
-	if (rc == -1)
-		return rc;
-
-	iattr->xid   = res.xid;
-	iattr->flags = res.flags;
-	iattr->mask  = res.mask;
-
-	return rc;
+list_t *pers_list_init(void)
+{
+	list_t *p = list_alloc(23);
+	
+	int i = 0;
+	LIST_ADD_PERS(PER, LINUX)
+	LIST_ADD_PERS(PER, LINUX_32BIT)
+	LIST_ADD_PERS(PER, LINUX_FDPIC)
+	LIST_ADD_PERS(PER, SVR4)
+	LIST_ADD_PERS(PER, SVR3)
+	LIST_ADD_PERS(PER, SCOSVR3)
+	LIST_ADD_PERS(PER, OSR5)
+	LIST_ADD_PERS(PER, WYSEV386)
+	LIST_ADD_PERS(PER, ISCR4)
+	LIST_ADD_PERS(PER, BSD)
+	LIST_ADD_PERS(PER, SUNOS)
+	LIST_ADD_PERS(PER, XENIX)
+	LIST_ADD_PERS(PER, LINUX32)
+	LIST_ADD_PERS(PER, LINUX32_3GB)
+	LIST_ADD_PERS(PER, IRIX32)
+	LIST_ADD_PERS(PER, IRIXN32)
+	LIST_ADD_PERS(PER, IRIX64)
+	LIST_ADD_PERS(PER, RISCOS)
+	LIST_ADD_PERS(PER, SOLARIS)
+	LIST_ADD_PERS(PER, UW7)
+	LIST_ADD_PERS(PER, OSF4)
+	LIST_ADD_PERS(PER, HPUX)
+	LIST_ADD_PERS(PER, MASK)
+	
+	return p;
 }

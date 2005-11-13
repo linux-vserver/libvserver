@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005 by the libvserver team                                 *
+ *   Copyright 2005 The libvserver Team                                    *
  *   See AUTHORS for details                                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -23,35 +23,30 @@
 #endif
 
 #include "vserver.h"
+#include "linux/vserver/sched_cmd.h"
 
-#include "linux/vserver/switch.h"
-#include "linux/vserver/inode_cmd.h"
+LIST_DATA_ALLOC_TYPE(sched, uint64_t)
 
-int vx_set_iattr(struct vx_iattr *iattr)
-{
-	struct vcmd_ctx_iattr_v1 res;
-
-	res.name  = iattr->filename;
-	res.xid   = iattr->xid;
-	res.flags = iattr->flags;
-	res.mask  = iattr->mask;
-
-	return sys_vserver(VCMD_set_iattr, 0, &res);
-}
-
-int vx_get_iattr(struct vx_iattr *iattr)
-{
-	struct vcmd_ctx_iattr_v1 res;
-
-	res.name = iattr->filename;
-	int rc = sys_vserver(VCMD_get_iattr, 0, &res);
+/*!
+ * @brief Macro for sched list allocation
+ * @ingroup list_defaults
+ */
+#define LIST_ADD_SCHED(TYPE, VALUE) \
+list_set(p->node+(i++), \
+         list_key_alloc(#VALUE), \
+         sched_list_data_alloc(TYPE ## _ ## VALUE));
 	
-	if (rc == -1)
-		return rc;
-
-	iattr->xid   = res.xid;
-	iattr->flags = res.flags;
-	iattr->mask  = res.mask;
-
-	return rc;
+list_t *sched_list_init(void)
+{
+	list_t *p = list_alloc(6);
+	
+	int i = 0;
+	LIST_ADD_SCHED(VXSM, FILL_RATE)
+	LIST_ADD_SCHED(VXSM, INTERVAL)
+	LIST_ADD_SCHED(VXSM, TOKENS)
+	LIST_ADD_SCHED(VXSM, TOKENS_MIN)
+	LIST_ADD_SCHED(VXSM, TOKENS_MAX)
+	LIST_ADD_SCHED(VXSM, PRIO_BIAS)
+	
+	return p;
 }

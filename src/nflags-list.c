@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005 by the libvserver team                                 *
+ *   Copyright 2005 The libvserver Team                                    *
  *   See AUTHORS for details                                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -23,35 +23,28 @@
 #endif
 
 #include "vserver.h"
+#include "linux/vserver/network.h"
 
-#include "linux/vserver/switch.h"
-#include "linux/vserver/inode_cmd.h"
+LIST_DATA_ALLOC_TYPE(nflags, uint64_t)
 
-int vx_set_iattr(struct vx_iattr *iattr)
-{
-	struct vcmd_ctx_iattr_v1 res;
-
-	res.name  = iattr->filename;
-	res.xid   = iattr->xid;
-	res.flags = iattr->flags;
-	res.mask  = iattr->mask;
-
-	return sys_vserver(VCMD_set_iattr, 0, &res);
-}
-
-int vx_get_iattr(struct vx_iattr *iattr)
-{
-	struct vcmd_ctx_iattr_v1 res;
-
-	res.name = iattr->filename;
-	int rc = sys_vserver(VCMD_get_iattr, 0, &res);
+/*!
+ * @brief Macro for nflags list allocation
+ * @ingroup list_defaults
+ */
+#define LIST_ADD_NFLAG(TYPE, VALUE) \
+list_set(p->node+(i++), \
+         list_key_alloc(#VALUE), \
+         nflags_list_data_alloc(TYPE ## _ ## VALUE));
 	
-	if (rc == -1)
-		return rc;
-
-	iattr->xid   = res.xid;
-	iattr->flags = res.flags;
-	iattr->mask  = res.mask;
-
-	return rc;
+list_t *nflags_list_init(void)
+{
+	list_t *p = list_alloc(4);
+	
+	int i = 0;
+	LIST_ADD_NFLAG(NXF, STATE_SETUP)
+	LIST_ADD_NFLAG(NXF, SC_HELPER)
+	LIST_ADD_NFLAG(NXF, ONE_TIME)
+	LIST_ADD_NFLAG(NXF, INIT_SET)
+	
+	return p;
 }

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005 by the libvserver team                                 *
+ *   Copyright 2005 The libvserver Team                                    *
  *   See AUTHORS for details                                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -23,35 +23,32 @@
 #endif
 
 #include "vserver.h"
+#include "linux/vserver/context.h"
 
-#include "linux/vserver/switch.h"
-#include "linux/vserver/inode_cmd.h"
+LIST_DATA_ALLOC_TYPE(ccaps, uint64_t)
 
-int vx_set_iattr(struct vx_iattr *iattr)
-{
-	struct vcmd_ctx_iattr_v1 res;
-
-	res.name  = iattr->filename;
-	res.xid   = iattr->xid;
-	res.flags = iattr->flags;
-	res.mask  = iattr->mask;
-
-	return sys_vserver(VCMD_set_iattr, 0, &res);
-}
-
-int vx_get_iattr(struct vx_iattr *iattr)
-{
-	struct vcmd_ctx_iattr_v1 res;
-
-	res.name = iattr->filename;
-	int rc = sys_vserver(VCMD_get_iattr, 0, &res);
+/*!
+ * @brief Macro for ccaps list allocation
+ * @ingroup list_defaults
+ */
+#define LIST_ADD_CCAP(TYPE, VALUE) \
+list_set(p->node+(i++), \
+         list_key_alloc(#VALUE), \
+         ccaps_list_data_alloc(TYPE ## _ ## VALUE));
 	
-	if (rc == -1)
-		return rc;
-
-	iattr->xid   = res.xid;
-	iattr->flags = res.flags;
-	iattr->mask  = res.mask;
-
-	return rc;
+list_t *ccaps_list_init(void)
+{
+	list_t *p = list_alloc(8);
+	
+	int i = 0;
+	LIST_ADD_CCAP(VXC, SET_UTSNAME)
+	LIST_ADD_CCAP(VXC, SET_RLIMIT)
+	LIST_ADD_CCAP(VXC, RAW_ICMP)
+	LIST_ADD_CCAP(VXC, SYSLOG)
+	LIST_ADD_CCAP(VXC, SECURE_MOUNT)
+	LIST_ADD_CCAP(VXC, SECURE_REMOUNT)
+	LIST_ADD_CCAP(VXC, BINARY_MOUNT)
+	LIST_ADD_CCAP(VXC, QUOTA_CTL)
+	
+	return p;
 }

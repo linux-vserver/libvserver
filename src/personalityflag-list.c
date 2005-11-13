@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005 by the libvserver team                                 *
+ *   Copyright 2005 The libvserver Team                                    *
  *   See AUTHORS for details                                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -23,35 +23,34 @@
 #endif
 
 #include "vserver.h"
+#include <linux/personality.h>
 
-#include "linux/vserver/switch.h"
-#include "linux/vserver/inode_cmd.h"
+LIST_DATA_ALLOC_TYPE(persflag, uint64_t)
 
-int vx_set_iattr(struct vx_iattr *iattr)
-{
-	struct vcmd_ctx_iattr_v1 res;
-
-	res.name  = iattr->filename;
-	res.xid   = iattr->xid;
-	res.flags = iattr->flags;
-	res.mask  = iattr->mask;
-
-	return sys_vserver(VCMD_set_iattr, 0, &res);
-}
-
-int vx_get_iattr(struct vx_iattr *iattr)
-{
-	struct vcmd_ctx_iattr_v1 res;
-
-	res.name = iattr->filename;
-	int rc = sys_vserver(VCMD_get_iattr, 0, &res);
+/*!
+ * @brief Macro for bcaps list allocation
+ * @ingroup list_defaults
+ */
+#define LIST_ADD_PERSFLAG(VALUE) \
+list_set(p->node+(i++), \
+         list_key_alloc(#VALUE), \
+         persflag_list_data_alloc(VALUE));
 	
-	if (rc == -1)
-		return rc;
-
-	iattr->xid   = res.xid;
-	iattr->flags = res.flags;
-	iattr->mask  = res.mask;
-
-	return rc;
+list_t *persflag_list_init(void)
+{
+	list_t *p = list_alloc(10);
+	
+	int i = 0;
+	LIST_ADD_PERSFLAG(ADDR_NO_RANDOMIZE)
+	LIST_ADD_PERSFLAG(FDPIC_FUNCPTRS)
+	LIST_ADD_PERSFLAG(MMAP_PAGE_ZERO)
+	LIST_ADD_PERSFLAG(ADDR_COMPAT_LAYOUT)
+	LIST_ADD_PERSFLAG(READ_IMPLIES_EXEC)
+	LIST_ADD_PERSFLAG(ADDR_LIMIT_32BIT)
+	LIST_ADD_PERSFLAG(SHORT_INODE)
+	LIST_ADD_PERSFLAG(WHOLE_SECONDS)
+	LIST_ADD_PERSFLAG(STICKY_TIMEOUTS)
+	LIST_ADD_PERSFLAG(ADDR_LIMIT_3GB)
+	
+	return p;
 }

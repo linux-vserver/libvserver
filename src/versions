@@ -1,125 +1,106 @@
-# Copyright 2005 The libvserver Developers
-# See AUTHORS for details
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by  *
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the
-# Free Software Foundation, Inc.,
-# 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-
 LIBVSERVER_1.0 {
 	global:
+		# bcaps-list.c
+		bcaps_list_init;
+		
+		# ccaps-list.c
+		ccaps_list_init;
+		
+		# cflags-list.c
+		cflags_list_init;
+		
+		# context.c
+		vx_create;
+		vx_get_caps;
+		vx_get_flags;
+		vx_get_info;
+		vx_get_task_xid;
+		vx_migrate;
+		vx_set_caps;
+		vx_set_flags;
+		
+		# cvirt.c
+		vx_get_vhi_name;
+		vx_set_vhi_name;
+		
+		# debug.c
+		vs_dump_history;
+		
+		# dlimit.c
+		vx_add_dlimit;
+		vx_get_dlimit;
+		vx_rem_dlimit;
+		vx_set_dlimit;
+		
+		# iattr-list.c
+		iattr_list_init;
+		
+		# inode.c
+		vx_get_iattr;
+		vx_set_iattr;
+		
+		# limit.c
+		vx_get_rlimit;
+		vx_get_rlimit_mask;
+		vx_set_rlimit;
+		
+		# list.c
+		list_alloc;
+		list_dealloc;
+		list_key_alloc;
+		list_set;
+		list_ntokens;
+		list_parse;
+		list_parse_hash;
+		list_parse_list;
+		list_search;
+		list_validate_flag;
+		list_validate;
+		list_list2flags;
+		
+		# namespace.c
+		vx_cleanup_namespace;
+		vx_enter_namespace;
+		vx_set_namespace;
+		
+		# network.c
+		nx_add_addr;
+		nx_create;
+		nx_get_caps;
+		nx_get_flags;
+		nx_get_info;
+		nx_get_task_nid;
+		nx_migrate;
+		nx_rem_addr;
+		nx_set_caps;
+		nx_set_flags;
+		
+		# nflags-list.c
+		nflags_list_init;
+		
+		# rlimit-list.c
+		rlimit_list_init;
+		
+		# sched-list.c
+		sched_list_init;
+		
+		# sched.c
+		vx_set_sched;
+		
+		# signal.c
+		vx_kill;
+		vx_wait;
+		
+		# switch.c
+		vs_get_version;
+		
 		# syscall.c
 		sys_vserver;
 		sys_personality;
-		sys_clone;
+		
+		# vhi-list.c
+		vhi_list_init;
 	
-		# context.c
-		vc_get_task_xid;
-		vc_get_vx_info;
-		vc_ctx_create;
-		vc_ctx_migrate;
-		vc_get_cflags;
-		vc_set_cflags;
-		vc_get_ccaps;
-		vc_set_ccaps;
-		
-		# cvirt.c
-		vc_set_vhi_name;
-		vc_get_vhi_name;
-		
-		# debug.c
-		vc_dump_history;
-		
-		# dlimit.c
-		vc_add_dlimit;
-		vc_rem_dlimit;
-		vc_set_dlimit;
-		vc_get_dlimit;
-		
-		# inode.c
-		vc_get_iattr;
-		vc_set_iattr;
-		
-		# legacy.c
-		vc_new_s_context;
-		vc_set_ipv4root;
-		
-		# limit.c
-		vc_get_rlimit;
-		vc_get_rlimit_mask;
-		vc_set_rlimit;
-		
-		# namespace.c
-		vc_enter_namespace;
-		vc_cleanup_namespace;
-		vc_set_namespace;
-		
-		# network.c
-		vc_get_task_nid;
-		vc_get_nx_info;
-		vc_net_create;
-		vc_net_migrate;
-		vc_net_add;
-		vc_net_remove;
-		vc_get_nflags;
-		vc_set_nflags;
-		vc_get_ncaps;
-		vc_set_ncaps;
-		
-		# sched.c
-		vc_set_sched;
-		
-		# signal.c
-		vc_ctx_kill;
-		vc_wait_exit;
-		
-		# switch.c
-		vc_get_version;
-		
-		# list/bcaps.c
-		vc_text2bcap;
-		vc_bcap2text;
-		vc_list2bcap;
-		
-		# list/ccaps.c
-		vc_text2ccap;
-		vc_ccap2text;
-		vc_list2ccap;
-		
-		# list/cflags.c
-		vc_text2cflag;
-		vc_cflag2text;
-		vc_list2cflag;
-		
-		# list/ncaps.c
-		vc_text2ncap;
-		vc_ncap2text;
-		vc_list2ncap;
-		
-		# list/nflags.c
-		vc_text2nflag;
-		vc_nflag2text;
-		vc_list2nflag;
-		
-		# list/personality.c
-		vc_text2personality;
-		vc_personality2text;
-		vc_list2personality;
-		
-		# list/personalitytype.c
-		vc_text2personalitytype;
-		vc_personalitytype2text;
-		
 	local:
 		*;
 };

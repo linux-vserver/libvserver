@@ -27,9 +27,9 @@ nobase_include_HEADERS = linux/vserver/context_cmd.h \
                          linux/vserver/debug_cmd.h \
                          linux/vserver/dlimit_cmd.h \
                          linux/vserver/dlimit.h \
+                         linux/vserver/global.h \
                          linux/vserver/inode_cmd.h \
                          linux/vserver/inode.h \
-                         linux/vserver/legacy.h \
                          linux/vserver/limit_cmd.h \
                          linux/vserver/limit_def.h \
                          linux/vserver/limit.h \
@@ -41,5 +41,6 @@ nobase_include_HEADERS = linux/vserver/context_cmd.h \
                          linux/vserver/sched_def.h \
                          linux/vserver/sched.h \
                          linux/vserver/signal_cmd.h \
+                         linux/vserver/signal.h \
                          linux/vserver/switch.h \
                          linux/vserver/xid.h

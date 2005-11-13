@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005 by the libvserver team                                 *
+ *   Copyright 2005 The libvserver Team                                    *
  *   See AUTHORS for details                                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -23,35 +23,56 @@
 #endif
 
 #include "vserver.h"
+#include <linux/capability.h>
 
-#include "linux/vserver/switch.h"
-#include "linux/vserver/inode_cmd.h"
+LIST_DATA_ALLOC_TYPE(bcaps, uint64_t)
 
-int vx_set_iattr(struct vx_iattr *iattr)
-{
-	struct vcmd_ctx_iattr_v1 res;
-
-	res.name  = iattr->filename;
-	res.xid   = iattr->xid;
-	res.flags = iattr->flags;
-	res.mask  = iattr->mask;
-
-	return sys_vserver(VCMD_set_iattr, 0, &res);
-}
-
-int vx_get_iattr(struct vx_iattr *iattr)
-{
-	struct vcmd_ctx_iattr_v1 res;
-
-	res.name = iattr->filename;
-	int rc = sys_vserver(VCMD_get_iattr, 0, &res);
+/*!
+ * @brief Macro for bcaps list allocation
+ * @ingroup list_defaults
+ */
+#define LIST_ADD_BCAP(TYPE, VALUE) \
+list_set(p->node+(i++), \
+         list_key_alloc(#VALUE), \
+         bcaps_list_data_alloc(TYPE ## _ ## VALUE));
 	
-	if (rc == -1)
-		return rc;
-
-	iattr->xid   = res.xid;
-	iattr->flags = res.flags;
-	iattr->mask  = res.mask;
-
-	return rc;
+list_t *bcaps_list_init(void)
+{
+	list_t *p = list_alloc(32);
+	
+	int i = 0;
+	LIST_ADD_BCAP(CAP, CHOWN)
+	LIST_ADD_BCAP(CAP, DAC_OVERRIDE)
+	LIST_ADD_BCAP(CAP, DAC_READ_SEARCH)
+	LIST_ADD_BCAP(CAP, FOWNER)
+	LIST_ADD_BCAP(CAP, FSETID)
+	LIST_ADD_BCAP(CAP, FS_MASK)
+	LIST_ADD_BCAP(CAP, KILL)
+	LIST_ADD_BCAP(CAP, SETGID)
+	LIST_ADD_BCAP(CAP, SETUID)
+	LIST_ADD_BCAP(CAP, SETPCAP)
+	LIST_ADD_BCAP(CAP, LINUX_IMMUTABLE)
+	LIST_ADD_BCAP(CAP, NET_BIND_SERVICE)
+	LIST_ADD_BCAP(CAP, NET_BROADCAST)
+	LIST_ADD_BCAP(CAP, NET_ADMIN)
+	LIST_ADD_BCAP(CAP, NET_RAW)
+	LIST_ADD_BCAP(CAP, IPC_LOCK)
+	LIST_ADD_BCAP(CAP, IPC_OWNER)
+	LIST_ADD_BCAP(CAP, SYS_MODULE)
+	LIST_ADD_BCAP(CAP, SYS_RAWIO)
+	LIST_ADD_BCAP(CAP, SYS_CHROOT)
+	LIST_ADD_BCAP(CAP, SYS_PTRACE)
+	LIST_ADD_BCAP(CAP, SYS_PACCT)
+	LIST_ADD_BCAP(CAP, SYS_ADMIN)
+	LIST_ADD_BCAP(CAP, SYS_BOOT)
+	LIST_ADD_BCAP(CAP, SYS_NICE)
+	LIST_ADD_BCAP(CAP, SYS_RESOURCE)
+	LIST_ADD_BCAP(CAP, SYS_TIME)
+	LIST_ADD_BCAP(CAP, SYS_TTY_CONFIG)
+	LIST_ADD_BCAP(CAP, MKNOD)
+	LIST_ADD_BCAP(CAP, LEASE)
+	LIST_ADD_BCAP(CAP, AUDIT_WRITE)
+	LIST_ADD_BCAP(CAP, AUDIT_CONTROL)
+	
+	return p;
 }

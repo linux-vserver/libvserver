@@ -55,9 +55,6 @@ CFLAGS="${CFLAGS} -W -Wall -std=gnu99 -pedantic"
 AC_LV_SYSCALL_NR
 
 # Output
-AC_CONFIG_FILES([src/list/listparser/Makefile
-                 src/list/val2text/Makefile
-                 src/list/Makefile
-                 src/Makefile
-                 Makefile])
+AC_CONFIG_FILES([Makefile
+                 src/Makefile])
 AC_OUTPUT
