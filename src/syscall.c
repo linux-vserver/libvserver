@@ -41,3 +41,6 @@ _syscall3(int, vserver, uint32_t, cmd, uint32_t, id, void *, data)
 
 /* personality system call */
 _syscall1(int, personality, int, pers)
+
+/* clone syscall */
+_syscall2(int, clone, int, flags, void *, child_stack)

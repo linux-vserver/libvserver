@@ -54,6 +54,22 @@
 int sys_vserver(uint32_t cmd, uint32_t id, void *data);
 
 /*!
+ * @brief Clone syscall interface
+ * 
+ * @param flags       clone flags
+ * @param child_stack Child stack size
+ * 
+ * @return Syscall return code
+ * 
+ * @see \htmlonly
+ *   <a class="el" href="file:///usr/include/linux/sched.h">
+ *     &lt;linux/sched.h&gt;
+ *   </a>
+ * \endhtmlonly
+ */
+int sys_clone(int flags, void *child_stack);
+
+/*!
  * @brief Linux personality syscall interface
  * 
  * @param pers Personality type
