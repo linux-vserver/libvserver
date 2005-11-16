@@ -61,6 +61,7 @@ LIBVSERVER_1.0 {
 		# namespace.c
 		vx_cleanup_namespace;
 		vx_enter_namespace;
+		vx_new_namespace;
 		vx_set_namespace;
 		
 		# network.c
@@ -97,6 +98,7 @@ LIBVSERVER_1.0 {
 		# syscall.c
 		sys_vserver;
 		sys_personality;
+		sys_clone;
 		
 		# vhi-list.c
 		vhi_list_init;
