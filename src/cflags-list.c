@@ -38,7 +38,7 @@ list_set(p->node+(i++), \
 	
 list_t *cflags_list_init(void)
 {
-	list_t *p = list_alloc(26);
+	list_t *p = list_alloc(27);
 	
 	int i = 0;
 	LIST_ADD_CFLAG(VXF, INFO_LOCK)
@@ -68,6 +68,7 @@ list_t *cflags_list_init(void)
 	
 	LIST_ADD_CFLAG(VXF, SC_HELPER)
 	LIST_ADD_CFLAG(VXF, REBOOT_KILL)
+	LIST_ADD_CFLAG(VXF, PERSISTANT)
 	
 	LIST_ADD_CFLAG(VXF, FORK_RSS)
 	LIST_ADD_CFLAG(VXF, PROLIFIC)
