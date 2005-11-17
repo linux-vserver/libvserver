@@ -24,6 +24,9 @@ struct	vcmd_ctx_dlimit_v0 {
 	uint32_t flags;
 };
 
+#define CDLIM_UNSET             (0UL)
+#define CDLIM_INFINITY          (~0UL)
+#define CDLIM_KEEP              (~1UL)
 
 #ifdef	__KERNEL__
 

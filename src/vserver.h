@@ -419,9 +419,11 @@ int vx_cleanup_namespace(void);
 /*!
  * @brief Set namespace
  * 
+ * @param xid Context ID
+ * 
  * Make current namespace the namespace of current context
  */
-int vx_set_namespace(void);
+int vx_set_namespace(xid_t xid);
 /*! @} syscall_namespace */
 
 

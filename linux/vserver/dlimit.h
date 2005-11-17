@@ -3,12 +3,14 @@
 
 #include "switch.h"
 
-#define CDLIM_UNSET		(0ULL)
-#define CDLIM_INFINITY		(~0ULL)
-#define CDLIM_KEEP		(~1ULL)
-
 
 #ifdef	__KERNEL__
+
+/*      keep in sync with CDLIM_*	*/
+
+#define DLIM_UNSET		(0ULL)
+#define DLIM_INFINITY		(~0ULL)
+#define DLIM_KEEP		(~1ULL)
 
 #include <linux/spinlock.h>
 
