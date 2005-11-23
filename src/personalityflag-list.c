@@ -25,6 +25,8 @@
 #include "vserver.h"
 #include <linux/personality.h>
 
+#include <stdlib.h>
+
 LIST_DATA_ALLOC_TYPE(persflag, uint64_t)
 
 /*!
@@ -38,13 +40,10 @@ list_set(p->node+(i++), \
 	
 list_t *persflag_list_init(void)
 {
-	list_t *p = list_alloc(10);
+	list_t *p = list_alloc(7);
 	
 	int i = 0;
-	LIST_ADD_PERSFLAG(ADDR_NO_RANDOMIZE)
-	LIST_ADD_PERSFLAG(FDPIC_FUNCPTRS)
 	LIST_ADD_PERSFLAG(MMAP_PAGE_ZERO)
-	LIST_ADD_PERSFLAG(ADDR_COMPAT_LAYOUT)
 	LIST_ADD_PERSFLAG(READ_IMPLIES_EXEC)
 	LIST_ADD_PERSFLAG(ADDR_LIMIT_32BIT)
 	LIST_ADD_PERSFLAG(SHORT_INODE)

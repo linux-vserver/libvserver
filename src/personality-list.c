@@ -25,6 +25,8 @@
 #include "vserver.h"
 #include <linux/personality.h>
 
+#include <stdlib.h>
+
 LIST_DATA_ALLOC_TYPE(pers, uint64_t)
 
 /*!
@@ -38,12 +40,11 @@ list_set(p->node+(i++), \
 	
 list_t *pers_list_init(void)
 {
-	list_t *p = list_alloc(23);
+	list_t *p = list_alloc(22);
 	
 	int i = 0;
 	LIST_ADD_PERS(PER, LINUX)
 	LIST_ADD_PERS(PER, LINUX_32BIT)
-	LIST_ADD_PERS(PER, LINUX_FDPIC)
 	LIST_ADD_PERS(PER, SVR4)
 	LIST_ADD_PERS(PER, SVR3)
 	LIST_ADD_PERS(PER, SCOSVR3)

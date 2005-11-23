@@ -25,6 +25,8 @@
 #include "vserver.h"
 #include "linux/vserver/cvirt_cmd.h"
 
+#include <stdlib.h>
+
 LIST_DATA_ALLOC_TYPE(vhi, uint64_t)
 
 /*!

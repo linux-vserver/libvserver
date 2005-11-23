@@ -25,6 +25,8 @@
 #include "vserver.h"
 #include "linux/vserver/sched_cmd.h"
 
+#include <stdlib.h>
+
 LIST_DATA_ALLOC_TYPE(sched, uint64_t)
 
 /*!

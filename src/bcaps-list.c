@@ -25,6 +25,8 @@
 #include "vserver.h"
 #include <linux/capability.h>
 
+#include <stdlib.h>
+
 LIST_DATA_ALLOC_TYPE(bcaps, uint64_t)
 
 /*!
@@ -38,7 +40,7 @@ list_set(p->node+(i++), \
 	
 list_t *bcaps_list_init(void)
 {
-	list_t *p = list_alloc(32);
+	list_t *p = list_alloc(30);
 	
 	int i = 0;
 	LIST_ADD_BCAP(CAP, CHOWN)
@@ -71,8 +73,6 @@ list_t *bcaps_list_init(void)
 	LIST_ADD_BCAP(CAP, SYS_TTY_CONFIG)
 	LIST_ADD_BCAP(CAP, MKNOD)
 	LIST_ADD_BCAP(CAP, LEASE)
-	LIST_ADD_BCAP(CAP, AUDIT_WRITE)
-	LIST_ADD_BCAP(CAP, AUDIT_CONTROL)
 	
 	return p;
 }

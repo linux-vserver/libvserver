@@ -25,6 +25,8 @@
 #include "vserver.h"
 #include "linux/vserver/context.h"
 
+#include <stdlib.h>
+
 LIST_DATA_ALLOC_TYPE(cflags, uint64_t)
 
 /*!

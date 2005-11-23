@@ -25,6 +25,8 @@
 #include "vserver.h"
 #include "linux/vserver/network.h"
 
+#include <stdlib.h>
+
 LIST_DATA_ALLOC_TYPE(nflags, uint64_t)
 
 /*!

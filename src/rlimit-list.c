@@ -26,6 +26,7 @@
 #include "linux/vserver/limit.h"
 
 #include <sys/resource.h>
+#include <stdlib.h>
 
 LIST_DATA_ALLOC_TYPE(rlimit, uint64_t)
 
@@ -43,6 +44,7 @@ list_t *rlimit_list_init(void)
 	list_t *p = list_alloc(9);
 	
 	int i = 0;
+	/* TODO: check if we miss sth */
 	LIST_ADD_RLIMIT(RLIMIT, RSS)
 	LIST_ADD_RLIMIT(RLIMIT, NPROC)
 	LIST_ADD_RLIMIT(RLIMIT, NOFILE)

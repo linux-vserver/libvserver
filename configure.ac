@@ -53,6 +53,7 @@ CFLAGS="${CFLAGS} -W -Wall -std=gnu99 -pedantic"
 
 # Site settings
 AC_LV_SYSCALL_NR
+AC_LV_CHECK_KERNEL_HEADERS
 
 # Output
 AC_CONFIG_FILES([Makefile

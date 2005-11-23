@@ -26,6 +26,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>

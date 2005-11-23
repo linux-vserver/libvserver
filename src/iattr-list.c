@@ -25,6 +25,8 @@
 #include "vserver.h"
 #include "linux/vserver/inode.h"
 
+#include <stdlib.h>
+
 LIST_DATA_ALLOC_TYPE(iattr, uint64_t)
 
 /*!
