@@ -40,11 +40,12 @@ list_set(p->node+(i++), \
 	
 list_t *nflags_list_init(void)
 {
-	list_t *p = list_alloc(4);
+	list_t *p = list_alloc(5);
 	
 	int i = 0;
 	LIST_ADD_NFLAG(NXF, STATE_SETUP)
 	LIST_ADD_NFLAG(NXF, SC_HELPER)
+	LIST_ADD_NFLAG(NXF, PERSISTANT)
 	LIST_ADD_NFLAG(NXF, ONE_TIME)
 	LIST_ADD_NFLAG(NXF, INIT_SET)
 	
