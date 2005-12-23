@@ -18,6 +18,8 @@
 
 INCLUDES = -I$(top_srcdir)
 
+EXTRA_DIST = versions
+
 noinst_HEADERS = syscall.h
 include_HEADERS = vserver.h
 

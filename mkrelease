@@ -23,7 +23,7 @@ svn copy ${svnroot}/trunk ${svnroot}/tags/release-${ver} \
 
 echo "Running autotools..."
 
-make -f Makefile.cvs &>/dev/null || die "make failed"
+make -f Makefile.svn &>/dev/null || die "make failed"
 mkdir build &>/dev/null
 pushd build/ &>/dev/null || die "popd failed"
 
@@ -31,7 +31,7 @@ echo "Make dist tarball..."
 ../configure &>/dev/null || die "configure failed"
 make dist &>/dev/null || die "make dist failed"
 
-for i in *.tar*; do
+for i in *.tar.bz2 *.tar.gz; do
 	md5sum $i > $i.md5
 done
 

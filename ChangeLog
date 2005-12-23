@@ -1,23 +1,9 @@
-* libvserver-0.4 (01 Aug 2005)
-    01 Aug 2005; Benedikt Boehm <hollow@gentoo.org>
-    release
+# ChangeLog for libvserver
 
-* libvserver-0.3 (01 Aug 2005)
-    01 Aug 2005; Benedikt Boehm <hollow@gentoo.org>
-    This is the first stable release of libvserver
-    libvserver-util added
+  23 Dec 2005; Benedikt Böhm <hollow@gentoo.org> Makefile.am, src/Makefile.am:
+  Fix 'make dist' target
 
-* libvserver-0.2 (13 Jun 2005)
+*libvserver-1.0 (22 Dec 2005)
 
-    13 Jun 2005; Benedikt Boehm <hollow@gentoo.org>
-    massive changes + cleanup => bump to 0.2
-
-* libvserver-0.1.1 (01 Jul 2005)
-	
-    01 Jul 2005; Benedikt Boehm <hollow@gentoo.org>
-    Thx to Doener who submitted a patch to clean up the header layout!
-
-* libvserver-0.1 (30 Jun 2005)
-	
-    30 Jun 2005; Benedikt Boehm <hollow@gentoo.org>
-    Initial release of libvserver
+  22 Dec 2005; Benedikt Böhm <hollow@gentoo.org>
+  Initial release of libvserver

@@ -18,6 +18,8 @@
 
 SUBDIRS = src
 
+EXTRA_DIST = Doxyfile
+
 nobase_include_HEADERS = linux/vserver/context_cmd.h \
                          linux/vserver/context.h \
                          linux/vserver/cvirt_cmd.h \
