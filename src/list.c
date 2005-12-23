@@ -96,7 +96,8 @@ char *list_parse(const char **str, const char delim)
 	}
 	
 	char *token = malloc(len+1);
-	strncpy(token, *str, len);
+	memcpy(token, *str, len);
+	token[len] = '\0';
 	
 	*str = ++ptr;
 	
