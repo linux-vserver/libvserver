@@ -1,5 +1,7 @@
 # ChangeLog for libvserver
 
+*libvserver-1.0.1 (23 Dec 2005)
+
   23 Dec 2005; Benedikt Böhm <hollow@gentoo.org> src/list.c:
   Fix non-terminated strings
 
