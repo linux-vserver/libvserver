@@ -1,5 +1,8 @@
 # ChangeLog for libvserver
 
+  23 Dec 2005; Benedikt Böhm <hollow@gentoo.org> src/list.c:
+  Fix non-terminated key string
+
   23 Dec 2005; Benedikt Böhm <hollow@gentoo.org> Makefile.am, src/Makefile.am:
   Fix 'make dist' target
 

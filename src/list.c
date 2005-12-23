@@ -56,8 +56,12 @@ void list_dealloc(list_t *list)
 
 char *list_key_alloc(char *value)
 {
-	char *key = malloc(strlen(value)+1);
-	strncpy(key, value, strlen(value));
+	size_t keylen = strlen(value);
+	
+	char *key = malloc(keylen+1);
+	memcpy(key, value, keylen);
+	key[keylen] = '\0';
+	
 	return key;
 }
 
