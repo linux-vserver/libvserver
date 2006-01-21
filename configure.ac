@@ -32,8 +32,32 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_LIBTOOL
+# HACK: see below why we do not check for libtool here
+#AC_PROG_LIBTOOL
 AC_PROG_EGREP
+
+# check for dietlibc
+case $host_cpu in
+	(i*86|athlon) min_diet_ver=0.25;;
+	(ia64|hppa*)  min_diet_ver=0.29;;
+	(*)           min_diet_ver=0.28;;
+esac
+
+AC_LV_DIETLIBC([$min_diet_ver])
+
+if test $ac_lv_have_dietlibc = yes; then
+	# HACK: libtool does not have cmdline options to build only
+	# static libraries; this can be done with the
+	# '--disable-shared' ./configure option only. We have to set
+	# this option which is evaluated by 'AC_PROG_LIBTOOL'
+ 	# below.  Therefore, this macro must not be called earlier.
+	enable_shared=no
+	enable_static=yes
+	CC="${DIET} ${DIETFLAGS} ${CC}"
+fi
+
+# HACK: see comments at 'enable_static' above
+AC_PROG_LIBTOOL
 
 # Checks for libraries.
 
@@ -49,7 +73,7 @@ AC_C_INLINE
 # Checks for library functions.
 
 # Compiler settings
-CFLAGS="${CFLAGS} -W -Wall -std=gnu99 -pedantic"
+CFLAGS="${CFLAGS} -fno-omit-frame-pointer -W -Wall -std=gnu99 -pedantic"
 
 # Site settings
 AC_LV_SYSCALL_NR
