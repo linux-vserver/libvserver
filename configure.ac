@@ -18,7 +18,7 @@
 
 # Generic configuration
 AC_PREREQ(2.59)
-AC_INIT(libvserver, 1.0.1, [http://dev.croup.de/proj/libvserver])
+AC_INIT(libvserver, 1.0.3, [http://dev.croup.de/proj/libvserver])
 AC_CONFIG_HEADER([config.h])
 AC_GNU_SOURCE
 
@@ -79,7 +79,22 @@ CFLAGS="${CFLAGS} -fno-omit-frame-pointer -W -Wall -std=gnu99 -pedantic"
 AC_LV_SYSCALL_NR
 AC_LV_CHECK_KERNEL_HEADERS
 
+# Final info page
+AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
+
+                       CC: $CC ($($CC --version | head -n1))
+                 CPPFLAGS: '$CPPFLAGS'
+                   CFLAGS: '$CFLAGS'
+
+                   prefix: $prefix
+               build/host: $build/$host
+             use dietlibc: $ac_lv_have_dietlibc
+           syscall number: $ac_lv_syscall_nr
+"])
+
 # Output
 AC_CONFIG_FILES([Makefile
                  src/Makefile])
 AC_OUTPUT
+
+AC_MSG_NOTICE([$SUMMARY])
