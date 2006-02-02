@@ -29,10 +29,6 @@
 #include <sys/types.h>
 
 /*!
- * @defgroup syscall System calls
- * @{
- */
-/*!
  * @file syscall.c
  * @brief System calls
  */
@@ -91,6 +87,84 @@ int sys_personality(int pers);
  * @file  context.c
  * @brief Context commands
  */
+
+/* system capabilities */
+#ifndef _LINUX_CAPABILITY_H
+#define CAP_CHOWN            0
+#define CAP_DAC_OVERRIDE     1
+#define CAP_DAC_READ_SEARCH  2
+#define CAP_FOWNER           3
+#define CAP_FSETID           4
+#define CAP_FS_MASK          0x1f
+#define CAP_KILL             5
+#define CAP_SETGID           6
+#define CAP_SETUID           7
+#define CAP_SETPCAP          8
+#define CAP_LINUX_IMMUTABLE  9
+#define CAP_NET_BIND_SERVICE 10
+#define CAP_NET_BROADCAST    11
+#define CAP_NET_ADMIN        12
+#define CAP_NET_RAW          13
+#define CAP_IPC_LOCK         14
+#define CAP_IPC_OWNER        15
+#define CAP_SYS_MODULE       16
+#define CAP_SYS_RAWIO        17
+#define CAP_SYS_CHROOT       18
+#define CAP_SYS_PTRACE       19
+#define CAP_SYS_PACCT        20
+#define CAP_SYS_ADMIN        21
+#define CAP_SYS_BOOT         22
+#define CAP_SYS_NICE         23
+#define CAP_SYS_RESOURCE     24
+#define CAP_SYS_TIME         25
+#define CAP_SYS_TTY_CONFIG   26
+#define CAP_MKNOD            27
+#define CAP_LEASE            28
+#define CAP_AUDIT_WRITE      29
+#define CAP_AUDIT_CONTROL    30
+#endif
+
+/* context capabilities */
+#ifndef _VX_CONTEXT_H
+#define VXC_CAP_MASK       0x00000000
+#define VXC_SET_UTSNAME    0x00000001
+#define VXC_SET_RLIMIT     0x00000002
+#define VXC_RAW_ICMP       0x00000100
+#define VXC_SYSLOG         0x00001000
+#define VXC_SECURE_MOUNT   0x00010000
+#define VXC_SECURE_REMOUNT 0x00020000
+#define VXC_BINARY_MOUNT   0x00040000
+#define VXC_QUOTA_CTL      0x00100000
+#endif
+
+/* context flags */
+#ifndef _VX_CONTEXT_H
+#define VXF_INFO_LOCK    0x00000001
+#define VXF_INFO_SCHED   0x00000002
+#define VXF_INFO_NPROC   0x00000004
+#define VXF_INFO_PRIVATE 0x00000008
+#define VXF_INFO_INIT    0x00000010
+#define VXF_INFO_HIDE    0x00000020
+#define VXF_INFO_ULIMIT  0x00000040
+#define VXF_INFO_NSPACE  0x00000080
+#define VXF_SCHED_HARD   0x00000100
+#define VXF_SCHED_PRIO   0x00000200
+#define VXF_SCHED_PAUSE  0x00000400
+#define VXF_VIRT_MEM     0x00010000
+#define VXF_VIRT_UPTIME  0x00020000
+#define VXF_VIRT_CPU     0x00040000
+#define VXF_VIRT_LOAD    0x00080000
+#define VXF_HIDE_MOUNT   0x01000000
+#define VXF_HIDE_NETIF   0x02000000
+#define VXF_STATE_SETUP  (1ULL<<32)
+#define VXF_STATE_INIT   (1ULL<<33)
+#define VXF_SC_HELPER    (1ULL<<36)
+#define VXF_REBOOT_KILL  (1ULL<<37)
+#define VXF_PERSISTANT   (1ULL<<38)
+#define VXF_FORK_RSS     (1ULL<<48)
+#define VXF_PROLIFIC     (1ULL<<49)
+#define VXF_IGNEG_NICE   (1ULL<<52)
+#endif
 
 typedef uint32_t xid_t; /*!< Context ID type */
 
@@ -201,6 +275,20 @@ int vx_get_caps(xid_t xid, struct vx_caps *caps);
  * @file cvirt.c
  * @brief Virtualization commands
  */
+
+/* vhi field types */
+#ifndef _VX_CVIRT_CMD_H
+enum vx_vhi_name_field {
+	VHIN_CONTEXT=0,
+	VHIN_SYSNAME,
+	VHIN_NODENAME,
+	VHIN_RELEASE,
+	VHIN_VERSION,
+	VHIN_MACHINE,
+	VHIN_DOMAINNAME,
+};
+#endif
+
 #define VHILEN 65 /*!< Maximum VHI string length */
 
 /*!
@@ -253,6 +341,14 @@ int vs_dump_history(void);
  * @file dlimit.c
  * @brief Disk limit commands
  */
+
+/* flags */
+#ifndef _VX_DLIMIT_CMD_H
+#define CDLIM_UNSET     (0UL)
+#define CDLIM_INFINITY (~0UL)
+#define CDLIM_KEEP     (~1UL)
+#endif
+
 /*!
  * @brief Disk limit information
  */
@@ -316,6 +412,19 @@ int vx_get_dlimit(xid_t xid, struct vx_dlimit *dlimit);
  * @file inode.c
  * @brief XID Inode attribute commands
  */
+
+/* inode flags */
+#ifndef _VX_INODE_H
+#define IATTR_XID       0x01000000
+#define IATTR_ADMIN     0x00000001
+#define IATTR_WATCH     0x00000002
+#define IATTR_HIDE      0x00000004
+#define IATTR_FLAGS     0x00000007
+#define IATTR_BARRIER   0x00010000
+#define IATTR_IUNLINK   0x00020000
+#define IATTR_IMMUTABLE 0x00040000
+#endif
+
 /*!
  * @brief Inode attributes
  */
@@ -350,6 +459,27 @@ int vx_get_iattr(struct vx_iattr *iattr);
  * @file limit.c
  * @brief Resource limit commands
  */
+
+/* flags */
+#ifndef _VX_LIMIT_CMD_H
+#define CRLIM_UNSET     (0ULL)
+#define CRLIM_INFINITY (~0ULL)
+#define CRLIM_KEEP     (~1ULL)
+#endif
+
+/* vserver limit types */
+#ifndef _VX_LIMIT_H
+#define VLIMIT_NSOCK  16
+#define VLIMIT_OPENFD 17
+#define VLIMIT_ANON   18
+#define VLIMIT_SHMEM  19
+#define VLIMIT_SEMARY 20
+#define VLIMIT_NSEMS  21
+#endif
+
+/* system limit types */
+#include <sys/resource.h>
+
 /*!
  * @brief Resource limits
  */
@@ -435,6 +565,21 @@ int vx_set_namespace(xid_t xid);
  * @file network.c
  * @brief Network context commands
  */
+
+/* network context flags */
+#ifndef _VX_NETWORK_H
+#define NXF_STATE_SETUP (1ULL<<32)
+#define NXF_SC_HELPER   (1ULL<<36)
+#define NXF_PERSISTANT  (1ULL<<38)
+#endif
+
+/* address types */
+#ifndef _VX_NETWORK_H
+#define NXA_TYPE_IPV4  1
+#define NXA_TYPE_IPV6  2
+#define NXA_MOD_BCAST (1<<8)
+#define NXA_TYPE_ANY  (~0)
+#endif
 
 typedef uint32_t nid_t; /*!< Network context ID type */
 
@@ -568,6 +713,19 @@ int nx_get_caps(nid_t nid, struct nx_caps *caps);
  * @file sched.c
  * @brief CPU scheduler commands
  */
+
+/* mask flags */
+#ifndef _VX_SCHED_CMD_H
+#define VXSM_FILL_RATE  0x0001
+#define VXSM_INTERVAL   0x0002
+#define VXSM_TOKENS     0x0010
+#define VXSM_TOKENS_MIN 0x0020
+#define VXSM_TOKENS_MAX 0x0040
+#define VXSM_PRIO_BIAS  0x0100
+
+#define SCHED_KEEP (-2)
+#endif
+
 /*!
  * @brief Scheduler values
  */
@@ -643,367 +801,5 @@ int vx_wait(xid_t xid, struct vx_wait_opts *wait_opts);
  * Get vserver API version of running kernel
  */
 int vs_get_version(void);
-
-/*! @} syscall */
-
-
-/*!
- * @defgroup list List functions
- * @{
- */
-/*! 
- * @brief List node
- */
-typedef struct list_node_s {
-	char *key;  /*!< unique key identifier */
-	void *data; /*!< any data associated with key */
-} list_node_t;
-
-/*!
- * @brief List
- */
-typedef struct list_s {
-	list_node_t *node; /*!< first node */
-	size_t n;          /*!< number of nodes */
-} list_t;
-
-/*!
- * @brief Linked lists
- */
-typedef struct list_link_s {
-	list_t *p; /*!< prisitine list */
-	list_t *d; /*!< descending list */
-} list_link_t;
-
-/*!
- * @file list.c
- * @brief List handling and parsing functions
- */
-/*!
- * @defgroup list_alloc List allocation
- * @{
- */
-/*!
- * @brief Allocate memory for a list
- * 
- * @param n Number of nodes
- * 
- * @return Pointer to empty list
- */
-list_t *list_alloc(size_t n);
-
-/*!
- * @brief Deallocate list memory
- * 
- * @param list List pointer
- */
-void list_dealloc(list_t *list);
-
-/*!
- * @brief Allocate memory for a list key
- * 
- * @param str Key to be allocated
- * 
- * @return Pointer to allocated memory
- * 
- * @see LIST_DATA_ALLOC_TYPE
- * @see list_set
- */
-char *list_key_alloc(char *str);
-
-/*!
- * @brief allocate memory for list data using TYPE
- * 
- * @see list_key_alloc
- * @see list_set
- */
-#define LIST_DATA_ALLOC_TYPE(NAME, TYPE) \
-static inline \
-TYPE *NAME ## _list_data_alloc(TYPE value) \
-{ \
-	TYPE *data = (TYPE *)malloc(sizeof(TYPE)); \
-	*data = value; \
-	return data; \
-}
-
-/*!
- * @brief Set key/data pair
- * 
- * @param node Current list node
- * @param key  Key to be set
- * @param data Data to be set
- * 
- * @see list_key_alloc
- * @see LIST_DATA_ALLOC_TYPE
- */
-void list_set(list_node_t *node, char *key, void *data);
-/*! @} list_alloc */
-
-/*!
- * @defgroup list_parse Token parser
- * @{
- */
-/*!
- * @brief Count tokens
- * 
- * @param str   Token string
- * @param delim Token delimiter
- * 
- * @return Number of tokens
- */
-size_t list_ntokens(const char *str, const char delim);
-
-/*!
- * @brief Extract token and modify str to point to next token
- * 
- * @param str   Token string
- * @param delim Token delimiter 
- * 
- * @return Current token
- */
-char *list_parse(const char **str, const char delim);
-
-/*!
- * @brief Extract key/value pairs
- * 
- * @param str     Token string
- * @param delim   Token delimiter
- * @param kvdelim key/value delimiter
- * 
- * @return Token list pointer
- */
-list_t *list_parse_hash(const char *str, const char delim, const char kvdelim);
-
-/*!
- * @brief Extract tokens
- * 
- * @param str   Token string
- * @param delim Token delimiter
- * 
- * @return Token list pointer
- */
-list_t *list_parse_list(const char *str, const char delim);
-/*! @} list_parse */
-
-/*!
- * @defgroup list_search List search
- * @{
- */
-/*!
- * @brief Perform a linear search
- * 
- * @param list List pointer
- * @param key  Key to search for in \a list
- * 
- * @return Matching node pointer
- */
-list_node_t *list_search(list_t *list, char *key);
-/*! @} list_search */
-
-/*!
- * @defgroup list_validate List validation
- * @{
- */
-/*!
- * @brief Validate a token based flag list
- * 
- * @param link  Pointer to a linked flag list
- * @param clmod Clear flag modifier
- * 
- * @return 0 on success, -1 otherwise; errno will be set
- */
-int list_validate_flag(list_link_t *link, const char clmod);
-
-/*!
- * @brief Validate a token based list
- * 
- * @param link Pointer to a linked list
- * 
- * @return 0 on success, -1 otherwise; errno will be set
- */
-int list_validate(list_link_t *link);
-/*! @} list_validate */
-
-/*!
- * @defgroup list_convert List converters
- * @{
- */
-/*!
- * @brief Convert a token based flag list to flags and a set mask
- * 
- * @param link  Pointer to a linked list
- * @param clmod Clear flag modifier
- * @param flags Pointer to flags integer
- * @param mask  Pointer to mask integer
- */
-void list_list2flags(list_link_t *link, const char clmod,
-                     uint64_t *flags, uint64_t *mask);
-/*! @} list_convert */
-
-/*!
- * @defgroup list_defaults Default lists
- * @brief Default lists
- * 
- * @see list_alloc
- * @see list_key_alloc
- * @see LIST_DATA_ALLOC_TYPE
- * 
- * @{
- */
-/*!
- * @file bcaps-list.c
- * @brief System capability list
- */
-/*!
- * @brief Initialise system capability list
- * 
- * @see \htmlonly
- *   <a class="el" href="file:///usr/include/linux/capability.h">
- *     &lt;linux/capability.h&gt;
- *   </a>
- * \endhtmlonly
- * 
- * @return List of all system capabilities
- */
-list_t *bcaps_list_init(void);
-
-/*!
- * @file ccaps-list.c
- * @brief Context capability list
- */
-/*!
- * @brief Initialise context capability list
- * 
- * @see \htmlonly
- *   <a class="el" href="file:///usr/include/linux/vserver/context.h">
- *     &lt;linux/vserver/context.h&gt;
- *   </a>
- * \endhtmlonly
- * 
- * @return List of all context capabilities
- */
-list_t *ccaps_list_init(void);
-
-/*!
- * @file cflags-list.c
- * @brief Context flag list
- */
-/*!
- * @brief Initialise context flag list
- * 
- * @see \htmlonly
- *   <a class="el" href="file:///usr/include/linux/vserver/context.h">
- *     &lt;linux/vserver/context.h&gt;
- *   </a>
- * \endhtmlonly
- * 
- * @return List of all context flags
- */
-list_t *cflags_list_init(void);
-
-/*!
- * @file iattr-list.c
- * @brief Inode attribute list
- */
-/*!
- * @brief Initialise inode attribute list
- * 
- * @see \htmlonly
- *   <a class="el" href="file:///usr/include/linux/vserver/inode.h">
- *     &lt;linux/vserver/inode.h&gt;
- *   </a>
- * \endhtmlonly
- * 
- * @return List of all inode attributes
- */
-list_t *iattr_list_init(void);
-
-/*!
- * @file nflags-list.c
- * @brief Network context flag list
- */
-/*!
- * @brief Initialise network context flag list
- * 
- * @see \htmlonly
- *   <a class="el" href="file:///usr/include/linux/vserver/network.h">
- *     &lt;linux/vserver/network.h&gt;
- *   </a>
- * \endhtmlonly
- * 
- * @return List of all network context flags
- */
-list_t *nflags_list_init(void);
-
-/*!
- * @file rlimit-list.c
- * @brief Resource limit list
- */
-/*!
- * @brief Initialise resource limit list
- * 
- * @see \htmlonly
- *   <a class="el" href="file:///usr/include/linux/vserver/limit.h">
- *     &lt;linux/vserver/limit.h&gt;
- *   </a>
- * \endhtmlonly
- * @see \htmlonly
- *   <a class="el" href="file:///usr/include/sys/resource.h">
- *     &lt;sys/resource.h&gt;
- *   </a>
- * \endhtmlonly
- * 
- * @return List of all resource limits
- */
-list_t *rlimit_list_init(void);
-
-/*!
- * @file sched-list.c
- * @brief Scheduler mask list
- */
-/*!
- * @brief Initialise scheduler mask list
- * 
- * @see \htmlonly
- *   <a class="el" href="file:///usr/include/linux/vserver/sched_cmd.h">
- *     &lt;linux/vserver/sched_cmd.h&gt;
- *   </a>
- * \endhtmlonly
- * 
- * @return List of all scheduler masks
- */
-list_t *sched_list_init(void);
-
-/*!
- * @file vhi-list.c
- * @brief VHI name list
- */
-/*!
- * @brief Initialise VHI name list
- * 
- * @see \htmlonly
- *   <a class="el" href="file:///usr/include/linux/vserver/cvirt_cmd.h">
- *     &lt;linux/vserver/cvirt_cmd.h&gt;
- *   </a>
- * \endhtmlonly
- * 
- * @return List of all VHI names
- */
-list_t *vhi_list_init(void);
-/*! @} list_defaults */
-
-/*!
- * @defgroup list_iter List iteration
- * @brief Iterate through a list
- * 
- * @{
- */
-/*!
- * @brief Iterate through LIST using IDX as counter
- */
-#define list_foreach(LIST, IDX) for (size_t IDX = 0; IDX < (LIST)->n; IDX++)
-/*! @} list_iter */
-
-/*! @} list */
 
 #endif /* _VSERVER_H_ */

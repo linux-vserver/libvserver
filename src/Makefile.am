@@ -18,37 +18,20 @@
 
 INCLUDES = -I$(top_srcdir)
 
-EXTRA_DIST = versions
-
 noinst_HEADERS = syscall.h
 include_HEADERS = vserver.h
 
-lib_LTLIBRARIES = libvserver.la
+lib_LIBRARIES = libvserver.a
 
-libvserver_la_SOURCES = bcaps-list.c \
-                        ccaps-list.c \
-                        cflags-list.c \
-                        context.c \
-                        cvirt.c \
-                        debug.c \
-                        dlimit.c \
-                        iattr-list.c \
-                        inode.c \
-                        limit.c \
-                        list.c \
-                        namespace.c \
-                        network.c \
-                        nflags-list.c \
-                        personalityflag-list.c \
-                        personality-list.c \
-                        rlimit-list.c \
-                        sched-list.c \
-                        sched.c \
-                        signal.c \
-                        switch.c \
-                        syscall.c \
-                        vhi-list.c
-
-libvserver_la_LDFLAGS = -version-info 1:0:0 \
-                        -Wl,--version-script,$(srcdir)/versions -Wl,-O1 \
-                        -export-dynamic
+libvserver_a_SOURCES = context.c \
+                       cvirt.c \
+                       debug.c \
+                       dlimit.c \
+                       inode.c \
+                       limit.c \
+                       namespace.c \
+                       network.c \
+                       sched.c \
+                       signal.c \
+                       switch.c \
+                       syscall.c

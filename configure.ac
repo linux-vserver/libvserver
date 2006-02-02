@@ -29,44 +29,21 @@ AM_MAINTAINER_MODE
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_CPP
+AC_PROG_RANLIB
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-# HACK: see below why we do not check for libtool here
-#AC_PROG_LIBTOOL
 AC_PROG_EGREP
 
-# check for dietlibc
-case $host_cpu in
-	(i*86|athlon) min_diet_ver=0.25;;
-	(ia64|hppa*)  min_diet_ver=0.29;;
-	(*)           min_diet_ver=0.28;;
-esac
-
-AC_LV_DIETLIBC([$min_diet_ver])
-
-if test $ac_lv_have_dietlibc = yes; then
-	# HACK: libtool does not have cmdline options to build only
-	# static libraries; this can be done with the
-	# '--disable-shared' ./configure option only. We have to set
-	# this option which is evaluated by 'AC_PROG_LIBTOOL'
- 	# below.  Therefore, this macro must not be called earlier.
-	enable_shared=no
-	enable_static=yes
-	CC="${DIET} ${DIETFLAGS} ${CC}"
-fi
-
-# HACK: see comments at 'enable_static' above
-AC_PROG_LIBTOOL
-
 # Checks for libraries.
+AC_LV_DIETLIBC
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([stdint.h string.h])
+AC_CHECK_HEADERS([errno.h sys/resource.h sys/syscall.h],
+                 [], AC_MSG_ERROR([Required headers not found]))
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_TYPE_PID_T
 AC_C_CONST
 AC_C_INLINE
 
@@ -77,7 +54,6 @@ CFLAGS="${CFLAGS} -fno-omit-frame-pointer -W -Wall -std=gnu99 -pedantic"
 
 # Site settings
 AC_LV_SYSCALL_NR
-AC_LV_CHECK_KERNEL_HEADERS
 
 # Final info page
 AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
@@ -88,7 +64,6 @@ AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
 
                    prefix: $prefix
                build/host: $build/$host
-             use dietlibc: $ac_lv_have_dietlibc
            syscall number: $ac_lv_syscall_nr
 "])
 

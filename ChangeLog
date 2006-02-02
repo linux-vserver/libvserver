@@ -1,5 +1,16 @@
 # ChangeLog for libvserver
 
+  02 Feb 2006; Benedikt Böhm <hollow@gentoo.org> m4/dietlibc.m4, Makefile.svn,
+  configure.ac, Makefile.am:
+  Depend on dietlibc, no more glibc support!
+
+  02 Feb 2006; Benedikt Böhm <hollow@gentoo.org> src/vserver.h:
+  Provide local defines for caps/flags etc
+
+  02 Feb 2006; Benedikt Böhm <hollow@gentoo.org> -src/*-list.c, -src/list.c,
+  src/vserver.h, src/Makefile.am:
+  Remove list implementation
+
 *libvserver-1.0.2 (21 Jan 2006)
 
   21 Jan 2006; Benedikt Böhm <hollow@gentoo.org> configure.ac:
