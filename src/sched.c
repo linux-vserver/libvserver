@@ -29,16 +29,17 @@
 
 int vx_set_sched(xid_t xid, struct vx_sched *sched)
 {
-	struct vcmd_set_sched_v3 res;
+	struct vcmd_set_sched_v4 res;
 
-	res.set_mask      = sched->set_mask;
-	res.fill_rate     = sched->fill_rate;
-	res.interval      = sched->interval;
-	res.tokens        = sched->tokens;
-	res.tokens_min    = sched->tokens_min;
-	res.tokens_max    = sched->tokens_max;
-	res.priority_bias = sched->priority_bias;
+	res.set_mask   = sched->set_mask;
+	res.fill_rate  = sched->fill_rate;
+	res.interval   = sched->interval;
+	res.tokens     = sched->tokens;
+	res.tokens_min = sched->tokens_min;
+	res.tokens_max = sched->tokens_max;
+	res.prio_bias  = sched->prio_bias;
+	res.cpu_id     = sched->cpu_id;
+	res.bucket_id  = sched->bucket_id;
 
 	return sys_vserver(VCMD_set_sched, xid, &res);
 }
-

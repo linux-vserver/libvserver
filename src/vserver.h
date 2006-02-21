@@ -50,36 +50,6 @@
 int sys_vserver(uint32_t cmd, uint32_t id, void *data);
 
 /*!
- * @brief Clone syscall interface
- * 
- * @param flags       clone flags
- * @param child_stack Child stack size
- * 
- * @return Syscall return code
- * 
- * @see \htmlonly
- *   <a class="el" href="file:///usr/include/linux/sched.h">
- *     &lt;linux/sched.h&gt;
- *   </a>
- * \endhtmlonly
- */
-int sys_clone(int flags, void *child_stack);
-
-/*!
- * @brief Linux personality syscall interface
- * 
- * @param pers Personality type
- * 
- * @see \htmlonly
- *   <a class="el" href="file:///usr/include/linux/personality.h">
- *     &lt;linux/personality.h&gt;
- *   </a>
- * \endhtmlonly
- */
-int sys_personality(int pers);
-/*! @} syscall_context */
-
-/*!
  * @defgroup syscall_context Context commands
  * @{
  */
@@ -122,6 +92,7 @@ int sys_personality(int pers);
 #define CAP_LEASE            28
 #define CAP_AUDIT_WRITE      29
 #define CAP_AUDIT_CONTROL    30
+#define CAP_CONTEXT          31
 #endif
 
 /* context capabilities */
@@ -244,7 +215,6 @@ int vx_get_flags(xid_t xid, struct vx_flags *flags);
  */
 struct vx_caps {
 	uint64_t bcaps; /*!< System capabilities */
-	uint64_t bmask; /*!< System capability mask */
 	uint64_t ccaps; /*!< Context capabilities */
 	uint64_t cmask; /*!< Context capability mask */
 };
@@ -344,9 +314,9 @@ int vs_dump_history(void);
 
 /* flags */
 #ifndef _VX_DLIMIT_CMD_H
-#define CDLIM_UNSET     (0UL)
-#define CDLIM_INFINITY (~0UL)
-#define CDLIM_KEEP     (~1UL)
+#define CDLIM_UNSET    ((uint32_t)0UL)
+#define CDLIM_INFINITY ((uint32_t)~0UL)
+#define CDLIM_KEEP     ((uint32_t)~1UL)
 #endif
 
 /*!
@@ -415,7 +385,7 @@ int vx_get_dlimit(xid_t xid, struct vx_dlimit *dlimit);
 
 /* inode flags */
 #ifndef _VX_INODE_H
-#define IATTR_XID       0x01000000
+#define IATTR_TAG       0x01000000
 #define IATTR_ADMIN     0x00000001
 #define IATTR_WATCH     0x00000002
 #define IATTR_HIDE      0x00000004
@@ -718,25 +688,32 @@ int nx_get_caps(nid_t nid, struct nx_caps *caps);
 #ifndef _VX_SCHED_CMD_H
 #define VXSM_FILL_RATE  0x0001
 #define VXSM_INTERVAL   0x0002
+#define VXSM_FILL_RATE2 0x0004
+#define VXSM_INTERVAL2  0x0008
 #define VXSM_TOKENS     0x0010
 #define VXSM_TOKENS_MIN 0x0020
 #define VXSM_TOKENS_MAX 0x0040
 #define VXSM_PRIO_BIAS  0x0100
+#define VXSM_IDLE_TIME  0x0200
+#define VXSM_CPU_ID     0x1000
+#define VXSM_BUCKET_ID  0x2000
 
-#define SCHED_KEEP (-2)
+#define VXSM_V3_MASK    0x0173
 #endif
 
 /*!
  * @brief Scheduler values
  */
 struct vx_sched {
-	uint32_t set_mask;     /*!< Set mask */
-	int32_t fill_rate;     /*!< Fill rate */
-	int32_t interval;      /*!< Interval between fills */
-	int32_t tokens;        /*!< Number of tokens in the bucket */
-	int32_t tokens_min;    /*!< Minimum tokens to unhold the context */
-	int32_t tokens_max;    /*!< Maximum number of tokens in the bucket */
-	int32_t priority_bias; /*!< Priority bias (unused) */
+	uint32_t set_mask;  /*!< Set mask */
+	int32_t fill_rate;  /*!< Fill rate */
+	int32_t interval;   /*!< Interval between fills */
+	int32_t tokens;     /*!< Number of tokens in the bucket */
+	int32_t tokens_min; /*!< Minimum tokens to unhold the context */
+	int32_t tokens_max; /*!< Maximum number of tokens in the bucket */
+	int32_t prio_bias;  /*!< Priority bias */
+	int32_t cpu_id;     /*!< CPU ID (for SMP machines) */
+	int32_t bucket_id;   /*!< Token Bucket ID */
 };
 
 /*!
