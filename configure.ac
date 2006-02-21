@@ -18,8 +18,11 @@
 
 # Generic configuration
 AC_PREREQ(2.59)
-AC_INIT(libvserver, 1.0.3, [http://dev.croup.de/proj/libvserver])
+AC_INIT(libvserver, 1.0.3, hollow@gentoo.org)
 AC_CONFIG_HEADER([config.h])
+AC_CANONICAL_BUILD
+AC_CANONICAL_HOST
+AC_CANONICAL_TARGET
 AC_GNU_SOURCE
 
 # Automake
@@ -61,9 +64,11 @@ AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
                        CC: $CC ($($CC --version | head -n1))
                  CPPFLAGS: '$CPPFLAGS'
                    CFLAGS: '$CFLAGS'
+                    build: $build
+                     host: $host
+                   target: $target
 
                    prefix: $prefix
-               build/host: $build/$host
            syscall number: $ac_lv_syscall_nr
 "])
 

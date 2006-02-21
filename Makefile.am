@@ -25,8 +25,8 @@ noinst_HEADERS = linux/vserver/context_cmd.h \
                  linux/vserver/cvirt_cmd.h \
                  linux/vserver/cvirt_def.h \
                  linux/vserver/cvirt.h \
-                 linux/vserver/debug.h \
                  linux/vserver/debug_cmd.h \
+                 linux/vserver/debug.h \
                  linux/vserver/dlimit_cmd.h \
                  linux/vserver/dlimit.h \
                  linux/vserver/global.h \
@@ -34,6 +34,7 @@ noinst_HEADERS = linux/vserver/context_cmd.h \
                  linux/vserver/inode.h \
                  linux/vserver/limit_cmd.h \
                  linux/vserver/limit_def.h \
+                 linux/vserver/limit_int.h \
                  linux/vserver/limit.h \
                  linux/vserver/namespace_cmd.h \
                  linux/vserver/namespace.h \
@@ -45,4 +46,4 @@ noinst_HEADERS = linux/vserver/context_cmd.h \
                  linux/vserver/signal_cmd.h \
                  linux/vserver/signal.h \
                  linux/vserver/switch.h \
-                 linux/vserver/xid.h
+                 linux/vserver/tag.h

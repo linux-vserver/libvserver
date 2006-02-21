@@ -24,23 +24,8 @@
 
 #include <stdint.h>
 #include <errno.h>
-#include <sys/syscall.h>
-
-#undef _syscall0
-#undef _syscall1
-#undef _syscall2
-#undef _syscall3
-#undef _syscall4
-#undef _syscall5
-#undef _syscall6
 
 #include "syscall.h"
 
 /* vserver system call */
 _syscall3(int, vserver, uint32_t, cmd, uint32_t, id, void *, data)
-
-/* personality system call */
-_syscall1(int, personality, int, pers)
-
-/* clone syscall */
-_syscall2(int, clone, int, flags, void *, child_stack)
