@@ -2,7 +2,7 @@
 #define _VX_INODE_H
 
 
-#define IATTR_XID	0x01000000
+#define IATTR_TAG	0x01000000
 
 #define IATTR_ADMIN	0x00000001
 #define IATTR_WATCH	0x00000002
@@ -15,9 +15,8 @@
 
 #ifdef	__KERNEL__
 
-#ifndef	CONFIG_VSERVER
-#warning config options missing
-#endif
+#include <linux/config.h>
+
 
 #ifdef	CONFIG_VSERVER_PROC_SECURE
 #define IATTR_PROC_DEFAULT	( IATTR_ADMIN | IATTR_HIDE )

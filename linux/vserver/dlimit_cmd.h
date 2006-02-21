@@ -1,6 +1,9 @@
 #ifndef _VX_DLIMIT_CMD_H
 #define _VX_DLIMIT_CMD_H
 
+#include <linux/config.h>
+
+
 /*  dlimit vserver commands */
 
 #define VCMD_add_dlimit		VC_CMD(DLIMIT, 1, 0)
@@ -24,9 +27,9 @@ struct	vcmd_ctx_dlimit_v0 {
 	uint32_t flags;
 };
 
-#define CDLIM_UNSET             (0UL)
-#define CDLIM_INFINITY          (~0UL)
-#define CDLIM_KEEP              (~1UL)
+#define CDLIM_UNSET		((uint32_t)0UL)
+#define CDLIM_INFINITY		((uint32_t)~0UL)
+#define CDLIM_KEEP		((uint32_t)~1UL)
 
 #ifdef	__KERNEL__
 

@@ -1,6 +1,7 @@
 #ifndef _VX_CVIRT_DEF_H
 #define _VX_CVIRT_DEF_H
 
+#include <linux/config.h>
 #include <linux/jiffies.h>
 #include <linux/utsname.h>
 #include <linux/spinlock.h>
@@ -56,9 +57,11 @@ struct _vx_cvirt {
 
 	atomic_t total_forks;		/* number of forks so far */
 
-	struct _vx_usage_stat cpustat[NR_CPUS];
-
 	struct _vx_syslog syslog;
+};
+
+struct _vx_cvirt_pc {
+	struct _vx_usage_stat cpustat;
 };
 
 
@@ -88,6 +91,8 @@ struct _vx_sock_acc {
 
 struct _vx_cacct {
 	struct _vx_sock_acc sock[5][3];
+	atomic_t slab[8];
+	atomic_t page[6][8];
 };
 
 #ifdef CONFIG_VSERVER_DEBUG

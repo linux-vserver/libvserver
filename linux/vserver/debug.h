@@ -1,9 +1,8 @@
 #ifndef _VX_DEBUG_H
 #define _VX_DEBUG_H
 
-#ifndef	CONFIG_VSERVER
-#warning config options missing
-#endif
+#include <linux/config.h>
+
 
 #define VXD_CBIT(n,m)	(vx_debug_ ## n & (1 << (m)))
 #define VXD_CMIN(n,m)	(vx_debug_ ## n > (m))
@@ -12,6 +11,12 @@
 #define VXD_QPOS(v,p)	(((uint32_t)(v) >> ((p)*8)) & 0xFF)
 #define VXD_QUAD(v)	VXD_QPOS(v,0), VXD_QPOS(v,1),		\
 			VXD_QPOS(v,2), VXD_QPOS(v,3)
+#define VXF_QUAD	"%u.%u.%u.%u"
+
+#define VXD_DEV(d)	(d), (d)->bd_inode->i_ino,		\
+			imajor((d)->bd_inode), iminor((d)->bd_inode)
+#define VXF_DEV		"%p[%lu,%d:%d]"
+
 
 #define __FUNC__	__func__
 
@@ -21,6 +26,7 @@
 extern unsigned int vx_debug_switch;
 extern unsigned int vx_debug_xid;
 extern unsigned int vx_debug_nid;
+extern unsigned int vx_debug_tag;
 extern unsigned int vx_debug_net;
 extern unsigned int vx_debug_limit;
 extern unsigned int vx_debug_dlim;
@@ -71,6 +77,7 @@ void dump_vx_info_inactive(int);
 #define vx_debug_switch 0
 #define vx_debug_xid	0
 #define vx_debug_nid	0
+#define vx_debug_tag	0
 #define vx_debug_net	0
 #define vx_debug_limit	0
 #define vx_debug_dlim	0
@@ -155,8 +162,7 @@ void	__vxh_copy_vxi(struct _vx_hist_entry *entry, struct vx_info *vxi)
 }
 
 
-#define	__HERE__ \
-	({ __label__ __vxh_label; __vxh_label:; &&__vxh_label; })
+#define	__HERE__ current_text_addr()
 
 #define __VXH_BODY(__type, __data, __here)	\
 	struct _vx_hist_entry *entry;		\
@@ -289,7 +295,7 @@ extern void vxh_dump_history(void);
 #define vxd_assert(c,f,x...)	vxlprintk(!(c), \
 	"assertion [" f "] failed.", ##x, __FILE__, __LINE__)
 #else
-#define	vxd_assert_lock(l)	do { } while (0)
+#define vxd_assert_lock(l)	do { } while (0)
 #define vxd_assert(c,f,x...)	do { } while (0)
 #endif
 
