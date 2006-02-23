@@ -41,17 +41,22 @@ int vx_get_info(xid_t xid, struct vx_info *info)
 	if (rc == -1)
 		return rc;
 
-	info->xid     = res.xid;
-	info->initpid = res.initpid;
+	if (info != NULL) {
+		info->xid     = res.xid;
+		info->initpid = res.initpid;
+	}
 
 	return rc;
 }
 
 int vx_create(xid_t xid, struct vx_create_flags *create_flags)
 {
-	struct vcmd_ctx_create res;
+	struct vcmd_ctx_create res = {
+		.flagword = 0,
+	};
 
-	res.flagword = create_flags->flags;
+	if (create_flags != NULL)
+		res.flagword = create_flags->flags;
 
 	return sys_vserver(VCMD_ctx_create, xid, &res);
 }

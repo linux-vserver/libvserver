@@ -43,16 +43,20 @@ int nx_get_info(nid_t nid, struct nx_info *info)
 	if (rc == -1)
 		return rc;
 
-	info->nid = res.nid;
+	if (info != NULL)
+		info->nid = res.nid;
 
 	return rc;
 }
 
 int nx_create(nid_t nid, struct nx_create_flags *create_flags)
 {
-	struct vcmd_net_create res;
+	struct vcmd_net_create res = {
+		.flagsword = 0,
+	};
 
-	res.flagword = create_flags->flags;
+	if (create_flags != NULL)
+		res.flagword = create_flags->flags;
 
 	return sys_vserver(VCMD_net_create, nid, &res);
 }
