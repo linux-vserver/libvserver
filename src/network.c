@@ -52,7 +52,7 @@ int nx_get_info(nid_t nid, struct nx_info *info)
 int nx_create(nid_t nid, struct nx_create_flags *create_flags)
 {
 	struct vcmd_net_create res = {
-		.flagsword = 0,
+		.flagword = 0,
 	};
 
 	if (create_flags != NULL)
