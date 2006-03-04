@@ -61,9 +61,16 @@ int vx_create(xid_t xid, struct vx_create_flags *create_flags)
 	return sys_vserver(VCMD_ctx_create, xid, &res);
 }
 
-int vx_migrate(xid_t xid)
+int vx_migrate(xid_t xid, struct vx_migrate_flags *migrate_flags)
 {
-	return sys_vserver(VCMD_ctx_migrate, xid, NULL);
+	struct vcmd_ctx_migrate res = {
+		.flagword = 0,
+	};
+
+	if (migrate_flags != NULL)
+		res.flagword = migrate_flags->flags;
+
+	return sys_vserver(VCMD_ctx_migrate, xid, &res);
 }
 
 int vx_set_flags(xid_t xid, struct vx_flags *flags)

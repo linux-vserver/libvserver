@@ -56,6 +56,11 @@
 #define VXF_INIT_SET		(VXF_STATE_SETUP|VXF_STATE_INIT)
 
 
+/* context migration */
+
+#define VXM_SET_INIT		0x00000001
+#define VXM_SET_REAPER		0x00000002
+
 /* context caps */
 
 #define VXC_CAP_MASK		0x00000000
@@ -113,7 +118,8 @@ struct vx_info {
 	uint64_t vx_bcaps;			/* bounding caps (system) */
 	uint64_t vx_ccaps;			/* context caps (vserver) */
 
-	pid_t vx_initpid;			/* PID of fake init process */
+	struct task_struct *vx_reaper;		/* guest reaper process */
+	pid_t vx_initpid;			/* PID of guest init */
 
 	wait_queue_head_t vx_wait;		/* context exit waitqueue */
 

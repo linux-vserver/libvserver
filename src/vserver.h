@@ -137,6 +137,12 @@ int sys_vserver(uint32_t cmd, uint32_t id, void *data);
 #define VXF_IGNEG_NICE   (1ULL<<52)
 #endif
 
+/* migration flags */
+#ifndef _VX_CONTEXT_H
+#define VXM_SET_INIT     0x00000001
+#define VXM_SET_REAPER   0x00000002
+#endif
+
 typedef uint32_t xid_t; /*!< Context ID type */
 
 /*!
@@ -180,11 +186,18 @@ struct vx_create_flags {
 int vx_create(xid_t xid, struct vx_create_flags *create_flags);
 
 /*!
+ * @brief Process migration flags
+ */
+struct vx_migrate_flags {
+	uint64_t flags; /*!< Process flags */
+};
+
+/*!
  * @brief Migrate to an existing context
  * 
  * @param xid Context ID
  */
-int vx_migrate(xid_t xid);
+int vx_migrate(xid_t xid, struct vx_migrate_flags *migrate_flags);
 
 /*!
  * @brief Context flags
