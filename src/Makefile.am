@@ -18,7 +18,8 @@
 
 INCLUDES = -I$(top_srcdir)
 
-noinst_HEADERS = syscall.h
+noinst_HEADERS = memcpy.h \
+                 syscall.h
 include_HEADERS = vserver.h
 
 lib_LTLIBRARIES = libvserver.la

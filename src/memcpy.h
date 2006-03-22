@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2005 by the libvserver team                                 *
+ *   Copyright 2005 The libvserver Team                                    *
  *   See AUTHORS for details                                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,37 +18,53 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
+#ifndef _MEMCPY_H
+#define _MEMCPY_H
+
+#if __WORDSIZE == 64
+# define STRALIGN(x) (((unsigned long)x&7)?8-((unsigned long)x&7):0)
+#else /* __WORDSIZE == 32 */
+# define STRALIGN(x) (((unsigned long)x&3)?4-((unsigned long)x&3):0)
 #endif
 
-#include "linux/vserver/switch.h"
-#include "linux/vserver/cvirt_cmd.h"
+#define UNALIGNED(x,y) (((unsigned long)x & (sizeof (unsigned long)-1)) ^ ((unsigned long)y & (sizeof (unsigned long)-1)))
 
-#include "vserver.h"
-#include "memcpy.h"
-
-int vx_set_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name)
+static inline
+void *Xmemcpy(void *dst, const void *src, size_t n)
 {
-	struct vcmd_vhi_name_v0 res;
-
-	res.field = vhi_name->field;
-	Xmemcpy(res.name, vhi_name->name, sizeof res.name);
-
-	return sys_vserver(VCMD_set_vhi_name, xid, &res);
-}
-
-int vx_get_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name)
-{
-	struct vcmd_vhi_name_v0 res;
-
-	res.field = vhi_name->field;
-	int rc = sys_vserver(VCMD_get_vhi_name, xid, &res);
+	void *res = dst;
+	unsigned char *c1, *c2;
+	int tmp;
+	unsigned long  *lx1 = NULL;
+	const unsigned long *lx2 = NULL;
 	
-	if (rc == -1)
-		return rc;
-
-	Xmemcpy(vhi_name->name, res.name, sizeof vhi_name->name);
-
-	return rc;
+	if (!UNALIGNED(dst, src) && n > sizeof(unsigned long)) {
+		if ((tmp = STRALIGN(dst))) {
+			c1 = (unsigned char *) dst;
+			c2 = (unsigned char *) src;
+			while (tmp-- && n--)
+				*c1++ = *c2++;
+			
+			if (n == (size_t) - 1)
+				return (res);
+		}
+		
+		lx1 = (unsigned long *) dst;
+		lx2 = (unsigned long *) src;
+		
+		for (; n >= sizeof(unsigned long); n -= sizeof(unsigned long))
+			*lx1++ = *lx2++;
+	}
+	
+	if (n) {
+		c1 = (unsigned char *) (lx1?lx1:dst);
+		c2 = (unsigned char *) (lx1?lx2:src);
+		
+		while (n--)
+			*c1++ = *c2++;
+	}
+	
+	return (res);
 }
+
+#endif /* _MEMCPY_H */
