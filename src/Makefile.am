@@ -21,17 +21,19 @@ INCLUDES = -I$(top_srcdir)
 noinst_HEADERS = syscall.h
 include_HEADERS = vserver.h
 
-lib_LIBRARIES = libvserver.a
+lib_LTLIBRARIES = libvserver.la
 
-libvserver_a_SOURCES = context.c \
-                       cvirt.c \
-                       debug.c \
-                       dlimit.c \
-                       inode.c \
-                       limit.c \
-                       namespace.c \
-                       network.c \
-                       sched.c \
-                       signal.c \
-                       switch.c \
-                       syscall.c
+libvserver_la_SOURCES = context.c \
+                        cvirt.c \
+                        debug.c \
+                        dlimit.c \
+                        inode.c \
+                        limit.c \
+                        namespace.c \
+                        network.c \
+                        sched.c \
+                        signal.c \
+                        switch.c \
+                        syscall.c
+
+libvserver_la_LDFLAGS = -version-info 2:0:0

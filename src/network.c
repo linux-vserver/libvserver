@@ -22,12 +22,13 @@
 #include <config.h>
 #endif
 
-#include "vserver.h"
+#include <string.h>
+#include <stdint.h>
 
 #include "linux/vserver/switch.h"
 #include "linux/vserver/network_cmd.h"
 
-#include <string.h>
+#include "vserver.h"
 
 int nx_get_task_nid(pid_t pid)
 {

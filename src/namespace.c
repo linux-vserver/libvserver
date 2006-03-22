@@ -22,10 +22,10 @@
 #include <config.h>
 #endif
 
-#include "vserver.h"
-
 #include "linux/vserver/switch.h"
 #include "linux/vserver/namespace_cmd.h"
+
+#include "vserver.h"
 
 int vx_enter_namespace(xid_t xid)
 {

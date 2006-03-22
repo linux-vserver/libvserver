@@ -25,9 +25,6 @@
 #ifndef _VSERVER_H
 #define _VSERVER_H
 
-#include <stdint.h>
-#include <sys/types.h>
-
 /*!
  * @file syscall.c
  * @brief System calls
@@ -726,7 +723,7 @@ struct vx_sched {
 	int32_t tokens_max; /*!< Maximum number of tokens in the bucket */
 	int32_t prio_bias;  /*!< Priority bias */
 	int32_t cpu_id;     /*!< CPU ID (for SMP machines) */
-	int32_t bucket_id;   /*!< Token Bucket ID */
+	int32_t bucket_id;  /*!< Token Bucket ID */
 };
 
 /*!

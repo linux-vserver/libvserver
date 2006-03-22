@@ -22,10 +22,10 @@
 #include <config.h>
 #endif
 
-#include "vserver.h"
-
 #include "linux/vserver/switch.h"
 #include "linux/vserver/context_cmd.h"
+
+#include "vserver.h"
 
 int vx_get_task_xid(pid_t pid)
 {

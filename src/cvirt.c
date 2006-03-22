@@ -22,12 +22,13 @@
 #include <config.h>
 #endif
 
+#include <string.h>
+#include <stdint.h>
+
 #include "linux/vserver/switch.h"
 #include "linux/vserver/cvirt_cmd.h"
 
 #include "vserver.h"
-
-#include <string.h>
 
 int vx_set_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name)
 {

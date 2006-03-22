@@ -22,10 +22,10 @@
 #include <config.h>
 #endif
 
-#include "vserver.h"
-
 #include "linux/vserver/switch.h"
 #include "linux/vserver/limit_cmd.h"
+
+#include "vserver.h"
 
 int vx_set_rlimit(xid_t xid, struct vx_rlimit *rlimit)
 {
