@@ -22,11 +22,12 @@
 #include <config.h>
 #endif
 
-#include "linux/vserver/switch.h"
-#include "linux/vserver/network_cmd.h"
+#include <string.h>
 
 #include "vserver.h"
-#include "memcpy.h"
+
+#include "linux/vserver/switch.h"
+#include "linux/vserver/network_cmd.h"
 
 int nx_get_task_nid(pid_t pid)
 {
@@ -71,8 +72,8 @@ int nx_add_addr(nid_t nid, struct nx_addr *net)
 
 	res.type = net->type;
 	res.count = net->count;
-	Xmemcpy(res.ip, net->ip, sizeof res.ip);
-	Xmemcpy(res.mask, net->mask, sizeof res.mask);
+	memcpy(res.ip, net->ip, sizeof res.ip);
+	memcpy(res.mask, net->mask, sizeof res.mask);
 
 	return sys_vserver(VCMD_net_add, nid, &res);
 }
@@ -83,8 +84,8 @@ int nx_rem_addr(nid_t nid, struct nx_addr *net)
 
 	res.type = net->type;
 	res.count = net->count;
-	Xmemcpy(res.ip, net->ip, sizeof res.ip);
-	Xmemcpy(res.mask, net->mask, sizeof res.mask);
+	memcpy(res.ip, net->ip, sizeof res.ip);
+	memcpy(res.mask, net->mask, sizeof res.mask);
 
 	return sys_vserver(VCMD_net_remove, nid, &res);
 }

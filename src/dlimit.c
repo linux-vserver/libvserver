@@ -22,10 +22,10 @@
 #include <config.h>
 #endif
 
+#include "vserver.h"
+
 #include "linux/vserver/switch.h"
 #include "linux/vserver/dlimit_cmd.h"
-
-#include "vserver.h"
 
 int vx_add_dlimit(xid_t xid, struct vx_dlimit_base *dlimit_base)
 {

@@ -25,6 +25,12 @@
 #ifndef _VSERVER_H
 #define _VSERVER_H
 
+#include <sys/types.h>
+#include <stdint.h>
+
+#define LIBVSERVER_API_MAJOR 2
+#define LIBVSERVER_API_MINOR 0
+
 /*!
  * @file syscall.c
  * @brief System calls
@@ -763,9 +769,9 @@ int vx_kill(xid_t xid, struct vx_kill_opts *kill_opts);
 /*!
  * @brief Wait options
  */
-struct vx_wait_opts {
-	int32_t a; /*!< Process A */
-	int32_t b; /*!< Process B */
+struct vx_wait_result {
+	int32_t reboot_cmd; /*!< context reboot command */
+	int32_t exit_code;  /*!< context exit code */
 };
 
 /*!
@@ -774,7 +780,7 @@ struct vx_wait_opts {
  * @param xid       Context ID
  * @param wait_opts Wait options
  */
-int vx_wait(xid_t xid, struct vx_wait_opts *wait_opts);
+int vx_wait(xid_t xid, struct vx_wait_result *wait_result);
 /*! @} syscall_signal */
 
 

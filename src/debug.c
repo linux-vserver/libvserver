@@ -22,10 +22,10 @@
 #include <config.h>
 #endif
 
+#include "vserver.h"
+
 #include "linux/vserver/switch.h"
 #include "linux/vserver/debug_cmd.h"
-
-#include "vserver.h"
 
 int vs_dump_history(void)
 {

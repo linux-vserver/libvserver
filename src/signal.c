@@ -22,10 +22,10 @@
 #include <config.h>
 #endif
 
+#include "vserver.h"
+
 #include "linux/vserver/switch.h"
 #include "linux/vserver/signal_cmd.h"
-
-#include "vserver.h"
 
 int vx_kill(xid_t xid, struct vx_kill_opts *kill_opts)
 {
@@ -37,12 +37,24 @@ int vx_kill(xid_t xid, struct vx_kill_opts *kill_opts)
 	return sys_vserver(VCMD_ctx_kill, xid, &res);
 }
 
-int vx_wait(xid_t xid, struct vx_wait_opts *wait_opts)
+int vx_wait(xid_t xid, struct vx_wait_result *wait_result)
 {
 	struct vcmd_wait_exit_v0 res;
 	
-	res.a = wait_opts->a;
-	res.b = wait_opts->b;
+	int rc, version = vs_get_version();
 	
-	return sys_vserver(VCMD_wait_exit, xid, &res);
+	if (version == -1)
+		return -1;
+	
+	rc = sys_vserver(VCMD_wait_exit, xid, &res);
+	
+	if (rc == -1)
+		return -1;
+	
+	if (wait_result != NULL) {
+		wait_result->reboot_cmd = res.reboot_cmd;
+		wait_result->exit_code  = res.exit_code;
+	}
+	
+	return rc;
 }

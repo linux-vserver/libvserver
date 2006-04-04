@@ -22,18 +22,20 @@
 #include <config.h>
 #endif
 
+#include <stdint.h>
+#include <string.h>
+
 #include "linux/vserver/switch.h"
 #include "linux/vserver/cvirt_cmd.h"
 
 #include "vserver.h"
-#include "memcpy.h"
 
 int vx_set_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name)
 {
 	struct vcmd_vhi_name_v0 res;
 
 	res.field = vhi_name->field;
-	Xmemcpy(res.name, vhi_name->name, sizeof res.name);
+	memcpy(res.name, vhi_name->name, sizeof res.name);
 
 	return sys_vserver(VCMD_set_vhi_name, xid, &res);
 }
@@ -48,7 +50,7 @@ int vx_get_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name)
 	if (rc == -1)
 		return rc;
 
-	Xmemcpy(vhi_name->name, res.name, sizeof vhi_name->name);
+	memcpy(vhi_name->name, res.name, sizeof vhi_name->name);
 
 	return rc;
 }
