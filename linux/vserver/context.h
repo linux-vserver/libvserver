@@ -1,7 +1,6 @@
 #ifndef _VX_CONTEXT_H
 #define _VX_CONTEXT_H
 
-#include <linux/config.h>
 #include <linux/types.h>
 
 
@@ -44,7 +43,7 @@
 
 #define VXF_SC_HELPER		(1ULL<<36)
 #define VXF_REBOOT_KILL		(1ULL<<37)
-#define VXF_PERSISTANT		(1ULL<<38)
+#define VXF_PERSISTENT		(1ULL<<38)
 
 #define VXF_FORK_RSS		(1ULL<<48)
 #define VXF_PROLIFIC		(1ULL<<49)
@@ -121,8 +120,6 @@ struct vx_info {
 	struct task_struct *vx_reaper;		/* guest reaper process */
 	pid_t vx_initpid;			/* PID of guest init */
 
-	wait_queue_head_t vx_wait;		/* context exit waitqueue */
-
 	struct _vx_limit limit;			/* vserver limits */
 	struct _vx_sched sched;			/* vserver scheduler */
 	struct _vx_cvirt cvirt;			/* virtual/bias stuff */
@@ -134,12 +131,16 @@ struct vx_info {
 	struct _vx_info_pc *ptr_pc;		/* per cpu array */
 #endif
 
+	wait_queue_head_t vx_wait;		/* context exit waitqueue */
+	int reboot_cmd;				/* last sys_reboot() cmd */
+	int exit_code;				/* last process exit code */
+
 	char vx_name[65];			/* vserver name */
 };
 
 #ifndef CONFIG_SMP
 #define	vx_ptr_pc(vxi)		(&(vxi)->info_pc)
-#define	vx_per_cpu(vxi, v, id)	per_cpu_ptr(vx_ptr_pc(vxi), id)->v
+#define	vx_per_cpu(vxi, v, id)	vx_ptr_pc(vxi)->v
 #else
 #define	vx_ptr_pc(vxi)		((vxi)->ptr_pc)
 #define	vx_per_cpu(vxi, v, id)	per_cpu_ptr(vx_ptr_pc(vxi), id)->v
@@ -159,6 +160,7 @@ struct vx_info_save {
 #define VXS_HASHED	0x0001
 #define VXS_PAUSED	0x0010
 #define VXS_SHUTDOWN	0x0100
+#define VXS_HELPER	0x1000
 #define VXS_RELEASED	0x8000
 
 /* check conditions */

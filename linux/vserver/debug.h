@@ -1,8 +1,6 @@
 #ifndef _VX_DEBUG_H
 #define _VX_DEBUG_H
 
-#include <linux/config.h>
-
 
 #define VXD_CBIT(n,m)	(vx_debug_ ## n & (1 << (m)))
 #define VXD_CMIN(n,m)	(vx_debug_ ## n > (m))
@@ -29,6 +27,7 @@ extern unsigned int vx_debug_nid;
 extern unsigned int vx_debug_tag;
 extern unsigned int vx_debug_net;
 extern unsigned int vx_debug_limit;
+extern unsigned int vx_debug_cres;
 extern unsigned int vx_debug_dlim;
 extern unsigned int vx_debug_quota;
 extern unsigned int vx_debug_cvirt;
@@ -80,6 +79,7 @@ void dump_vx_info_inactive(int);
 #define vx_debug_tag	0
 #define vx_debug_net	0
 #define vx_debug_limit	0
+#define vx_debug_cres	0
 #define vx_debug_dlim	0
 #define vx_debug_cvirt	0
 
