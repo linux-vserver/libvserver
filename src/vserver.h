@@ -134,7 +134,7 @@ int sys_vserver(uint32_t cmd, uint32_t id, void *data);
 #define VXF_STATE_INIT   (1ULL<<33)
 #define VXF_SC_HELPER    (1ULL<<36)
 #define VXF_REBOOT_KILL  (1ULL<<37)
-#define VXF_PERSISTANT   (1ULL<<38)
+#define VXF_PERSISTENT   (1ULL<<38)
 #define VXF_FORK_RSS     (1ULL<<48)
 #define VXF_PROLIFIC     (1ULL<<49)
 #define VXF_IGNEG_NICE   (1ULL<<52)
@@ -556,7 +556,7 @@ int vx_set_namespace(xid_t xid);
 #ifndef _VX_NETWORK_H
 #define NXF_STATE_SETUP (1ULL<<32)
 #define NXF_SC_HELPER   (1ULL<<36)
-#define NXF_PERSISTANT  (1ULL<<38)
+#define NXF_PERSISTENT  (1ULL<<38)
 #endif
 
 /* address types */
