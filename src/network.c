@@ -66,26 +66,26 @@ int nx_migrate(nid_t nid)
 	return sys_vserver(VCMD_net_migrate, nid, NULL);
 }
 
-int nx_add_addr(nid_t nid, struct nx_addr *net)
+int nx_add_addr(nid_t nid, struct nx_addr *addr)
 {
 	struct vcmd_net_addr_v0 res;
 
-	res.type = net->type;
-	res.count = net->count;
-	memcpy(res.ip, net->ip, sizeof res.ip);
-	memcpy(res.mask, net->mask, sizeof res.mask);
+	res.type = addr->type;
+	res.count = addr->count;
+	memcpy(res.ip, addr->ip, sizeof res.ip);
+	memcpy(res.mask, addr->mask, sizeof res.mask);
 
 	return sys_vserver(VCMD_net_add, nid, &res);
 }
 
-int nx_rem_addr(nid_t nid, struct nx_addr *net)
+int nx_rem_addr(nid_t nid, struct nx_addr *addr)
 {
 	struct vcmd_net_addr_v0 res;
 
-	res.type = net->type;
-	res.count = net->count;
-	memcpy(res.ip, net->ip, sizeof res.ip);
-	memcpy(res.mask, net->mask, sizeof res.mask);
+	res.type = addr->type;
+	res.count = addr->count;
+	memcpy(res.ip, addr->ip, sizeof res.ip);
+	memcpy(res.mask, addr->mask, sizeof res.mask);
 
 	return sys_vserver(VCMD_net_remove, nid, &res);
 }
