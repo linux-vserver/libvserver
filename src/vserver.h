@@ -100,17 +100,23 @@ int vs_get_version(void);
 #define VXC_SET_UTSNAME    0x00000001  /*!< Allow setdomainname(2) and sethostname(2) */
 #define VXC_SET_RLIMIT     0x00000002  /*!< Allow setrlimit(2) */
 #define VXC_RAW_ICMP       0x00000100  /*!< Allow raw ICMP sockets */
-#define VXC_SYSLOG         0x00001000  /*!< ?? */
+#define VXC_SYSLOG         0x00001000  /*!< Allow syslog(2) */
 #define VXC_SECURE_MOUNT   0x00010000  /*!< Allow secure mount(2) */
 #define VXC_SECURE_REMOUNT 0x00020000  /*!< Allow secure remount */
-#define VXC_BINARY_MOUNT   0x00040000  /*!< ?? */
+#define VXC_BINARY_MOUNT   0x00040000  /*!< Allow binary/network mounts */
 #define VXC_QUOTA_CTL      0x00100000  /*!< Allow quota ioctl */
 
-#define VXF_INFO_INIT    0x00000010  /*!< ?? */
-#define VXF_INFO_HIDE    0x00000020  /*!< ?? */
+#define VXF_INFO_LOCK    0x00000001  /*!< Prohibit further context switches (L) */
+#define VXF_INFO_SCHED   0x00000002  /*!< Account all processes as one (L) */
+#define VXF_INFO_NPROC   0x00000004  /*!< Apply process limits to context (L) */
+#define VXF_INFO_PRIVATE 0x00000008  /*!< Context cannot be entered (L) */
+#define VXF_INFO_INIT    0x00000010  /*!< Show a fake init process */
+#define VXF_INFO_HIDE    0x00000020  /*!< Hide context information in task status */
+#define VXF_INFO_ULIMIT  0x00000040  /*!< Apply ulimits to context (L) */
+#define VXF_INFO_NSPACE  0x00000080  /*!< Use private namespace (L) */
 #define VXF_SCHED_HARD   0x00000100  /*!< Enable hard scheduler */
 #define VXF_SCHED_PRIO   0x00000200  /*!< Enable priority scheduler */
-#define VXF_SCHED_PAUSE  0x00000400  /*!< Pause all processes */
+#define VXF_SCHED_PAUSE  0x00000400  /*!< Pause context (unschedule) */
 #define VXF_VIRT_MEM     0x00010000  /*!< Virtualize memory information */
 #define VXF_VIRT_UPTIME  0x00020000  /*!< Virtualize uptime information */
 #define VXF_VIRT_CPU     0x00040000  /*!< Virtualize cpu usage information */
@@ -122,9 +128,9 @@ int vs_get_version(void);
 #define VXF_SC_HELPER    (1ULL<<36)  /*!< Context state change helper */
 #define VXF_REBOOT_KILL  (1ULL<<37)  /*!< Kill all processes on reboot(2) */
 #define VXF_PERSISTENT   (1ULL<<38)  /*!< Make context persistent */
-#define VXF_FORK_RSS     (1ULL<<48)  /*!< ?? */
-#define VXF_PROLIFIC     (1ULL<<49)  /*!< ?? */
-#define VXF_IGNEG_NICE   (1ULL<<52)  /*!< ?? */
+#define VXF_FORK_RSS     (1ULL<<48)  /*!< Block fork when over RSS */
+#define VXF_PROLIFIC     (1ULL<<49)  /*!< Allow context to create new contexts */
+#define VXF_IGNEG_NICE   (1ULL<<52)  /*!< Ignore priority raise */
 
 #define VXM_SET_INIT     0x00000001  /*!< Make current process the new init */
 #define VXM_SET_REAPER   0x00000002  /*!< Make current process the new reaper */
@@ -365,7 +371,7 @@ int vx_get_dlimit(xid_t xid, struct vx_dlimit *dlimit);
  * @{
  */
 #ifndef _VX_INODE_H
-#define IATTR_TAG       0x01000000  /*!< Context ID type */
+#define IATTR_TAG       0x01000000  /*!< File is xid tagged */
 #define IATTR_ADMIN     0x00000001  /*!< Accessible in xid=0 (only for /proc) */
 #define IATTR_WATCH     0x00000002  /*!< Accessible in xid=1 (only for /proc) */
 #define IATTR_HIDE      0x00000004  /*!< Not Accessible in xid!=(0|1) (only for /proc) */
@@ -416,9 +422,9 @@ int vx_get_iattr(struct vx_iattr *iattr);
 #ifndef _VX_LIMIT_H
 #define VLIMIT_NSOCK  16  /*!< Number of open sockets */
 #define VLIMIT_OPENFD 17  /*!< Number of open file descriptors */
-#define VLIMIT_ANON   18  /*!< ?? */
+#define VLIMIT_ANON   18  /*!< Amount of anonymous memory */
 #define VLIMIT_SHMEM  19  /*!< Amount of shared memory */
-#define VLIMIT_SEMARY 20  /*!< ?? */
+#define VLIMIT_SEMARY 20  /*!< Size of semary */
 #define VLIMIT_NSEMS  21  /*!< Number of semaphores */
 #endif
 
@@ -502,8 +508,8 @@ int vx_set_namespace(xid_t xid);
 
 #define NXA_TYPE_IPV4  1      /*!< Address is IPv4 */
 #define NXA_TYPE_IPV6  2      /*!< Address is IPv6 */
-#define NXA_MOD_BCAST (1<<8)  /*!< ?? */
-#define NXA_TYPE_ANY  (~0)    /*!< ?? */
+#define NXA_MOD_BCAST (1<<8)  /*!< Address is Broadcast*/
+#define NXA_TYPE_ANY  (~0)    /*!< Matches any address */
 #endif
 
 typedef uint32_t nid_t; /*!< Network context ID type */
