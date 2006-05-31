@@ -98,29 +98,52 @@ int vx_get_flags(xid_t xid, struct vx_flags *flags)
 	return rc;
 }
 
-int vx_set_caps(xid_t xid, struct vx_caps *caps)
+int vx_set_bcaps(xid_t xid, struct vx_bcaps *bcaps)
 {
-	struct vcmd_ctx_caps_v0 res;
+	struct vcmd_bcaps res;
 
-	res.bcaps = caps->bcaps;
-	res.ccaps = caps->ccaps;
-	res.cmask = caps->cmask;
+	res.bcaps = bcaps->bcaps;
+	res.bmask = bcaps->bmask;
+
+	return sys_vserver(VCMD_set_bcaps, xid, &res);
+}
+
+int vx_get_bcaps(xid_t xid, struct vx_bcaps *bcaps)
+{
+	struct vcmd_bcaps res;
+
+	int rc = sys_vserver(VCMD_get_bcaps, xid, &res);
+
+	if (rc == -1)
+		return rc;
+
+	bcaps->bcaps = res.bcaps;
+	bcaps->bmask = res.bmask;
+
+	return rc;
+}
+
+int vx_set_ccaps(xid_t xid, struct vx_ccaps *ccaps)
+{
+	struct vcmd_ctx_caps_v1 res;
+
+	res.ccaps = ccaps->ccaps;
+	res.cmask = ccaps->cmask;
 
 	return sys_vserver(VCMD_set_ccaps, xid, &res);
 }
 
-int vx_get_caps(xid_t xid, struct vx_caps *caps)
+int vx_get_ccaps(xid_t xid, struct vx_ccaps *ccaps)
 {
-	struct vcmd_ctx_caps_v0 res;
+	struct vcmd_ctx_caps_v1 res;
 
 	int rc = sys_vserver(VCMD_get_ccaps, xid, &res);
 
 	if (rc == -1)
 		return rc;
 
-	caps->bcaps = res.bcaps;
-	caps->ccaps = res.ccaps;
-	caps->cmask = res.cmask;
+	ccaps->ccaps = res.ccaps;
+	ccaps->cmask = res.cmask;
 
 	return rc;
 }

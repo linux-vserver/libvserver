@@ -22,10 +22,18 @@
 #include <config.h>
 #endif
 
+#include <sched.h>
+#include <signal.h>
+
 #include "vserver.h"
 
 #include "linux/vserver/switch.h"
 #include "linux/vserver/namespace_cmd.h"
+
+int vx_clone_namespace(void)
+{
+	return sys_clone(CLONE_NEWNS|SIGCHLD, 0);
+}
 
 int vx_enter_namespace(xid_t xid)
 {

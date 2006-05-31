@@ -49,6 +49,18 @@
 int sys_vserver(uint32_t cmd, uint32_t id, void *data);
 
 /*!
+ * @brief Clone system call
+ * 
+ * @param flags Command number
+ * @param stack Context ID (sometimes process id)
+ * 
+ * @return Process ID in parent, 0 in child, -1 on error
+ * 
+ * @see clone(2)
+ */
+int sys_clone(int flags, void *stack);
+
+/*!
  * @brief Get vserver version of running kernel
  * 
  * @return API version
@@ -121,6 +133,7 @@ int vs_get_version(void);
 #define VXF_VIRT_UPTIME  0x00020000  /*!< Virtualize uptime information */
 #define VXF_VIRT_CPU     0x00040000  /*!< Virtualize cpu usage information */
 #define VXF_VIRT_LOAD    0x00080000  /*!< Virtualize load average information */
+#define VXF_VIRT_TIME    0x00100000  /*!< Allow per guest time offsets */
 #define VXF_HIDE_MOUNT   0x01000000  /*!< Hide entries in /proc/$pid/mounts */
 #define VXF_HIDE_NETIF   0x02000000  /*!< Hide foreign network interfaces */
 #define VXF_STATE_SETUP  (1ULL<<32)  /*!< Context is in setup state */
@@ -159,7 +172,7 @@ struct vx_info {
  * @brief Get context information
  * 
  * @param xid  Context ID
- * @param info Empty information struct to be filled
+ * @param info Empty vx_info struct to be filled
  */
 int vx_get_info(xid_t xid, struct vx_info *info);
 
@@ -213,15 +226,38 @@ int vx_set_flags(xid_t xid, struct vx_flags *flags);
  * @brief Get context flags
  * 
  * @param xid   Context ID
- * @param flags Empty flags struct to be filled
+ * @param flags Empty vx_flags struct to be filled
  */
 int vx_get_flags(xid_t xid, struct vx_flags *flags);
 
 /*!
+ * @brief System capabilities
+ */
+struct vx_bcaps {
+	uint64_t bcaps; /*!< System capabilities */
+	uint64_t bmask; /*!< System capability mask */
+};
+
+/*!
+ * @brief Set system capabilities
+ * 
+ * @param xid   Context ID
+ * @param bcaps System capabilities
+ */
+int vx_set_bcaps(xid_t xid, struct vx_bcaps *bcaps);
+
+/*!
+ * @brief Get system capabilities
+ * 
+ * @param xid   Context ID
+ * @param bcaps Empty vx_bcaps struct to be filled
+ */
+int vx_get_bcaps(xid_t xid, struct vx_bcaps *bcaps);
+
+/*!
  * @brief Context capabilities
  */
-struct vx_caps {
-	uint64_t bcaps; /*!< System capabilities */
+struct vx_ccaps {
 	uint64_t ccaps; /*!< Context capabilities */
 	uint64_t cmask; /*!< Context capability mask */
 };
@@ -229,18 +265,18 @@ struct vx_caps {
 /*!
  * @brief Set context capabilities
  * 
- * @param xid  Context ID
- * @param caps Context capabilities
+ * @param xid   Context ID
+ * @param ccaps Context capabilities
  */
-int vx_set_caps(xid_t xid, struct vx_caps *caps);
+int vx_set_ccaps(xid_t xid, struct vx_ccaps *ccaps);
 
 /*!
  * @brief Get context capabilities
  * 
- * @param xid  Context ID
- * @param caps Empty caps struct to be filled
+ * @param xid   Context ID
+ * @param ccaps Empty vx_ccaps struct to be filled
  */
-int vx_get_caps(xid_t xid, struct vx_caps *caps);
+int vx_get_ccaps(xid_t xid, struct vx_ccaps *ccaps);
 /*! @} syscall_context */
 
 
@@ -285,7 +321,7 @@ int vx_set_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name);
  * @brief Get VHI names
  * 
  * @param xid      Context ID
- * @param vhi_name Empty VHI names struct to be filled
+ * @param vhi_name Empty vx_vhi_name struct to be filled
  */
 int vx_get_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name);
 /*! @} syscall_cvirt */
@@ -360,7 +396,7 @@ int vx_set_dlimit(xid_t xid, struct vx_dlimit *dlimit);
  * @brief Get disk limit values
  * 
  * @param xid    Context ID
- * @param dlimit Empty disk limit values struct to be filled
+ * @param dlimit Empty vx_dlimit struct to be filled
  */
 int vx_get_dlimit(xid_t xid, struct vx_dlimit *dlimit);
 /*! @} syscall_dlimit */
@@ -426,6 +462,7 @@ int vx_get_iattr(struct vx_iattr *iattr);
 #define VLIMIT_SHMEM  19  /*!< Amount of shared memory */
 #define VLIMIT_SEMARY 20  /*!< Size of semary */
 #define VLIMIT_NSEMS  21  /*!< Number of semaphores */
+#define VLIMIT_DENTRY 22  /*!< Size of the dentry cache */
 #endif
 
 /*!
@@ -450,7 +487,7 @@ int vx_set_rlimit(xid_t xid, struct vx_rlimit *rlimit);
  * @brief Get resource limits
  * 
  * @param xid    Context ID
- * @param rlimit Empty resource limits struct to be filled
+ * @param rlimit Empty vx_rlimit struct to be filled
  */
 int vx_get_rlimit(xid_t xid, struct vx_rlimit *rlimit);
 
@@ -466,7 +503,7 @@ struct vx_rlimit_mask {
 /*!
  * @brief Get resource limits mask
  * 
- * @param rmask Empty resource limits mask struct to be filled
+ * @param rmask Empty vx_rlimit_mask struct to be filled
  */
 int vx_get_rlimit_mask(struct vx_rlimit_mask *rmask);
 /*! @} syscall_limit */
@@ -476,6 +513,11 @@ int vx_get_rlimit_mask(struct vx_rlimit_mask *rmask);
  * @defgroup syscall_namespace Filesystem namespace commands
  * @{
  */
+/*!
+ * @brief Clone the current namespace
+ */
+int vx_clone_namespace(void);
+
 /*!
  * @brief Enter namespace
  * 
@@ -534,7 +576,7 @@ struct nx_info {
  * @brief Get network context information
  * 
  * @param nid  Network context ID
- * @param info Empty information struct to be filled
+ * @param info Empty nx_info struct to be filled
  */
 int nx_get_info(nid_t nid, struct nx_info *info);
 
@@ -606,7 +648,7 @@ int nx_set_flags(nid_t nid, struct nx_flags *flags);
  * @brief Get network context flags
  * 
  * @param nid   Network context ID
- * @param flags Empty flags struct to be filled
+ * @param flags Empty nx_flags struct to be filled
  */
 int nx_get_flags(nid_t nid, struct nx_flags *flags);
 
@@ -630,7 +672,7 @@ int nx_set_caps(nid_t nid, struct nx_caps *caps);
  * @brief Get network context capabilities
  * 
  * @param nid  Network context ID
- * @param caps Empty caps struct to be filled
+ * @param caps Empty nx_caps struct to be filled
  */
 int nx_get_caps(nid_t nid, struct nx_caps *caps);
 /*! @} syscall_network */
@@ -649,11 +691,14 @@ int nx_get_caps(nid_t nid, struct nx_caps *caps);
 #define VXSM_TOKENS_MIN 0x0020  /*!< Minimum amount of tokens */
 #define VXSM_TOKENS_MAX 0x0040  /*!< Maximum amount of tokens */
 #define VXSM_PRIO_BIAS  0x0100  /*!< Priority bias */
+
 #define VXSM_IDLE_TIME  0x0200  /*!< Use IDLE time settings */
-#define VXSM_CPU_ID     0x1000  /*!< CPU ID (for SMP) */
+#define VXSM_FORCE      0x0400  /*!< Force scheduler reload (SMP only) */
+#define VXSM_CPU_ID     0x1000  /*!< CPU ID (SMP only) */
 #define VXSM_BUCKET_ID  0x2000  /*!< Bucket ID */
 
-#define VXSM_V3_MASK    0x0173  /*!< Mask IDLE flags (for scheduler v3) */
+#define VXSM_V3_MASK    0x0173  /*!< Mask all fields for scheduler v3 */
+#define VXSM_SET_MASK   0x01FF  /*!< Mask all fields for set_sched */
 #endif
 
 /*!

@@ -61,4 +61,3 @@ int vx_set_sched(xid_t xid, struct vx_sched *sched)
 		return sys_vserver(VCMD_set_sched_v3, xid, &res3);
 	}
 }
-

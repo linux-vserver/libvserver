@@ -27,5 +27,10 @@
 
 #include "syscall.h"
 
+#define __NR_clone 120
+
 /* vserver system call */
 _syscall3(int, vserver, uint32_t, cmd, uint32_t, id, void *, data)
+
+/* clone system call (glibc only has a wrapper) */
+_syscall2(int, clone, int, flags, void *, child_stack)
