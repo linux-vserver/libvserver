@@ -50,7 +50,9 @@ AC_C_INLINE
 # Checks for library functions.
 
 # Compiler settings
-CFLAGS="${CFLAGS} -fno-omit-frame-pointer -W -Wall -std=gnu99 -pedantic"
+CFLAGS="${CFLAGS} -std=gnu99 -pedantic -fno-omit-frame-pointer"
+CFLAGS="${CFLAGS} -Wall -Wextra -Wpointer-arith -Wcast-qual -Winline"
+CFLAGS="${CFLAGS} -Wredundant-decls -Wcast-align -Wno-unused-parameter"
 
 # Site settings
 AC_LV_SYSCALL_NR

@@ -17,8 +17,7 @@ features  in an adequate timeframe.
 What can i do to help?
 ======================
 
-Currently all syscalls are implemented in the library and the interface is
-freezed, though libvserver-util needs some love...
+Currently all syscalls are implemented and seem to work
 
 If you'd like to participate in libvservers development feel free to contact
 me (Hollow) using IRC (irc.oftc.net#vserver) or hollow@gentoo.org
