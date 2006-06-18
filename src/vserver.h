@@ -494,6 +494,14 @@ int vx_set_rlimit(xid_t xid, struct vx_rlimit *rlimit);
 int vx_get_rlimit(xid_t xid, struct vx_rlimit *rlimit);
 
 /*!
+ * @brief Reset limit accounting (min/max)
+ * 
+ * @param xid    Context ID
+ * @param rlimit Empty vx_rlimit struct to be filled
+ */
+int vx_reset_rminmax(xid_t xid, struct vx_rlimit *rlimit);
+
+/*!
  * @brief Resource limits mask
  */
 struct vx_rlimit_mask {

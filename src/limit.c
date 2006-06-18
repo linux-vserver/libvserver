@@ -23,30 +23,38 @@
 int vx_set_rlimit(xid_t xid, struct vx_rlimit *rlimit)
 {
 	struct vcmd_ctx_rlimit_v0 res;
-
+	
 	res.id        = rlimit->id;
 	res.minimum   = rlimit->minimum;
 	res.softlimit = rlimit->softlimit;
 	res.maximum   = rlimit->maximum;
-
+	
 	return sys_vserver(VCMD_set_rlimit, xid, &res);
 }
 
 int vx_get_rlimit(xid_t xid, struct vx_rlimit *rlimit)
 {
 	struct vcmd_ctx_rlimit_v0 res;
-
+	
 	res.id = rlimit->id;
 	int rc = sys_vserver(VCMD_get_rlimit, xid, &res);
 	
 	if (rc == -1)
 		return rc;
-
+	
 	rlimit->minimum   = res.minimum;
 	rlimit->softlimit = res.softlimit;
 	rlimit->maximum   = res.maximum;
-
+	
 	return rc;
+}
+
+int vx_reset_rminmax(xid_t xid, struct vx_rlimit *rlimit)
+{
+	if (rlimit && vx_get_rlimit(xid, rlimit) == -1)
+		return -1;
+	
+	return sys_vserver(VCMD_reset_minmax, xid, NULL);
 }
 
 int vx_get_rlimit_mask(struct vx_rlimit_mask *rmask)
@@ -54,13 +62,13 @@ int vx_get_rlimit_mask(struct vx_rlimit_mask *rmask)
 	struct vcmd_ctx_rlimit_mask_v0 res;
 	
 	int rc = sys_vserver(VCMD_get_rlimit_mask, 0, &res);
-
+	
 	if (rc == -1)
 		return rc;
-
+	
 	rmask->minimum   = res.minimum;
 	rmask->softlimit = res.softlimit;
 	rmask->maximum   = res.maximum;
-
+	
 	return rc;
 }
