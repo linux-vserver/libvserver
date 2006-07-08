@@ -51,7 +51,7 @@ AC_C_INLINE
 
 # Compiler settings
 CFLAGS="${CFLAGS} -std=gnu99 -pedantic -fno-omit-frame-pointer"
-CFLAGS="${CFLAGS} -Wall -Wextra -Wpointer-arith -Wcast-qual -Winline"
+CFLAGS="${CFLAGS} -Wall -Wpointer-arith -Wcast-qual -Winline"
 CFLAGS="${CFLAGS} -Wredundant-decls -Wcast-align -Wno-unused-parameter"
 
 # Site settings
