@@ -20,10 +20,11 @@
 AC_PREREQ(2.59)
 AC_INIT(libvserver, 2.0, hollow@gentoo.org)
 AC_CONFIG_HEADER([config.h])
+AC_GNU_SOURCE
+
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
-AC_GNU_SOURCE
 
 # Automake
 AM_INIT_AUTOMAKE([1.9 gnu dist-bzip2])
@@ -37,6 +38,12 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_EGREP
+
+# Checks for libraries.
+AC_CHECK_LIB(ucid, flist32_to_str,
+	LUCID_LIBS="-lucid", AC_MSG_ERROR([lucid not found]),)
+
+AC_SUBST(LUCID_LIBS)
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -73,7 +80,9 @@ AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
 
 # Output
 AC_CONFIG_FILES([Makefile
-                 src/Makefile])
+                 src/Makefile
+                 src/lib/Makefile
+                 src/tools/Makefile])
 AC_OUTPUT
 
 AC_MSG_NOTICE([$SUMMARY])

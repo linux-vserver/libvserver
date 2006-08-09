@@ -15,35 +15,16 @@
 // Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <stdint.h>
-#include <string.h>
-
-#include "linux/vserver/switch.h"
-#include "linux/vserver/cvirt_cmd.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #include "vserver.h"
 
-int vx_set_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name)
+#include "linux/vserver/switch.h"
+
+int vs_get_version(void)
 {
-	struct vcmd_vhi_name_v0 res;
-
-	res.field = vhi_name->field;
-	memcpy(res.name, vhi_name->name, sizeof res.name);
-
-	return sys_vserver(VCMD_set_vhi_name, xid, &res);
+	return sys_vserver(VCMD_get_version, 0, NULL);
 }
 
-int vx_get_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name)
-{
-	struct vcmd_vhi_name_v0 res;
-
-	res.field = vhi_name->field;
-	int rc = sys_vserver(VCMD_get_vhi_name, xid, &res);
-	
-	if (rc == -1)
-		return rc;
-
-	memcpy(vhi_name->name, res.name, sizeof vhi_name->name);
-
-	return rc;
-}
