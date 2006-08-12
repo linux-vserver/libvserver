@@ -80,9 +80,9 @@ AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
 
 # Output
 AC_CONFIG_FILES([Makefile
-                 src/Makefile
                  src/lib/Makefile
-                 src/tools/Makefile])
+                 src/tools/Makefile
+                 src/Makefile])
 AC_OUTPUT
 
 AC_MSG_NOTICE([$SUMMARY])
