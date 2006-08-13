@@ -1,0 +1,250 @@
+.TH vx 8 User Manuals
+.SH NAME
+vx \- Virtual Context Setup
+.SH SYNOPSIS
+\fBvx -create \fIxid\fB [\fIlist\fB] [-- \fIprogram\fB \fIargs\fB*]
+
+vx -migrate \fIxid\fB -- \fIprogram\fB \fIargs\fB*
+
+vx -login \fIxid\fB [-- \fIprogram\fB \fIargs\fB*]
+
+vx -set-bcaps \fIxid\fB \fIlist\fB
+
+vx -set-ccaps \fIxid\fB \fIlist\fB
+
+vx -set-flags \fIxid\fB \fIlist\fB
+
+vx -set-limit \fIxid\fB \fItype\fB=\fImin\fB,\fIsoft\fB,\fIhard\fB*
+
+vx -set-sched \fIxid\fB \fItype\fB=\fIvalue\fB*
+
+vx -set-vhi \fIxid\fB \fItype\fB=\fIvalue\fB*
+
+vx -get-bcaps \fIxid\fB
+
+vx -get-ccaps \fIxid\fB
+
+vx -get-flags \fIxid\fB
+
+vx -get-limit \fIxid\fB \fItype\fB*
+
+vx -get-vhi \fIxid\fB \fItype\fB*
+
+vx -kill \fIxid\fB [\fIpid\fB \fIsig\fB]
+
+vx -wait \fIxid\fB
+
+vx -reset-limit \fIxid\fB
+\f1
+.SH DESCRIPTION
+The purpose of this "Context" is to hide all processes outside of its scope, and prohibit any unwanted interaction between a process inside the context and a process belonging to another context.
+
+This separation requires the extension of some existing data structures in order for them to become aware of contexts and to differentiate between identical uids used in different virtual servers.
+
+It also requires the definition of a default context that is used when the host system is booted, and to work around the issues resulting from some false assumptions made by some user-space tools (like pstree) that the init process has to exist and to be running under id '1'.
+
+To simplify administration, the Host Context isn't treated any differently than any other context as far as process isolation is concerned. To allow for process overview, a special Spectator context has been defined to peek at all processes at once.
+.SH OPTIONS
+.TP
+\fB-create\f1
+Create a new context with id \fIxid\f1 using optional flags in \fIlist\f1 and optionally run \fIprogram\f1 in the new context.
+.TP
+\fB-migrate\f1
+Migrate to context \fIxid\f1 and execute \fIprogram\f1.
+.TP
+\fB-login\f1
+Migrate to context \fIxid\f1 and execute \fIprogram\f1 using a new pseudo terminal.
+.TP
+\fB-set-bcaps\f1
+Set system capabilities in \fIlist\f1 for context \fIxid\f1. See below for valid capabilities.
+.TP
+\fB-set-ccaps\f1
+Set context capabilities in \fIlist\f1 for context \fIxid\f1. See below for valid capabilities.
+.TP
+\fB-set-flags\f1
+Set context flags in \fIlist\f1 for context \fIxid\f1. See below for valid capabilities.
+.TP
+\fB-set-limit\f1
+Set \fImin\f1, \fIsoft\f1 and \fIhard\f1 limit for \fItype\f1 and context \fIxid\f1. See below for valid limit types.
+.TP
+\fB-set-sched\f1
+Set token bucket scheduler for context \fIxid\f1 using \fIvalue\f1. See below for valid scheduler types.
+.TP
+\fB-set-vhi\f1
+Set virtual host information (UTS/uname) for context \fIxid\f1 using \fIvalue\f1. See below for valid VHI types.
+.TP
+\fB-get-bcaps\f1
+Get system capabilities for context \fIxid\f1. See below for valid capabilities.
+.TP
+\fB-get-ccaps\f1
+Get context capabilities for context \fIxid\f1. See below for valid capabilities.
+.TP
+\fB-get-flags\f1
+Get context flags for context \fIxid\f1. See below for valid capabilities.
+.TP
+\fB-get-limit\f1
+Get limit for \fItype\f1 and context \fIxid\f1. See below for valid limit types.
+.TP
+\fB-get-vhi\f1
+Get virtual host information (UTS/uname) for context \fIxid\f1. See below for valid VHI types.
+.TP
+\fB-kill\f1
+Kill process(es) in context \fIxid\f1 using optional process id \fIpid\f1 and signal number \fIsig\f1. Default signal number is 9.
+.TP
+\fB-wait\f1
+Wait until context has died.
+.TP
+\fB-reset-limit\f1
+Reset limit accounting for context \fIxid\f1.
+.SH VALID SYSTEM CAPABILITIES
+See \fBcapabilities(7)\f1. 
+.SH VALID CONTEXT CAPABILITIES
+SET_UTSNAME - allow \fBsetdomainname(2)\f1 and \fBsethostname(2)\f1
+
+SET_RLIMIT - allow \fBsetrlimit(2)\f1
+
+RAW_ICMP - allow raw ICMP sockets
+
+SYSLOG - allow \fBsyslog(2)\f1
+
+SECURE_MOUNT - allow secure \fBmount(2)\f1
+
+SECURE_REMOUNT - allow secure remount
+
+BINARY_MOUNT - allow binary/network mounts
+
+QUOTA_CTL - allow quota ioctl
+.SH VALID CONTEXT FLAGS
+INFO_LOCK - Prohibit further context switches (legacy)
+
+INFO_SCHED - Account all processes as one (legacy)
+
+INFO_NPROC - Apply process limits to context (legacy)
+
+INFO_PRIVATE - Context cannot be entered (legacy)
+
+INFO_INIT - Show a fake init process
+
+INFO_HIDE - Hide context information in task status
+
+INFO_ULIMIT - Apply ulimits to context (legacy)
+
+INFO_NSPACE - Use private namespace (legacy)
+
+SCHED_HARD - Enable hard scheduler
+
+SCHED_PRIO - Enable priority scheduler
+
+SCHED_PAUSE - Pause context (unschedule)
+
+VIRT_MEM - Virtualize memory information
+
+VIRT_UPTIME - Virtualize uptime information
+
+VIRT_CPU - Virtualize cpu usage information
+
+VIRT_LOAD - Virtualize load average information
+
+VIRT_TIME - Allow per guest time offsets
+
+HIDE_MOUNT - Hide entries in /proc/$pid/mounts
+
+HIDE_NETIF - Hide foreign network interfaces
+
+STATE_SETUP - Context is in setup state
+
+STATE_INIT - Context is in init state
+
+SC_HELPER - Context state change helper
+
+REBOOT_KILL - Kill all processes on \fBreboot(2)\f1
+
+PERSISTENT - Make context persistent
+
+FORK_RSS - Block fork when over RSS
+
+PROLIFIC - Allow context to create new contexts
+
+IGNEG_NICE - Ignore priority raise
+.SH VALID LIMIT TYPES
+CPU
+
+FSIZE
+
+DATA
+
+STACK
+
+CORE
+
+RSS
+
+NPROC
+
+NOFILE
+
+MEMLOCK
+
+AS
+
+LOCKS
+
+NSOCK
+
+OPENFD
+
+ANON
+
+SHMEM
+
+SEMARY
+
+NSEMS
+
+DENTRY
+.SH VALID SCHEDULER TYPES
+FILL_RATE
+
+FILL_RATE2
+
+INTERVAL
+
+INTERVAL2
+
+TOKENS
+
+TOKENS_MIN
+
+TOKENS_MAX
+
+PRIO_BIAS
+
+IDLE_TIME
+
+FORCE
+
+CPU_ID
+
+BUCKET_ID
+.SH VALID VHI TYPES
+CONTEXT
+
+SYSNAME
+
+NODENAME
+
+RELEASE
+
+VERSION
+
+MACHINE
+
+DOMAINNAME
+.SH AUTHOR
+vx was written by Benedikt Boehm <hollow@gentoo.org>
+
+You will find the newest version of dx in the libvserver package at \fBhttp://linux-vserver.org\f1. There is also a mailing list, you will find information about it at Linux-VServer main site.
+.SH BUGS
+You should report them to the mailing list.
+.SH SEE ALSO
+\fBdx(8)\f1, \fBix(8)\f1, \fBns(8)\f1, \fBnx(8)\f1, \fBvr(8)\f1, 

@@ -1,0 +1,52 @@
+<?xml version="1.0" standalone='no'?>
+<!DOCTYPE manpage SYSTEM "http://masqmail.cx/xmltoman/xmltoman.dtd">
+<?xml-stylesheet type="text/xsl" href="http://masqmail.cx/xmltoman/xmltoman.xsl" ?>
+
+<manpage name="vr" section="8" desc="Virtual Root Device Setup">
+
+<synopsis>
+<cmd>vr -set-dev   <arg>dev</arg> <arg>realdev</arg></cmd>
+<cmd>vr -clear-dev <arg>dev</arg></cmd>
+</synopsis>
+
+<description>
+<p>Quota operations (ioctls) require some access to the block device, which for
+security reasons is not available inside a context. The Virtual Root Device
+allows the quota part of ioctl(2) inside contexts.</p>
+</description>
+
+<options>
+<option>
+<p><opt>-set-dev</opt></p>
+<optdesc><p>Make <arg>dev</arg> the virtual root device for <arg>realdev</arg>.</p></optdesc>
+</option>
+
+<option>
+<p><opt>-clear-dev</opt></p>
+<optdesc><p>Clear (remove) virtual root device <arg>dev</arg>.</p></optdesc>
+</option>
+
+</options>
+
+<section name="Author">
+<p>vr was written by Benedikt Boehm &lt;hollow@gentoo.org&gt;</p>
+<p>You will find the newest version of dx in the libvserver package at
+<url href="http://linux-vserver.org"/>. There is also a mailing list,
+you will find information about it at Linux-VServer main site.</p>
+</section>
+
+<section name="Bugs">
+<p>You should report them to the mailing list.</p>
+</section>
+
+<seealso>
+<p>
+<manref name="dx" section="8" href="dx.8.html"/>,
+<manref name="ix" section="8" href="ix.8.html"/>,
+<manref name="ns" section="8" href="ns.8.html"/>,
+<manref name="nx" section="8" href="nx.8.html"/>,
+<manref name="vx" section="8" href="vx.8.html"/>,
+</p>
+</seealso>
+
+</manpage>

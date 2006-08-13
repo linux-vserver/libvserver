@@ -1,0 +1,93 @@
+<?xml version="1.0" standalone='no'?>
+<!DOCTYPE manpage SYSTEM "http://masqmail.cx/xmltoman/xmltoman.dtd">
+<?xml-stylesheet type="text/xsl" href="http://masqmail.cx/xmltoman/xmltoman.xsl" ?>
+
+<manpage name="nx" section="8" desc="Network Context Setup">
+
+<synopsis>
+<cmd>nx -create    <arg>nid</arg> [<arg>list</arg>] [-- <arg>program</arg> <arg>args</arg>*]</cmd>
+<cmd>nx -migrate   <arg>nid</arg> -- <arg>program</arg> <arg>args</arg>*</cmd>
+<cmd>nx -set-flags <arg>nid</arg> <arg>list</arg></cmd>
+<cmd>nx -get-flags <arg>nid</arg></cmd>
+<cmd>nx -add-addr  <arg>nid</arg> <arg>addr</arg>/<arg>netmask</arg>*</cmd>
+<cmd>nx -rem-addr  <arg>nid</arg> <arg>addr</arg>/<arg>netmask</arg>*</cmd>
+</synopsis>
+
+<description>
+<p>While the Context Separation is sufficient to isolate groups of processes, a
+different kind of separation, or rather a limitation, is required to confine
+processes to a subset of available network addresses.</p>
+<p>Several issues have to be considered when doing so; for example, the fact
+that bindings to special addresses like IPADDR_ANY or the local host address
+have to be handled in a very special way.</p>
+<p>Currently, Linux-VServer doesn't make use of virtual network devices
+(and maybe never will) to minimize the resulting overhead. Therefore socket
+binding and packet transmission have been adjusted.</p>
+</description>
+
+<options>
+<option>
+<p><opt>-create</opt></p>
+<optdesc><p>Create a new network context with id <arg>nid</arg> using optional 
+flags in <arg>list</arg> and optionally run <arg>program</arg> in the new
+context.</p></optdesc>
+</option>
+
+<option>
+<p><opt>-migrate</opt></p>
+<optdesc><p>Migrate to network context <arg>nid</arg> and execute
+<arg>program</arg>.</p></optdesc>
+</option>
+
+<option>
+<p><opt>-set-flags</opt></p>
+<optdesc><p>Set context flags in <arg>list</arg> for network context
+<arg>nid</arg>. See below for valid flags.</p></optdesc>
+</option>
+
+<option>
+<p><opt>-get-flags</opt></p>
+<optdesc><p>Get flags for network context <arg>nid</arg>. See below for valid
+flags.</p></optdesc>
+</option>
+
+<option>
+<p><opt>-add-addr</opt></p>
+<optdesc><p>Add IP address <arg>addr</arg>/<arg>netmask</arg> to network context <arg>nid</arg>. More than one IP address can be specified.</p></optdesc>
+</option>
+
+<option>
+<p><opt>-rem-addr</opt></p>
+<optdesc><p>Remove IP address <arg>addr</arg>/<arg>netmask</arg> from network context <arg>nid</arg>. More than one IP address can be specified.</p></optdesc>
+</option>
+
+</options>
+
+<section name="Valid Flags">
+<p>STATE_SETUP - network context is in setup state</p>
+<p>SC_HELPER - network state change helper</p>
+<p>PERSISTENT - make network context persistent</p>
+</section>
+
+<section name="Author">
+<p>nx was written by Benedikt Boehm &lt;hollow@gentoo.org&gt;</p>
+<p>You will find the newest version of dx in the libvserver package at
+<url href="http://linux-vserver.org"/>. There is also a mailing list,
+you will find information about it at Linux-VServer main site.</p>
+</section>
+
+<section name="Bugs">
+<p>You should report them to the mailing list.</p>
+</section>
+
+<seealso>
+<p>
+<manref name="dx" section="8" href="dx.8.html"/>,
+<manref name="ix" section="8" href="ix.8.html"/>,
+<manref name="ns" section="8" href="ns.8.html"/>,
+<manref name="vr" section="8" href="vr.8.html"/>,
+<manref name="vx" section="8" href="vx.8.html"/>
+</p>
+</seealso>
+
+</manpage>

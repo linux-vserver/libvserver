@@ -1,0 +1,25 @@
+.TH vr 8 User Manuals
+.SH NAME
+vr \- Virtual Root Device Setup
+.SH SYNOPSIS
+\fBvr -set-dev \fIdev\fB \fIrealdev\fB
+
+vr -clear-dev \fIdev\fB
+\f1
+.SH DESCRIPTION
+Quota operations (ioctls) require some access to the block device, which for security reasons is not available inside a context. The Virtual Root Device allows the quota part of ioctl(2) inside contexts.
+.SH OPTIONS
+.TP
+\fB-set-dev\f1
+Make \fIdev\f1 the virtual root device for \fIrealdev\f1.
+.TP
+\fB-clear-dev\f1
+Clear (remove) virtual root device \fIdev\f1.
+.SH AUTHOR
+vr was written by Benedikt Boehm <hollow@gentoo.org>
+
+You will find the newest version of dx in the libvserver package at \fBhttp://linux-vserver.org\f1. There is also a mailing list, you will find information about it at Linux-VServer main site.
+.SH BUGS
+You should report them to the mailing list.
+.SH SEE ALSO
+\fBdx(8)\f1, \fBix(8)\f1, \fBns(8)\f1, \fBnx(8)\f1, \fBvx(8)\f1, 

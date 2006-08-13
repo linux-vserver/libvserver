@@ -1,0 +1,49 @@
+.TH dx 8 User Manuals
+.SH NAME
+dx \- Context Disk Limits
+.SH SYNOPSIS
+\fBdx -add-path \fIxid\fB \fIpath\fB
+
+dx -rem-path \fIxid\fB \fIpath\fB
+
+dx -set-limit \fIxid\fB \fIpath\fB \fIsu\fB,\fIst\fB,\fIiu\fB,\fIit\fB,\fIrr\fB
+
+dx -get-limit \fIxid\fB \fIpath\fB
+\f1
+.SH DESCRIPTION
+This Feature requires the use of XID Tagged Files, and allows for independent Disk Limits for different contexts on a shared partition.
+
+The number of inodes and blocks for each filesystem is accounted, if an XID-Hash was added for the Context-Filesystem combo.
+
+Those values, including current usage, maximum and reserved space, will be shown for filesystem queries, creating the illusion that the shared filesystem has a different usage and size, for each context.
+.SH OPTIONS
+.TP
+\fB-add-path\f1
+Add directory \fIpath\f1 to context \fIxid\f1. Use -set-limit to apply a limit to \fIpath\f1.
+.TP
+\fB-rem-path\f1
+Remove directory \fIpath\f1 from context \fIxid\f1.
+.TP
+\fB-set-limit\f1
+Set limit for \fIpath\f1 in context \fIxid\f1.
+
+\fIsu\f1 - space currently used
+
+\fIst\f1 - total space available
+
+\fIiu\f1 - inodes currently used
+
+\fIit\f1 - total inodes available
+
+\fIrr\f1 - reserved for root (in %)
+.TP
+\fB-get-limit\f1
+Get limit on \fIpath\f1 for context \fIxid\f1.
+.SH AUTHOR
+dx was written by Benedikt Boehm <hollow@gentoo.org>
+
+You will find the newest version of dx in the libvserver package at \fBhttp://linux-vserver.org\f1. There is also a mailing list, you will find information about it at Linux-VServer main site.
+.SH BUGS
+You should report them to the mailing list.
+.SH SEE ALSO
+\fBix(8)\f1, \fBns(8)\f1, \fBnx(8)\f1, \fBvr(8)\f1, \fBvx(8)\f1
