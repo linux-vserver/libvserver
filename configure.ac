@@ -39,9 +39,23 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_EGREP
 
+# Parts to build
+AC_ARG_ENABLE([tools],
+              [AC_HELP_STRING([--disable-tools],
+                              [Disable the command line tools])],
+              [case "${enableval}" in
+                yes) enable_tools=true;;
+                no)  enable_tools=false;;
+                *)   AC_MSG_ERROR(bad value ${enableval} for --enable-tools);;
+              esac],
+              [enable_tools=true])
+AM_CONDITIONAL(ENABLE_TOOLS, test x$enable_tools = xtrue)
+
 # Checks for libraries.
+if test x$enable_tools = xtrue; then
 AC_CHECK_LIB(ucid, flist32_to_str,
 	LUCID_LIBS="-lucid", AC_MSG_ERROR([lucid not found]),)
+fi
 
 AC_SUBST(LUCID_LIBS)
 
