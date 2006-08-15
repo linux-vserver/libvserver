@@ -15,6 +15,8 @@
 ## Free Software Foundation, Inc.,
 ## 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+if ENABLE_TOOLS
+
 INCLUDES = -I$(top_srcdir)/src/lib
 
 noinst_HEADERS = tools.h
@@ -55,3 +57,5 @@ vr_LDADD = $(TOOLLIBS)
 
 vx_SOURCES = vx.c msg.c lists.c
 vx_LDADD = $(TOOLLIBS)
+
+endif
