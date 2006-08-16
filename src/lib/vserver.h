@@ -115,6 +115,8 @@ int vs_get_version(void);
 #define VXC_SECURE_REMOUNT 0x00020000  /*!< Allow secure remount */
 #define VXC_BINARY_MOUNT   0x00040000  /*!< Allow binary/network mounts */
 #define VXC_QUOTA_CTL      0x00100000  /*!< Allow quota ioctl */
+#define VXC_ADMIN_MAPPER   0x00200000  /*!< Allow device mapper */
+#define VXC_ADMIN_CLOOP    0x00400000  /*!< Allow loop devices */
 
 #define VXF_INFO_LOCK    0x00000001  /*!< Prohibit further context switches (L) */
 #define VXF_INFO_SCHED   0x00000002  /*!< Account all processes as one (L) */
@@ -136,6 +138,7 @@ int vs_get_version(void);
 #define VXF_HIDE_NETIF   0x02000000  /*!< Hide foreign network interfaces */
 #define VXF_STATE_SETUP  (1ULL<<32)  /*!< Context is in setup state */
 #define VXF_STATE_INIT   (1ULL<<33)  /*!< Context is in init state */
+#define VXF_STATE_ADMIN  (1ULL<<34)  /*!< Context is in admin state */
 #define VXF_SC_HELPER    (1ULL<<36)  /*!< Context state change helper */
 #define VXF_REBOOT_KILL  (1ULL<<37)  /*!< Kill all processes on reboot(2) */
 #define VXF_PERSISTENT   (1ULL<<38)  /*!< Make context persistent */
@@ -522,9 +525,10 @@ int vx_get_rlimit_mask(struct vx_rlimit_mask *rmask);
 /*!
  * @brief Clone the current namespace
  *
+ * @param flags       Clone flags
  * @param child_stack Child stack
  */
-int vx_clone_namespace(void *child_stack);
+int vx_clone_namespace(int flags, void *child_stack);
 
 /*!
  * @brief Enter namespace
@@ -552,7 +556,9 @@ int vx_set_namespace(xid_t xid);
  * @{
  */
 #ifndef _VX_NETWORK_H
+#define NXF_INFO_LOCK   0x00000001  /*!< Prohibit further context switches (L) */
 #define NXF_STATE_SETUP (1ULL<<32)  /*!< Network context is in setup state */
+#define NXF_STATE_ADMIN (1ULL<<34)  /*!< Context is in admin state */
 #define NXF_SC_HELPER   (1ULL<<36)  /*!< Network state change helper */
 #define NXF_PERSISTENT  (1ULL<<38)  /*!< Make network context persistent */
 

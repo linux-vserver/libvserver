@@ -42,6 +42,7 @@
 
 #define VXF_STATE_SETUP		(1ULL<<32)
 #define VXF_STATE_INIT		(1ULL<<33)
+#define VXF_STATE_ADMIN		(1ULL<<34)
 
 #define VXF_SC_HELPER		(1ULL<<36)
 #define VXF_REBOOT_KILL		(1ULL<<37)
@@ -52,9 +53,9 @@
 
 #define VXF_IGNEG_NICE		(1ULL<<52)
 
-#define VXF_ONE_TIME		(0x0003ULL<<32)
+#define VXF_ONE_TIME		(0x0007ULL<<32)
 
-#define VXF_INIT_SET		(VXF_STATE_SETUP|VXF_STATE_INIT)
+#define VXF_INIT_SET		(VXF_STATE_SETUP|VXF_STATE_INIT|VXF_STATE_ADMIN)
 
 
 /* context migration */
@@ -77,6 +78,8 @@
 #define VXC_BINARY_MOUNT	0x00040000
 
 #define VXC_QUOTA_CTL		0x00100000
+#define VXC_ADMIN_MAPPER	0x00200000
+#define VXC_ADMIN_CLOOP		0x00400000
 
 
 /* context state changes */
@@ -99,6 +102,7 @@ enum {
 #include "limit_def.h"
 #include "sched_def.h"
 #include "cvirt_def.h"
+#include "cacct_def.h"
 
 struct _vx_info_pc {
 	struct _vx_sched_pc sched_pc;
@@ -185,6 +189,14 @@ struct vx_info_save {
 
 #define VX_ATR_MASK	0x0F00
 
+
+#ifdef	CONFIG_VSERVER_PRIVACY
+#define VX_ADMIN_P	(0)
+#define VX_WATCH_P	(0)
+#else
+#define VX_ADMIN_P	VX_ADMIN
+#define VX_WATCH_P	VX_WATCH
+#endif
 
 extern void claim_vx_info(struct vx_info *, struct task_struct *);
 extern void release_vx_info(struct vx_info *, struct task_struct *);

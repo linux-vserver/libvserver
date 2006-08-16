@@ -90,7 +90,7 @@ void usage(int rc)
 {
 	printf("Usage:\n\n"
 	          "vx -create      <xid> [<list>] [-- <program> <args>*]\n"
-	          "   -migrate     <xid> -- <program> <args>*\n"
+	          "   -migrate     <xid> [<list>] -- <program> <args>*\n"
 	          "   -login       <xid> [-- <program> <args>*]\n"
 	          "   -set-bcaps   <xid> <list>\n"
 	          "   -set-ccaps   <xid> <list>\n"
@@ -120,6 +120,10 @@ int main(int argc, char *argv[])
 	
 	/* syscall data */
 	struct vx_create_flags cf = {
+		.flags = 0,
+	};
+	
+	struct vx_migrate_flags mf = {
 		.flags = 0,
 	};
 	
@@ -203,24 +207,46 @@ int main(int argc, char *argv[])
 	goto usage;
 	
 create:
-	if (argc > optind && strcmp(argv[optind], "--") != 0)
+	if (argc > optind && strcmp(argv[optind], "--") != 0) {
 		if (flist64_from_str(argv[optind], cflags_list, &cf.flags, &mask, '~', ',') == -1)
 			perr("flist64_from_str");
+		
+		if (vx_create(xid, &cf) == -1)
+			perr("vx_create");
+		
+		if (argc > optind+2)
+			execvp(argv[optind+2], argv+optind+2);
+	}
 	
-	if (vx_create(xid, &cf) == -1)
-		perr("vx_create");
-	
-	if (argc > optind+1)
-		execvp(argv[optind+1], argv+optind+1);
+	else {
+		if (vx_create(xid, NULL) == -1)
+			perr("vx_create");
+		
+		if (argc > optind+1)
+			execvp(argv[optind+1], argv+optind+1);
+	}
 	
 	goto out;
 
 migrate:
-	if (vx_migrate(xid, NULL) == -1)
-		perr("vx_migrate");
+	if (argc > optind && strcmp(argv[optind], "--") != 0) {
+		if (flist64_from_str(argv[optind], mflags_list, &mf.flags, &mask, '~', ',') == -1)
+			perr("flist64_from_str");
+		
+		if (vx_migrate(xid, &mf) == -1)
+			perr("vx_migrate");
+		
+		if (argc > optind+2)
+			execvp(argv[optind+2], argv+optind+2);
+	}
 	
-	if (argc > optind+1)
-		execvp(argv[optind+1], argv+optind+1);
+	else {
+		if (vx_migrate(xid, NULL) == -1)
+			perr("vx_migrate");
+		
+		if (argc > optind+1)
+			execvp(argv[optind+1], argv+optind+1);
+	}
 	
 	goto out;
 	

@@ -44,6 +44,7 @@ void perr  (const char *fmt, /*args*/ ...);
 extern const flist64_t bcaps_list[];
 extern const flist64_t ccaps_list[];
 extern const flist64_t cflags_list[];
+extern const flist64_t mflags_list[];
 extern const flist32_t vhiname_list[];
 extern const flist32_t iattr_list[];
 extern const flist32_t rlimit_list[];
