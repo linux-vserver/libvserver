@@ -51,16 +51,12 @@ int sys_vserver(uint32_t cmd, uint32_t id, void *data);
  * 
  * @param flags         Clone flags
  * @param child_stack   Child stack
- * @param parent_tidptr Child thread ID pointer
- * @param newtls        Thread Local Storage
- * @param child_tidptr  Child thread ID pointer
  * 
  * @return Process ID in parent, 0 in child, -1 on error
  * 
  * @see clone(2)
  */
-int sys_clone(int flags, void *child_stack, int *parent_tidptr,
-              struct user_desc *newtls, int *child_tidptr);
+int sys_clone(int flags, void *child_stack);
 
 /*!
  * @brief Get vserver version of running kernel
@@ -525,8 +521,10 @@ int vx_get_rlimit_mask(struct vx_rlimit_mask *rmask);
  */
 /*!
  * @brief Clone the current namespace
+ *
+ * @param child_stack Child stack
  */
-int vx_clone_namespace(void);
+int vx_clone_namespace(void *child_stack);
 
 /*!
  * @brief Enter namespace

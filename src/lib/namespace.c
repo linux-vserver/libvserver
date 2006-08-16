@@ -27,9 +27,9 @@
 #include "linux/vserver/switch.h"
 #include "linux/vserver/namespace_cmd.h"
 
-int vx_clone_namespace(void)
+int vx_clone_namespace(void *child_stack)
 {
-	return sys_clone(CLONE_NEWNS|SIGCHLD, NULL, NULL, NULL, NULL);
+	return sys_clone(CLONE_NEWNS|SIGCHLD, child_stack);
 }
 
 int vx_enter_namespace(xid_t xid)

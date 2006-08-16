@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 	goto usage;
 	
 create:
-	switch((pid = vx_clone_namespace())) {
+	switch((pid = vx_clone_namespace(NULL))) {
 		case -1:
 			perr("vx_clone_namespace");
 		

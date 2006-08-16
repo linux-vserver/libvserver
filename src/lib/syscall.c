@@ -31,5 +31,4 @@
 _syscall3(int, vserver, uint32_t, cmd, uint32_t, id, void *, data)
 
 /* clone system call (glibc only has a wrapper) */
-_syscall5(int, clone, int, flags, void *, child_stack, int *, parent_tidptr,
-          struct user_desc *, newtls, int *, child_tidptr)
+_syscall2(int, clone, int, flags, void *, child_stack)
