@@ -56,7 +56,11 @@ int sys_vserver(uint32_t cmd, uint32_t id, void *data);
  * 
  * @see clone(2)
  */
+#if defined (__s390__)
+int sys_clone(void *child_stack, int flags);
+#else
 int sys_clone(int flags, void *child_stack);
+#endif
 
 /*!
  * @brief Get vserver version of running kernel
@@ -118,7 +122,7 @@ int vs_get_version(void);
 #define VXC_ADMIN_MAPPER   0x00200000  /*!< Allow device mapper */
 #define VXC_ADMIN_CLOOP    0x00400000  /*!< Allow loop devices */
 
-#define VXF_INFO_LOCK    0x00000001  /*!< Prohibit further context switches (L) */
+#define VXF_INFO_LOCK    0x00000001  /*!< Prohibit further context migration */
 #define VXF_INFO_SCHED   0x00000002  /*!< Account all processes as one (L) */
 #define VXF_INFO_NPROC   0x00000004  /*!< Apply process limits to context (L) */
 #define VXF_INFO_PRIVATE 0x00000008  /*!< Context cannot be entered (L) */
@@ -556,7 +560,7 @@ int vx_set_namespace(xid_t xid);
  * @{
  */
 #ifndef _VX_NETWORK_H
-#define NXF_INFO_LOCK   0x00000001  /*!< Prohibit further context switches (L) */
+#define NXF_INFO_LOCK   0x00000001  /*!< Prohibit further context migration */
 #define NXF_STATE_SETUP (1ULL<<32)  /*!< Network context is in setup state */
 #define NXF_STATE_ADMIN (1ULL<<34)  /*!< Context is in admin state */
 #define NXF_SC_HELPER   (1ULL<<36)  /*!< Network state change helper */
