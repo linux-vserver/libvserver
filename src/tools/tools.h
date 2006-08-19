@@ -50,3 +50,4 @@ extern const flist32_t iattr_list[];
 extern const flist32_t rlimit_list[];
 extern const flist64_t nflags_list[];
 extern const flist32_t sched_list[];
+extern const flist32_t sock_list[];

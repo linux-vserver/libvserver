@@ -22,7 +22,8 @@ include_HEADERS = vserver.h
 
 lib_LTLIBRARIES = libvserver.la
 
-libvserver_la_SOURCES = context.c \
+libvserver_la_SOURCES = cacct.c \
+                        context.c \
                         cvirt.c \
                         debug.c \
                         dlimit.c \

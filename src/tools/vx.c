@@ -51,9 +51,11 @@ struct option long_opts[] = {
 	{ "get-flags",   1, 0, 0x1A },
 	{ "get-limit",   1, 0, 0x1B },
 	{ "get-vhi",     1, 0, 0x1C },
-	{ "kill",        1, 0, 0x1D },
-	{ "wait",        1, 0, 0x1E },
-	{ "reset-limit", 1, 0, 0x20 },
+	{ "limit-stat",  1, 0, 0x1D },
+	{ "limit-reset", 1, 0, 0x1E },
+	{ "sock-stat",   1, 0, 0x1F },
+	{ "kill",        1, 0, 0x20 },
+	{ "wait",        1, 0, 0x21 },
 	{ NULL,          0, 0, 0 },
 };
 
@@ -102,10 +104,13 @@ void usage(int rc)
 	          "   -get-ccaps   <xid>\n"
 	          "   -get-flags   <xid>\n"
 	          "   -get-limit   <xid> <type>*\n"
+	          "   -limit-stat  <xid> <type>*\n"
+	          "   -limit-reset <xid>\n"
+	          "   -sock-stat   <xid> <type>*\n"
 	          "   -get-vhi     <xid> <type>*\n"
 	          "   -kill        <xid> [<pid> <sig>]\n"
 	          "   -wait        <xid>\n"
-	          "   -reset-limit <xid>\n");
+	          );
 	exit(rc);
 }
 
@@ -164,6 +169,20 @@ int main(int argc, char *argv[])
 		.name  = "",
 	};
 	
+	struct vx_rlimit_stat rlimitstat = {
+		.id      = 0,
+		.hits    = 0,
+		.value   = 0,
+		.minimum = 0,
+		.maximum = 0,
+	};
+	
+	struct vx_sock_stat sockstat = {
+		.field = 0,
+		.count = { 0, 0, 0 },
+		.total = { 0, 0, 0 },
+	};
+	
 	struct vx_wait_result wait_result = {
 		.reboot_cmd = 0,
 		.exit_code  = 0,
@@ -194,9 +213,11 @@ int main(int argc, char *argv[])
 			CASE_GOTO(0x1A, getflags);
 			CASE_GOTO(0x1B, getlimit);
 			CASE_GOTO(0x1C, getvhi);
-			CASE_GOTO(0x1D, kill);
-			CASE_GOTO(0x1E, wait);
-			CASE_GOTO(0x20, resetlimit);
+			CASE_GOTO(0x1D, limitstat);
+			CASE_GOTO(0x1E, limitreset);
+			CASE_GOTO(0x1F, sockstat);
+			CASE_GOTO(0x20, kill);
+			CASE_GOTO(0x21, wait);
 			
 			DEFAULT_GETOPT_CASES
 		}
@@ -469,6 +490,8 @@ getlimit:
 		if (vx_get_rlimit(xid, &rlimit) == -1)
 			perr("vx_get_rlimit");
 		
+		printf("%s=", argv[i]);
+		
 		buf = rlim_to_str(rlimit.minimum);
 		printf("%s,", buf);
 		free(buf);
@@ -502,12 +525,61 @@ getvhi:
 	
 	goto out;
 	
+limitstat:
+	if (argc <= optind)
+		goto usage;
+	
+	for (i = optind; argc > i; i++) {
+		if (!(rlimitstat.id = flist32_getval(rlimit_list, argv[i])))
+			perr("flist32_getval");
+		
+		rlimitstat.id = v2i32(rlimitstat.id);
+		
+		if (vx_get_rlimit_stat(xid, &rlimitstat) == -1)
+			perr("vx_get_rlimit_stat");
+		
+		printf("%s=%" PRIu32 ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 "\n",
+		       argv[i],
+		       rlimitstat.hits, rlimitstat.minimum,
+		       rlimitstat.value, rlimitstat.maximum);
+	}
+	
+	goto out;
+	
+limitreset:
+	if (vx_reset_rlimit(xid) == -1)
+		perr("vx_reset_rlimit");
+	
+	goto out;
+	
+sockstat:
+	if (argc <= optind)
+		goto usage;
+	
+	for (i = optind; argc > i; i++) {
+		if (!(sockstat.field = flist32_getval(sock_list, argv[i])))
+			perr("flist32_getval");
+		
+		sockstat.field = v2i32(sockstat.field);
+		
+		if (vx_get_sock_stat(xid, &sockstat) == -1)
+			perr("vx_get_sock_stat");
+		
+		printf("%s=%" PRIu32 "/%" PRIu64 ",%" PRIu32 "/%" PRIu64 ",%" PRIu32 "/%" PRIu64 "\n",
+		       argv[i],
+		       sockstat.count[0], sockstat.total[0],
+		       sockstat.count[1], sockstat.total[1],
+		       sockstat.count[2], sockstat.total[2]);
+	}
+	
+	goto out;
+	
 wait:
 	if (vx_wait(xid, &wait_result) == -1)
 		perr("vx_wait");
 	
-	printf("reboot_cmd: %" PRIi32 "\n", wait_result.reboot_cmd);
-	printf("exit_code:  %" PRIi32 "\n", wait_result.exit_code);
+	printf("reboot_cmd=%" PRIi32 "\n", wait_result.reboot_cmd);
+	printf("exit_code=%" PRIi32 "\n", wait_result.exit_code);
 	
 	goto out;
 	
@@ -522,12 +594,6 @@ kill:
 	
 	if (vx_kill(xid, &kill_opts) == -1)
 		perr("vx_kill");
-	
-	goto out;
-	
-resetlimit:
-	if (vx_reset_rminmax(xid, NULL) == -1)
-		perr("vx_reset_rminmax");
 	
 	goto out;
 	

@@ -53,11 +53,26 @@ int vx_get_rlimit(xid_t xid, struct vx_rlimit *rlimit)
 	return rc;
 }
 
-int vx_reset_rminmax(xid_t xid, struct vx_rlimit *rlimit)
+int vx_get_rlimit_stat(xid_t xid, struct vx_rlimit_stat *rlimit_stat)
 {
-	if (rlimit && vx_get_rlimit(xid, rlimit) == -1)
-		return -1;
+	struct vcmd_rlimit_stat_v0 res;
 	
+	res.id = rlimit_stat->id;
+	int rc = sys_vserver(VCMD_rlimit_stat, xid, &res);
+	
+	if (rc == -1)
+		return rc;
+	
+	rlimit_stat->hits    = res.hits;
+	rlimit_stat->value   = res.value;
+	rlimit_stat->minimum = res.minimum;
+	rlimit_stat->maximum = res.maximum;
+	
+	return rc;
+}
+
+int vx_reset_rlimit(xid_t xid)
+{
 	return sys_vserver(VCMD_reset_minmax, xid, NULL);
 }
 

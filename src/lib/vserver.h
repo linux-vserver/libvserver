@@ -286,6 +286,43 @@ int vx_get_ccaps(xid_t xid, struct vx_ccaps *ccaps);
 
 
 /*!
+ * @defgroup syscall_cacct Accounting commands
+ * @{
+ */
+/*!
+ * @brief Valid socket fields
+ */
+#ifndef _VX_CACCT_DEF_H
+enum vx_sock_stat_field {
+	VXA_SOCK_UNSPEC = 0,
+	VXA_SOCK_UNIX,
+	VXA_SOCK_INET,
+	VXA_SOCK_INET6,
+	VXA_SOCK_PACKET,
+	VXA_SOCK_OTHER,
+};
+#endif
+
+/*!
+ * @brief Accounting data
+ */
+struct vx_sock_stat {
+	uint32_t field;    /*!< socket field */
+	uint32_t count[3];
+	uint64_t total[3];
+};
+
+/*!
+ * @brief Get context accounting data
+ *
+ * @param xid       Context ID
+ * @param sock_stat Empty vx_sock_stat struct to be filled
+ */
+int vx_get_sock_stat(xid_t xid, struct vx_sock_stat *sock_stat);
+/*! @} syscall_cacct */
+
+
+/*!
  * @defgroup syscall_cvirt Virtualization commands
  * @{
  */
@@ -294,7 +331,7 @@ int vx_get_ccaps(xid_t xid, struct vx_ccaps *ccaps);
  */
 #ifndef _VX_CVIRT_CMD_H
 enum vx_vhi_name_field {
-	VHIN_CONTEXT=0,
+	VHIN_CONTEXT = 0,
 	VHIN_SYSNAME,
 	VHIN_NODENAME,
 	VHIN_RELEASE,
@@ -497,12 +534,30 @@ int vx_set_rlimit(xid_t xid, struct vx_rlimit *rlimit);
 int vx_get_rlimit(xid_t xid, struct vx_rlimit *rlimit);
 
 /*!
+ * @brief Resource limits
+ */
+struct vx_rlimit_stat {
+	uint32_t id;      /*!< Limit ID */
+	uint32_t hits;    /*!< Number of hits */
+	uint64_t value;   /*!< Current value */
+	uint64_t minimum; /*!< Minimum value */
+	uint64_t maximum; /*!< Maximum value */
+};
+
+/*!
+ * @brief Get resource limit accounting data
+ * 
+ * @param xid         Context ID
+ * @param rlimit_stat Empty vx_rlimit_stat struct to be filled
+ */
+int vx_get_rlimit_stat(xid_t xid, struct vx_rlimit_stat *rlimit_stat);
+
+/*!
  * @brief Reset limit accounting (min/max)
  * 
- * @param xid    Context ID
- * @param rlimit Empty vx_rlimit struct to be filled
+ * @param xid Context ID
  */
-int vx_reset_rminmax(xid_t xid, struct vx_rlimit *rlimit);
+int vx_reset_rlimit(xid_t xid);
 
 /*!
  * @brief Resource limits mask
