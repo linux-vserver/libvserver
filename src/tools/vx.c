@@ -51,11 +51,13 @@ struct option long_opts[] = {
 	{ "get-flags",   1, 0, 0x1A },
 	{ "get-limit",   1, 0, 0x1B },
 	{ "get-vhi",     1, 0, 0x1C },
-	{ "limit-stat",  1, 0, 0x1D },
-	{ "limit-reset", 1, 0, 0x1E },
+	{ "stat",        1, 0, 0x1D },
+	{ "virt-stat",   1, 0, 0x1E },
 	{ "sock-stat",   1, 0, 0x1F },
-	{ "kill",        1, 0, 0x20 },
-	{ "wait",        1, 0, 0x21 },
+	{ "limit-stat",  1, 0, 0x20 },
+	{ "limit-reset", 1, 0, 0x21 },
+	{ "kill",        1, 0, 0x22 },
+	{ "wait",        1, 0, 0x23 },
 	{ NULL,          0, 0, 0 },
 };
 
@@ -104,10 +106,12 @@ void usage(int rc)
 	          "   -get-ccaps   <xid>\n"
 	          "   -get-flags   <xid>\n"
 	          "   -get-limit   <xid> <type>*\n"
+	          "   -get-vhi     <xid> <type>*\n"
+	          "   -stat        <xid>\n"
+	          "   -virt-stat   <xid>\n"
+	          "   -sock-stat   <xid> <type>*\n"
 	          "   -limit-stat  <xid> <type>*\n"
 	          "   -limit-reset <xid>\n"
-	          "   -sock-stat   <xid> <type>*\n"
-	          "   -get-vhi     <xid> <type>*\n"
 	          "   -kill        <xid> [<pid> <sig>]\n"
 	          "   -wait        <xid>\n"
 	          );
@@ -169,18 +173,34 @@ int main(int argc, char *argv[])
 		.name  = "",
 	};
 	
-	struct vx_rlimit_stat rlimitstat = {
-		.id      = 0,
-		.hits    = 0,
-		.value   = 0,
-		.minimum = 0,
-		.maximum = 0,
+	struct vx_stat stat = {
+		.usecnt = 0,
+		.tasks  = 0,
+	};
+	
+	struct vx_virt_stat virt_stat = {
+		.offset = 0,
+		.uptime = 0,
+		.nr_threads = 0,
+		.nr_running = 0,
+		.nr_uninterruptible = 0,
+		.nr_onhold = 0,
+		.nr_forks = 0,
+		.load = { 0, 0, 0 },
 	};
 	
 	struct vx_sock_stat sockstat = {
 		.field = 0,
 		.count = { 0, 0, 0 },
 		.total = { 0, 0, 0 },
+	};
+	
+	struct vx_rlimit_stat rlimitstat = {
+		.id      = 0,
+		.hits    = 0,
+		.value   = 0,
+		.minimum = 0,
+		.maximum = 0,
 	};
 	
 	struct vx_wait_result wait_result = {
@@ -213,11 +233,13 @@ int main(int argc, char *argv[])
 			CASE_GOTO(0x1A, getflags);
 			CASE_GOTO(0x1B, getlimit);
 			CASE_GOTO(0x1C, getvhi);
-			CASE_GOTO(0x1D, limitstat);
-			CASE_GOTO(0x1E, limitreset);
+			CASE_GOTO(0x1D, stat);
+			CASE_GOTO(0x1E, virtstat);
 			CASE_GOTO(0x1F, sockstat);
-			CASE_GOTO(0x20, kill);
-			CASE_GOTO(0x21, wait);
+			CASE_GOTO(0x20, limitstat);
+			CASE_GOTO(0x21, limitreset);
+			CASE_GOTO(0x22, kill);
+			CASE_GOTO(0x23, wait);
 			
 			DEFAULT_GETOPT_CASES
 		}
@@ -525,6 +547,56 @@ getvhi:
 	
 	goto out;
 	
+stat:
+	if (vx_get_stat(xid, &stat) == -1)
+		perr("vx_get_stat");
+	
+	printf("usecnt=%" PRIu32 "\n", stat.usecnt);
+	printf("tasks=%"  PRIu32 "\n", stat.tasks);
+	
+	goto out;
+	
+virtstat:
+	if (vx_get_virt_stat(xid, &virt_stat) == -1)
+		perr("vx_get_virt_stat");
+	
+	printf("offset=%" PRIu64 "\n", virt_stat.offset);
+	printf("uptime=%" PRIu64 "\n", virt_stat.uptime);
+	
+	printf("nr_threads=%"         PRIu32 "\n", virt_stat.nr_threads);
+	printf("nr_running=%"         PRIu32 "\n", virt_stat.nr_running);
+	printf("nr_uninterruptible=%" PRIu32 "\n", virt_stat.nr_uninterruptible);
+	printf("nr_onhold=%"          PRIu32 "\n", virt_stat.nr_onhold);
+	printf("nr_forks=%"           PRIu32 "\n", virt_stat.nr_forks);
+	
+	printf("load[0]=%" PRIu32 "\n", virt_stat.load[0]);
+	printf("load[1]=%" PRIu32 "\n", virt_stat.load[1]);
+	printf("load[2]=%" PRIu32 "\n", virt_stat.load[2]);
+	
+	goto out;
+	
+sockstat:
+	if (argc <= optind)
+		goto usage;
+	
+	for (i = optind; argc > i; i++) {
+		if (!(sockstat.field = flist32_getval(sock_list, argv[i])))
+			perr("flist32_getval");
+		
+		sockstat.field = v2i32(sockstat.field);
+		
+		if (vx_get_sock_stat(xid, &sockstat) == -1)
+			perr("vx_get_sock_stat");
+		
+		printf("%s=%" PRIu32 "/%" PRIu64 ",%" PRIu32 "/%" PRIu64 ",%" PRIu32 "/%" PRIu64 "\n",
+		       argv[i],
+		       sockstat.count[0], sockstat.total[0],
+		       sockstat.count[1], sockstat.total[1],
+		       sockstat.count[2], sockstat.total[2]);
+	}
+	
+	goto out;
+	
 limitstat:
 	if (argc <= optind)
 		goto usage;
@@ -549,28 +621,6 @@ limitstat:
 limitreset:
 	if (vx_reset_rlimit(xid) == -1)
 		perr("vx_reset_rlimit");
-	
-	goto out;
-	
-sockstat:
-	if (argc <= optind)
-		goto usage;
-	
-	for (i = optind; argc > i; i++) {
-		if (!(sockstat.field = flist32_getval(sock_list, argv[i])))
-			perr("flist32_getval");
-		
-		sockstat.field = v2i32(sockstat.field);
-		
-		if (vx_get_sock_stat(xid, &sockstat) == -1)
-			perr("vx_get_sock_stat");
-		
-		printf("%s=%" PRIu32 "/%" PRIu64 ",%" PRIu32 "/%" PRIu64 ",%" PRIu32 "/%" PRIu64 "\n",
-		       argv[i],
-		       sockstat.count[0], sockstat.total[0],
-		       sockstat.count[1], sockstat.total[1],
-		       sockstat.count[2], sockstat.total[2]);
-	}
 	
 	goto out;
 	

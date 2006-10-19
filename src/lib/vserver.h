@@ -140,6 +140,7 @@ int vs_get_version(void);
 #define VXF_VIRT_TIME    0x00100000  /*!< Allow per guest time offsets */
 #define VXF_HIDE_MOUNT   0x01000000  /*!< Hide entries in /proc/$pid/mounts */
 #define VXF_HIDE_NETIF   0x02000000  /*!< Hide foreign network interfaces */
+#define VXF_HIDE_VINFO   0x04000000  /*!< Hide context information in task status */
 #define VXF_STATE_SETUP  (1ULL<<32)  /*!< Context is in setup state */
 #define VXF_STATE_INIT   (1ULL<<33)  /*!< Context is in init state */
 #define VXF_STATE_ADMIN  (1ULL<<34)  /*!< Context is in admin state */
@@ -180,6 +181,22 @@ struct vx_info {
  * @param info Empty vx_info struct to be filled
  */
 int vx_get_info(xid_t xid, struct vx_info *info);
+
+/*!
+ * @brief Context information
+ */
+struct vx_stat {
+	uint32_t usecnt; /*!< Number of context references */
+	uint32_t tasks;  /*!< Number of tasks */
+};
+
+/*!
+ * @brief Get context statistics
+ *
+ * @param xid  Context ID
+ * @param stat Empty vx_stat struct to be filled
+ */
+int vx_get_stat(xid_t xid, struct vx_stat *stat);
 
 /*!
  * @brief Initial Context flags
@@ -292,7 +309,7 @@ int vx_get_ccaps(xid_t xid, struct vx_ccaps *ccaps);
 /*!
  * @brief Valid socket fields
  */
-#ifndef _VX_CACCT_DEF_H
+#ifndef _VX_CACCT_H
 enum vx_sock_stat_field {
 	VXA_SOCK_UNSPEC = 0,
 	VXA_SOCK_UNIX,
@@ -366,6 +383,28 @@ int vx_set_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name);
  * @param vhi_name Empty vx_vhi_name struct to be filled
  */
 int vx_get_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name);
+
+/*!
+ * @brief Virtualized context information
+ */
+struct vx_virt_stat {
+	uint64_t offset;              /*!< Offset to the system time */
+	uint64_t uptime;              /*!< Context uptime */
+	uint32_t nr_threads;          /*!< Total number of threads */
+	uint32_t nr_running;          /*!< Number of running threads */
+	uint32_t nr_uninterruptible;  /*!< Number of uninterruptible threads */
+	uint32_t nr_onhold;           /*!< Number of threads being held */
+	uint32_t nr_forks;            /*!< Total number of forks since context startup */
+	uint32_t load[3];             /*!< Load average */
+};
+
+/*!
+ * @brief Get virtualized context information
+ * 
+ * @param xid       Context ID
+ * @param virt_stat Empty vx_virt_stat struct to be filled
+ */
+int vx_get_virt_stat(xid_t xid, struct vx_virt_stat *virt_stat);
 /*! @} syscall_cvirt */
 
 /*!
@@ -621,10 +660,10 @@ int vx_set_namespace(xid_t xid);
 #define NXF_SC_HELPER   (1ULL<<36)  /*!< Network state change helper */
 #define NXF_PERSISTENT  (1ULL<<38)  /*!< Make network context persistent */
 
-#define NXA_TYPE_IPV4  1      /*!< Address is IPv4 */
-#define NXA_TYPE_IPV6  2      /*!< Address is IPv6 */
-#define NXA_MOD_BCAST (1<<8)  /*!< Address is Broadcast*/
-#define NXA_TYPE_ANY  (~0)    /*!< Matches any address */
+#define NXA_TYPE_IPV4  1              /*!< Address is IPv4 */
+#define NXA_TYPE_IPV6  2              /*!< Address is IPv6 */
+#define NXA_MOD_BCAST (1<<8)          /*!< Address is Broadcast*/
+#define NXA_TYPE_ANY  ((uint16_t)-1)  /*!< Matches any address */
 #endif
 
 typedef uint32_t nid_t; /*!< Network context ID type */

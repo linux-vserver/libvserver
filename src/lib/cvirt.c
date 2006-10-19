@@ -51,3 +51,28 @@ int vx_get_vhi_name(xid_t xid, struct vx_vhi_name *vhi_name)
 
 	return rc;
 }
+
+int vx_get_virt_stat(xid_t xid, struct vx_virt_stat *virt_stat)
+{
+	struct vcmd_virt_stat_v0 res;
+
+	int rc = sys_vserver(VCMD_virt_stat, xid, &res);
+
+	if (rc == -1)
+		return rc;
+
+	if (virt_stat != NULL) {
+		virt_stat->offset             = res.offset;
+		virt_stat->uptime             = res.uptime;
+		virt_stat->nr_threads         = res.nr_threads;
+		virt_stat->nr_running         = res.nr_running;
+		virt_stat->nr_uninterruptible = res.nr_uninterruptible;
+		virt_stat->nr_onhold          = res.nr_onhold;
+		virt_stat->nr_forks           = res.nr_forks;
+		virt_stat->load[0]            = res.load[0];
+		virt_stat->load[1]            = res.load[1];
+		virt_stat->load[2]            = res.load[2];
+	}
+
+	return rc;
+}

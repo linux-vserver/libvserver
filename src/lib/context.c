@@ -46,6 +46,23 @@ int vx_get_info(xid_t xid, struct vx_info *info)
 	return rc;
 }
 
+int vx_get_stat(xid_t xid, struct vx_stat *stat)
+{
+	struct vcmd_ctx_stat_v0 res;
+
+	int rc = sys_vserver(VCMD_ctx_stat, xid, &res);
+
+	if (rc == -1)
+		return rc;
+
+	if (stat != NULL) {
+		stat->usecnt = res.usecnt;
+		stat->tasks  = res.tasks;
+	}
+
+	return rc;
+}
+
 int vx_create(xid_t xid, struct vx_create_flags *create_flags)
 {
 	struct vcmd_ctx_create res = {
