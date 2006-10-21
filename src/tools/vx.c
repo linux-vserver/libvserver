@@ -38,27 +38,26 @@ static const char *rcsid = "$Id: vx.c 294 2006-07-09 08:46:15Z hollow $";
 static
 struct option long_opts[] = {
 	COMMON_LONG_OPTS
-	{ "create",      1, 0, 0x10 },
-	{ "migrate",     1, 0, 0x11 },
-	{ "set-bcaps",   1, 0, 0x12 },
-	{ "set-ccaps",   1, 0, 0x13 },
-	{ "set-flags",   1, 0, 0x14 },
-	{ "set-limit",   1, 0, 0x15 },
-	{ "set-sched",   1, 0, 0x16 },
-	{ "set-vhi",     1, 0, 0x17 },
-	{ "get-bcaps",   1, 0, 0x18 },
-	{ "get-ccaps",   1, 0, 0x19 },
-	{ "get-flags",   1, 0, 0x1A },
-	{ "get-limit",   1, 0, 0x1B },
-	{ "get-vhi",     1, 0, 0x1C },
-	{ "stat",        1, 0, 0x1D },
-	{ "virt-stat",   1, 0, 0x1E },
-	{ "sock-stat",   1, 0, 0x1F },
-	{ "limit-stat",  1, 0, 0x20 },
-	{ "limit-reset", 1, 0, 0x21 },
-	{ "kill",        1, 0, 0x22 },
-	{ "wait",        1, 0, 0x23 },
-	{ NULL,          0, 0, 0 },
+	{ "create",           1, 0, 0x10 },
+	{ "migrate",          1, 0, 0x11 },
+	{ "get-info",         1, 0, 0x12 },
+	{ "set-bcaps",        1, 0, 0x13 },
+	{ "set-ccaps",        1, 0, 0x14 },
+	{ "set-flags",        1, 0, 0x15 },
+	{ "set-limit",        1, 0, 0x16 },
+	{ "set-sched",        1, 0, 0x17 },
+	{ "set-uname",        1, 0, 0x18 },
+	{ "get-bcaps",        1, 0, 0x19 },
+	{ "get-ccaps",        1, 0, 0x1A },
+	{ "get-flags",        1, 0, 0x1B },
+	{ "get-limit",        1, 0, 0x1C },
+	{ "get-uname",        1, 0, 0x1D },
+	{ "get-stat",         1, 0, 0x1E },
+	{ "get-limit-stat",   1, 0, 0x1F },
+	{ "reset-limit-stat", 1, 0, 0x20 },
+	{ "kill",             1, 0, 0x21 },
+	{ "wait",             1, 0, 0x22 },
+	{ NULL,               0, 0, 0 },
 };
 
 static
@@ -93,27 +92,25 @@ static inline
 void usage(int rc)
 {
 	printf("Usage:\n\n"
-	          "vx -create      <xid> [<list>] [-- <program> <args>*]\n"
-	          "   -migrate     <xid> [<list>] -- <program> <args>*\n"
-	          "   -login       <xid> [-- <program> <args>*]\n"
-	          "   -set-bcaps   <xid> <list>\n"
-	          "   -set-ccaps   <xid> <list>\n"
-	          "   -set-flags   <xid> <list>\n"
-	          "   -set-limit   <xid> <type>=<min>,<soft>,<hard>*\n"
-	          "   -set-sched   <xid> <type>=<value>*\n"
-	          "   -set-vhi     <xid> <type>=<value>*\n"
-	          "   -get-bcaps   <xid>\n"
-	          "   -get-ccaps   <xid>\n"
-	          "   -get-flags   <xid>\n"
-	          "   -get-limit   <xid> <type>*\n"
-	          "   -get-vhi     <xid> <type>*\n"
-	          "   -stat        <xid>\n"
-	          "   -virt-stat   <xid>\n"
-	          "   -sock-stat   <xid> <type>*\n"
-	          "   -limit-stat  <xid> <type>*\n"
-	          "   -limit-reset <xid>\n"
-	          "   -kill        <xid> [<pid> <sig>]\n"
-	          "   -wait        <xid>\n"
+	          "vx -create           <xid> [<list>] [-- <program> <args>*]\n"
+	          "   -migrate          <xid> [<list>] -- <program> <args>*\n"
+	          "   -get-info         <xid>\n"
+	          "   -set-bcaps        <xid> <list>\n"
+	          "   -set-ccaps        <xid> <list>\n"
+	          "   -set-flags        <xid> <list>\n"
+	          "   -set-limit        <xid> <type>=<min>,<soft>,<hard>*\n"
+	          "   -set-sched        <xid> <type>=<value>*\n"
+	          "   -set-uname        <xid> <type>=<value>*\n"
+	          "   -get-bcaps        <xid>\n"
+	          "   -get-ccaps        <xid>\n"
+	          "   -get-flags        <xid>\n"
+	          "   -get-limit        <xid> <type>*\n"
+	          "   -get-uname        <xid> <type>*\n"
+	          "   -get-stat         <xid>\n"
+	          "   -get-limit-stat   <xid> <type>*\n"
+	          "   -reset-limit-stat <xid>\n"
+	          "   -kill             <xid> [<pid> <sig>]\n"
+	          "   -wait             <xid>\n"
 	          );
 	exit(rc);
 }
@@ -126,91 +123,30 @@ int main(int argc, char *argv[])
 	xid_t xid = 0;
 	char *buf;
 	uint64_t mask;
+	pid_t pid = 0;
+	int sig = SIGKILL;
 	
 	/* syscall data */
-	struct vx_create_flags cf = {
-		.flags = 0,
+	struct vx_info        info;
+	struct vx_stat        stat;
+	struct vx_flags       flags;
+	struct vx_sched       sched;
+	struct vx_caps        ccaps;
+	struct vx_uname       uname;
+	struct vx_wait_result wait_result;
+	struct vx_limit_stat  limit_stat;
+	
+	/* TODO: do we really need to initialize this to ~0ULL? */
+	struct vx_caps bcaps = {
+		.caps = ~(0ULL),
+		.mask = ~(0ULL),
 	};
 	
-	struct vx_migrate_flags mf = {
-		.flags = 0,
-	};
-	
-	struct vx_bcaps bcaps = {
-		.bcaps = ~(0ULL),
-		.bmask = ~(0ULL),
-	};
-	
-	struct vx_ccaps ccaps = {
-		.ccaps =   0,
-		.cmask =   0,
-	};
-	
-	struct vx_flags flags = {
-		.flags = 0,
-		.mask  = 0,
-	};
-	
-	struct vx_rlimit rlimit = {
-		.id        = 0,
+	/* TODO: move this to setlimit? */
+	struct vx_limit limit = {
 		.minimum   = CRLIM_KEEP,
 		.softlimit = CRLIM_KEEP,
 		.maximum   = CRLIM_KEEP,
-	};
-	
-	struct vx_sched sched = {
-		.set_mask   = 0,
-		.fill_rate  = 0,
-		.interval   = 0,
-		.tokens     = 0,
-		.tokens_min = 0,
-		.tokens_max = 0,
-		.prio_bias  = 0,
-	};
-	
-	struct vx_vhi_name vhiname = {
-		.field = 0,
-		.name  = "",
-	};
-	
-	struct vx_stat stat = {
-		.usecnt = 0,
-		.tasks  = 0,
-	};
-	
-	struct vx_virt_stat virt_stat = {
-		.offset = 0,
-		.uptime = 0,
-		.nr_threads = 0,
-		.nr_running = 0,
-		.nr_uninterruptible = 0,
-		.nr_onhold = 0,
-		.nr_forks = 0,
-		.load = { 0, 0, 0 },
-	};
-	
-	struct vx_sock_stat sockstat = {
-		.field = 0,
-		.count = { 0, 0, 0 },
-		.total = { 0, 0, 0 },
-	};
-	
-	struct vx_rlimit_stat rlimitstat = {
-		.id      = 0,
-		.hits    = 0,
-		.value   = 0,
-		.minimum = 0,
-		.maximum = 0,
-	};
-	
-	struct vx_wait_result wait_result = {
-		.reboot_cmd = 0,
-		.exit_code  = 0,
-	};
-	
-	struct vx_kill_opts kill_opts = {
-		.pid = 0,
-		.sig = SIGKILL,
 	};
 	
 #define CASE_GOTO(ID, P) case ID: xid = atoi(optarg); goto P; break
@@ -222,24 +158,23 @@ int main(int argc, char *argv[])
 			
 			CASE_GOTO(0x10, create);
 			CASE_GOTO(0x11, migrate);
-			CASE_GOTO(0x12, setbcaps);
-			CASE_GOTO(0x13, setccaps);
-			CASE_GOTO(0x14, setflags);
-			CASE_GOTO(0x15, setlimit);
-			CASE_GOTO(0x16, setsched);
-			CASE_GOTO(0x17, setvhi);
-			CASE_GOTO(0x18, getbcaps);
-			CASE_GOTO(0x19, getccaps);
-			CASE_GOTO(0x1A, getflags);
-			CASE_GOTO(0x1B, getlimit);
-			CASE_GOTO(0x1C, getvhi);
-			CASE_GOTO(0x1D, stat);
-			CASE_GOTO(0x1E, virtstat);
-			CASE_GOTO(0x1F, sockstat);
-			CASE_GOTO(0x20, limitstat);
-			CASE_GOTO(0x21, limitreset);
-			CASE_GOTO(0x22, kill);
-			CASE_GOTO(0x23, wait);
+			CASE_GOTO(0x12, getinfo);
+			CASE_GOTO(0x13, setbcaps);
+			CASE_GOTO(0x14, setccaps);
+			CASE_GOTO(0x15, setflags);
+			CASE_GOTO(0x16, setlimit);
+			CASE_GOTO(0x17, setsched);
+			CASE_GOTO(0x18, setuname);
+			CASE_GOTO(0x19, getbcaps);
+			CASE_GOTO(0x1A, getccaps);
+			CASE_GOTO(0x1B, getflags);
+			CASE_GOTO(0x1C, getlimit);
+			CASE_GOTO(0x1D, getuname);
+			CASE_GOTO(0x1E, getstat);
+			CASE_GOTO(0x1F, getlimitstat);
+			CASE_GOTO(0x20, resetlimitstat);
+			CASE_GOTO(0x21, kill);
+			CASE_GOTO(0x22, wait);
 			
 			DEFAULT_GETOPT_CASES
 		}
@@ -251,10 +186,10 @@ int main(int argc, char *argv[])
 	
 create:
 	if (argc > optind && strcmp(argv[optind], "--") != 0) {
-		if (flist64_from_str(argv[optind], cflags_list, &cf.flags, &mask, '~', ',') == -1)
+		if (flist64_from_str(argv[optind], cflags_list, &flags.flags, &mask, '~', ',') == -1)
 			perr("flist64_from_str");
 		
-		if (vx_create(xid, &cf) == -1)
+		if (vx_create(xid, &flags) == -1)
 			perr("vx_create");
 		
 		if (argc > optind+2)
@@ -273,10 +208,10 @@ create:
 
 migrate:
 	if (argc > optind && strcmp(argv[optind], "--") != 0) {
-		if (flist64_from_str(argv[optind], mflags_list, &mf.flags, &mask, '~', ',') == -1)
+		if (flist64_from_str(argv[optind], mflags_list, &flags.flags, &mask, '~', ',') == -1)
 			perr("flist64_from_str");
 		
-		if (vx_migrate(xid, &mf) == -1)
+		if (vx_migrate(xid, &flags) == -1)
 			perr("vx_migrate");
 		
 		if (argc > optind+2)
@@ -293,11 +228,20 @@ migrate:
 	
 	goto out;
 	
+getinfo:
+	if (vx_get_info(xid, &info) == -1)
+		perr("vx_get_info");
+	
+	printf("XID=%" PRIu32 "\n", info.xid);
+	printf("InitPID=%" PRIu32 "\n", info.initpid);
+	
+	goto out;
+	
 setbcaps:
 	if (argc <= optind)
 		goto usage;
 	
-	if (flist64_from_str(argv[optind], bcaps_list, &bcaps.bcaps, &bcaps.bmask, '~', ',') == -1)
+	if (flist64_from_str(argv[optind], bcaps_list, &bcaps.caps, &bcaps.mask, '~', ',') == -1)
 		perr("flist64_from_str");
 	
 	if (vx_set_bcaps(xid, &bcaps) == -1)
@@ -309,7 +253,7 @@ setccaps:
 	if (argc <= optind)
 		goto usage;
 	
-	if (flist64_from_str(argv[optind], ccaps_list, &ccaps.ccaps, &ccaps.cmask, '~', ',') == -1)
+	if (flist64_from_str(argv[optind], ccaps_list, &ccaps.caps, &ccaps.mask, '~', ',') == -1)
 		perr("flist64_from_str");
 	
 	if (vx_set_ccaps(xid, &ccaps) == -1)
@@ -339,27 +283,27 @@ setlimit:
 		if (buf == NULL)
 			goto usage;
 		
-		if (!(rlimit.id = flist32_getval(rlimit_list, buf)))
+		if (!(limit.id = flist32_getval(rlimit_list, buf)))
 			perr("flist32_getval");
 		
-		rlimit.id = v2i32(rlimit.id);
+		limit.id = v2i32(limit.id);
 		
 		if ((buf = strtok(NULL, ",")) == NULL)
 			goto usage;
 		else
-			rlimit.minimum = str_to_rlim(buf);
+			limit.minimum = str_to_rlim(buf);
 		
 		if ((buf = strtok(NULL, ",")) == NULL)
 			goto usage;
 		else
-			rlimit.softlimit = str_to_rlim(buf);
+			limit.softlimit = str_to_rlim(buf);
 		
 		if ((buf = strtok(NULL, ",")) == NULL)
 			goto usage;
 		else
-			rlimit.maximum = str_to_rlim(buf);
+			limit.maximum = str_to_rlim(buf);
 		
-		if (vx_set_rlimit(xid, &rlimit) == -1)
+		if (vx_set_limit(xid, &limit) == -1)
 			perr("vx_set_rlimit");
 	}
 	
@@ -431,7 +375,7 @@ setsched:
 	
 	goto out;
 	
-setvhi:
+setuname:
 	if (argc <= optind)
 		goto usage;
 	
@@ -441,21 +385,21 @@ setvhi:
 		if (buf == NULL)
 			goto usage;
 		
-		if (!(vhiname.field = flist32_getval(vhiname_list, buf)))
+		if (!(uname.id = flist32_getval(uname_list, buf)))
 			perr("flist32_getval");
 		
-		vhiname.field = v2i32(vhiname.field);
+		uname.id = v2i32(uname.id);
 		
 		buf = strtok(NULL, "=");
 		
 		if (buf == NULL)
 			goto usage;
 		
-		strncpy(vhiname.name, buf, VHILEN-1);
-		vhiname.name[VHILEN-1] = '\0';
+		bzero(uname.value, 65);
+		strncpy(uname.value, buf, 64);
 		
-		if (vx_set_vhi_name(xid, &vhiname) == -1)
-			perr("vx_set_vhi_name");
+		if (vx_set_uname(xid, &uname) == -1)
+			perr("vx_set_uname");
 	}
 	
 	goto out;
@@ -464,7 +408,7 @@ getbcaps:
 	if (vx_get_bcaps(xid, &bcaps) == -1)
 		perr("vx_get_bcaps");
 	
-	buf = flist64_to_str(bcaps_list, bcaps.bcaps, '\n');
+	buf = flist64_to_str(bcaps_list, bcaps.caps, '\n');
 	
 	if (!str_isempty(buf))
 		printf("%s\n", buf);
@@ -477,7 +421,7 @@ getccaps:
 	if (vx_get_ccaps(xid, &ccaps) == -1)
 		perr("vx_get_ccaps");
 	
-	buf = flist64_to_str(ccaps_list, ccaps.ccaps, '\n');
+	buf = flist64_to_str(ccaps_list, ccaps.caps, '\n');
 	
 	if (!str_isempty(buf))
 		printf("%s\n", buf);
@@ -504,123 +448,95 @@ getlimit:
 		goto usage;
 	
 	for (i = optind; argc > i; i++) {
-		if (!(rlimit.id = flist32_getval(rlimit_list, argv[i])))
+		if (!(limit.id = flist32_getval(rlimit_list, argv[i])))
 			perr("flist32_getval");
 		
-		rlimit.id = v2i32(rlimit.id);
+		limit.id = v2i32(limit.id);
 		
-		if (vx_get_rlimit(xid, &rlimit) == -1)
+		if (vx_get_limit(xid, &limit) == -1)
 			perr("vx_get_rlimit");
 		
 		printf("%s=", argv[i]);
 		
-		buf = rlim_to_str(rlimit.minimum);
+		buf = rlim_to_str(limit.minimum);
 		printf("%s,", buf);
 		free(buf);
 		
-		buf = rlim_to_str(rlimit.softlimit);
+		buf = rlim_to_str(limit.softlimit);
 		printf("%s,", buf);
 		free(buf);
 		
-		buf = rlim_to_str(rlimit.maximum);
+		buf = rlim_to_str(limit.maximum);
 		printf("%s\n", buf);
 		free(buf);
 	}
 	
 	goto out;
 	
-getvhi:
+getuname:
 	if (argc <= optind)
 		goto usage;
 	
 	for (i = optind; argc > i; i++) {
-		if (!(vhiname.field = flist32_getval(vhiname_list, argv[i])))
+		if (!(uname.id = flist32_getval(uname_list, argv[i])))
 			perr("flist32_getval");
 		
-		vhiname.field = v2i32(vhiname.field);
+		uname.id = v2i32(uname.id);
 		
-		if (vx_get_vhi_name(xid, &vhiname) == -1)
-			perr("vx_get_vhi_name");
+		if (vx_get_uname(xid, &uname) == -1)
+			perr("vx_get_uname");
 		
-		printf("%s=%s\n", argv[i], vhiname.name);
+		printf("%s=%s\n", argv[i], uname.value);
 	}
 	
 	goto out;
 	
-stat:
+getstat:
 	if (vx_get_stat(xid, &stat) == -1)
 		perr("vx_get_stat");
 	
 	printf("usecnt=%" PRIu32 "\n", stat.usecnt);
 	printf("tasks=%"  PRIu32 "\n", stat.tasks);
 	
-	goto out;
+	printf("nr_threads=%" PRIu32 "\n", stat.nr_threads);
+	printf("nr_running=%" PRIu32 "\n", stat.nr_running);
+	printf("nr_unintr=%"  PRIu32 "\n", stat.nr_unintr);
+	printf("nr_onhold=%"  PRIu32 "\n", stat.nr_onhold);
+	printf("nr_forks=%"   PRIu32 "\n", stat.nr_forks);
 	
-virtstat:
-	if (vx_get_virt_stat(xid, &virt_stat) == -1)
-		perr("vx_get_virt_stat");
+	printf("load[0]=%" PRIu32 "\n", stat.load[0]);
+	printf("load[1]=%" PRIu32 "\n", stat.load[1]);
+	printf("load[2]=%" PRIu32 "\n", stat.load[2]);
 	
-	printf("offset=%" PRIu64 "\n", virt_stat.offset);
-	printf("uptime=%" PRIu64 "\n", virt_stat.uptime);
-	
-	printf("nr_threads=%"         PRIu32 "\n", virt_stat.nr_threads);
-	printf("nr_running=%"         PRIu32 "\n", virt_stat.nr_running);
-	printf("nr_uninterruptible=%" PRIu32 "\n", virt_stat.nr_uninterruptible);
-	printf("nr_onhold=%"          PRIu32 "\n", virt_stat.nr_onhold);
-	printf("nr_forks=%"           PRIu32 "\n", virt_stat.nr_forks);
-	
-	printf("load[0]=%" PRIu32 "\n", virt_stat.load[0]);
-	printf("load[1]=%" PRIu32 "\n", virt_stat.load[1]);
-	printf("load[2]=%" PRIu32 "\n", virt_stat.load[2]);
+	printf("offset=%" PRIu64 "\n", stat.offset);
+	printf("uptime=%" PRIu64 "\n", stat.uptime);
 	
 	goto out;
 	
-sockstat:
+getlimitstat:
 	if (argc <= optind)
 		goto usage;
 	
 	for (i = optind; argc > i; i++) {
-		if (!(sockstat.field = flist32_getval(sock_list, argv[i])))
+		if (!(limit_stat.id = flist32_getval(rlimit_list, argv[i])))
 			perr("flist32_getval");
 		
-		sockstat.field = v2i32(sockstat.field);
+		limit_stat.id = v2i32(limit_stat.id);
 		
-		if (vx_get_sock_stat(xid, &sockstat) == -1)
-			perr("vx_get_sock_stat");
-		
-		printf("%s=%" PRIu32 "/%" PRIu64 ",%" PRIu32 "/%" PRIu64 ",%" PRIu32 "/%" PRIu64 "\n",
-		       argv[i],
-		       sockstat.count[0], sockstat.total[0],
-		       sockstat.count[1], sockstat.total[1],
-		       sockstat.count[2], sockstat.total[2]);
-	}
-	
-	goto out;
-	
-limitstat:
-	if (argc <= optind)
-		goto usage;
-	
-	for (i = optind; argc > i; i++) {
-		if (!(rlimitstat.id = flist32_getval(rlimit_list, argv[i])))
-			perr("flist32_getval");
-		
-		rlimitstat.id = v2i32(rlimitstat.id);
-		
-		if (vx_get_rlimit_stat(xid, &rlimitstat) == -1)
-			perr("vx_get_rlimit_stat");
+		if (vx_get_limit_stat(xid, &limit_stat) == -1)
+			perr("vx_get_limit_stat");
 		
 		printf("%s=%" PRIu32 ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 "\n",
 		       argv[i],
-		       rlimitstat.hits, rlimitstat.minimum,
-		       rlimitstat.value, rlimitstat.maximum);
+		       limit_stat.hits,  limit_stat.minimum,
+		       limit_stat.value, limit_stat.maximum);
 	}
 	
 	goto out;
 	
-limitreset:
-	if (vx_reset_rlimit(xid) == -1)
-		perr("vx_reset_rlimit");
+resetlimitstat:
+	if (vx_reset_limit_stat(xid) == -1)
+		perr("vx_reset_limit_stat");
 	
 	goto out;
 	
@@ -635,14 +551,14 @@ wait:
 	
 kill:
 	if (argc > optind+1) {
-		kill_opts.pid = atoi(argv[optind]);
-		kill_opts.sig = atoi(argv[optind+1]);
+		pid = atoi(argv[optind]);
+		sig = atoi(argv[optind+1]);
 	}
 	
 	else if (argc > optind)
 		goto usage;
 	
-	if (vx_kill(xid, &kill_opts) == -1)
+	if (vx_kill(xid, pid, sig) == -1)
 		perr("vx_kill");
 	
 	goto out;

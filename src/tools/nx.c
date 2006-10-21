@@ -22,8 +22,10 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <inttypes.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <lucid/bitmap.h>
 
 #include "tools.h"
 #include "vserver.h"
@@ -33,25 +35,29 @@ static const char *rcsid = "$Id: nx.c 294 2006-07-09 08:46:15Z hollow $";
 static
 struct option long_opts[] = {
 	COMMON_LONG_OPTS
-	{ "create",    1, 0, 0x10 },
-	{ "migrate",   1, 0, 0x11 },
-	{ "set-flags", 1, 0, 0x12 },
-	{ "get-flags", 1, 0, 0x13 },
-	{ "add-addr",  1, 0, 0x14 },
-	{ "rem-addr",  1, 0, 0x15 },
-	{ NULL,        0, 0, 0 },
+	{ "create",        1, 0, 0x10 },
+	{ "migrate",       1, 0, 0x11 },
+	{ "get-info",      1, 0, 0x12 },
+	{ "add-addr",      1, 0, 0x13 },
+	{ "rem-addr",      1, 0, 0x14 },
+	{ "set-flags",     1, 0, 0x15 },
+	{ "get-flags",     1, 0, 0x16 },
+	{ "get-sock-stat", 1, 0, 0x17 },
+	{ NULL,            0, 0, 0 },
 };
 
 static inline
 void usage(int rc)
 {
 	printf("Usage:\n\n"
-	          "nx -create    <nid> [<list>] [-- <program> <args>*]\n"
-	          "   -migrate   <nid> -- <program> <args>*\n"
-	          "   -set-flags <nid> <list>\n"
-	          "   -get-flags <nid>\n"
-	          "   -add-addr  <nid> <addr>/<netmask>*\n"
-	          "   -rem-addr  <nid> <addr>/<netmask>*\n");
+	       "nx -create        <nid> [<list>] [-- <program> <args>*]\n"
+	       "   -migrate       <nid> -- <program> <args>*\n"
+	       "   -get-info      <nid>\n"
+	       "   -add-addr      <nid> <addr>/<netmask>*\n"
+	       "   -rem-addr      <nid> <addr>/<netmask>*\n"
+	       "   -set-flags     <nid> <list>\n"
+	       "   -get-flags     <nid>\n"
+	       "   -get-sock-stat <nid> <type>*\n");
 	exit(rc);
 }
 
@@ -110,16 +116,10 @@ int main(int argc, char *argv[])
 	char *buf;
 	
 	/* syscall data */
-	struct nx_create_flags cf = {
-		.flags = 0,
-	};
-	
-	struct nx_flags flags = {
-		.flags = 0,
-		.mask  = 0,
-	};
-	
+	struct nx_info info;
+	struct nx_flags flags;
 	struct nx_addr addr;
+	struct nx_sock_stat sockstat;
 	
 	uint64_t mask;
 	
@@ -132,10 +132,12 @@ int main(int argc, char *argv[])
 			
 			CASE_GOTO(0x10, create);
 			CASE_GOTO(0x11, migrate);
-			CASE_GOTO(0x12, setflags);
-			CASE_GOTO(0x13, getflags);
-			CASE_GOTO(0x14, addaddr);
-			CASE_GOTO(0x15, remaddr);
+			CASE_GOTO(0x12, getinfo);
+			CASE_GOTO(0x13, addaddr);
+			CASE_GOTO(0x14, remaddr);
+			CASE_GOTO(0x15, setflags);
+			CASE_GOTO(0x16, getflags);
+			CASE_GOTO(0x17, getsockstat);
 			
 			DEFAULT_GETOPT_CASES
 		}
@@ -147,10 +149,10 @@ int main(int argc, char *argv[])
 	
 create:
 	if (argc > optind && strcmp(argv[optind], "--") != 0)
-		if (flist64_from_str(argv[optind], nflags_list, &cf.flags, &mask, '~', ',') == -1)
+		if (flist64_from_str(argv[optind], nflags_list, &flags.flags, &mask, '~', ',') == -1)
 			perr("flist64_from_str");
 	
-	if (nx_create(nid, &cf) == -1)
+	if (nx_create(nid, &flags) == -1)
 		perr("nx_create");
 	
 	if (argc > optind+1)
@@ -167,27 +169,11 @@ migrate:
 	
 	goto out;
 	
-setflags:
-	if (argc <= optind)
-		goto usage;
+getinfo:
+	if (nx_get_info(nid, &info) == -1)
+		perr("nx_get_info");
 	
-	if (flist64_from_str(argv[optind], nflags_list, &flags.flags, &flags.mask, '~', ',') == -1)
-		perr("flist64_from_str");
-	
-	if (nx_set_flags(nid, &flags) == -1)
-		perr("nx_set_flags");
-	
-	goto out;
-	
-getflags:
-	if (nx_get_flags(nid, &flags) == -1)
-		perr("nx_get_flags");
-	
-	if (!(buf = flist64_to_str(nflags_list, flags.flags, '\n')))
-		perr("flist64_to_str");
-	
-	printf("%s", buf);
-	free(buf);
+	printf("NID: %" PRIu32 "\n", info.nid);
 	
 	goto out;
 	
@@ -221,6 +207,52 @@ remaddr:
 		
 		if (nx_rem_addr(nid, &addr) == -1)
 			perr("nx_rem_addr");
+	}
+	
+	goto out;
+	
+setflags:
+	if (argc <= optind)
+		goto usage;
+	
+	if (flist64_from_str(argv[optind], nflags_list, &flags.flags, &flags.mask, '~', ',') == -1)
+		perr("flist64_from_str");
+	
+	if (nx_set_flags(nid, &flags) == -1)
+		perr("nx_set_flags");
+	
+	goto out;
+	
+getflags:
+	if (nx_get_flags(nid, &flags) == -1)
+		perr("nx_get_flags");
+	
+	if (!(buf = flist64_to_str(nflags_list, flags.flags, '\n')))
+		perr("flist64_to_str");
+	
+	printf("%s", buf);
+	free(buf);
+	
+	goto out;
+	
+getsockstat:
+	if (argc <= optind)
+		goto usage;
+	
+	for (i = optind; argc > i; i++) {
+		if (!(sockstat.id = flist32_getval(sock_list, argv[i])))
+			perr("flist32_getval");
+		
+		sockstat.id = v2i32(sockstat.id);
+		
+		if (nx_get_sock_stat(nid, &sockstat) == -1)
+			perr("nx_get_sock_stat");
+		
+		printf("%s=%" PRIu32 "/%" PRIu64 ",%" PRIu32 "/%" PRIu64 ",%" PRIu32 "/%" PRIu64 "\n",
+		       argv[i],
+		       sockstat.count[0], sockstat.total[0],
+		       sockstat.count[1], sockstat.total[1],
+		       sockstat.count[2], sockstat.total[2]);
 	}
 	
 	goto out;

@@ -59,14 +59,14 @@ int main(int argc, char *argv[])
 	char *buf;
 	
 	/* syscall data */
-	struct vx_iattr iattr = {
+	struct ix_attr attr = {
 		.filename = NULL,
 		.xid      = 0,
 		.flags    = 0,
 		.mask     = 0,
 	};
 	
-#define CASE_GOTO(ID, P) case ID: iattr.filename = optarg; goto P; break
+#define CASE_GOTO(ID, P) case ID: attr.filename = optarg; goto P; break
 	
 	/* parse command line */
 	while (GETOPT(c)) {
@@ -87,10 +87,10 @@ int main(int argc, char *argv[])
 	goto usage;
 	
 getattr:
-	if (vx_get_iattr(&iattr) == -1)
-		perr("vx_get_iattr");
+	if (ix_get_attr(&attr) == -1)
+		perr("ix_get_attr");
 	
-	if (!(buf = flist32_to_str(iattr_list, iattr.flags & iattr.mask, ',')))
+	if (!(buf = flist32_to_str(iattr_list, attr.flags & attr.mask, ',')))
 		perr("flist32_to_str");
 	
 	if (strlen(buf) > 0)
@@ -103,20 +103,23 @@ setattr:
 	if (argc <= optind)
 		goto usage;
 	
-	if (flist32_from_str(argv[optind], iattr_list, &iattr.flags, &iattr.mask, '~', ',') == -1)
+	if (flist32_from_str(argv[optind], iattr_list, &attr.flags, &attr.mask, '~', ',') == -1)
 		perr("flist32_parse");
 	
-	if (vx_set_iattr(&iattr) == -1)
-		perr("vx_set_iattr");
+	if (ix_set_attr(&attr) == -1)
+		perr("ix_set_attr");
 	
 	goto out;
 	
 getxid:
-	if (vx_get_iattr(&iattr) == -1)
-		perr("vx_get_iattr");
+	if (ix_get_attr(&attr) == -1)
+		perr("ix_get_attr");
 	
-	if (iattr.mask & IATTR_TAG)
-		printf("%" PRIu32 "\n", iattr.xid);
+	if (attr.mask & IATTR_TAG)
+		printf("%" PRIu32 "\n", attr.xid);
+	
+	else
+		err("%s: IATTR_XID not available", attr.filename);
 	
 	goto out;
 	
@@ -124,23 +127,23 @@ setxid:
 	if (argc <= optind)
 		goto usage;
 	
-	if (vx_get_iattr(&iattr) == -1)
-		perr("vx_get_iattr");
+	if (ix_get_attr(&attr) == -1)
+		perr("ix_get_attr");
 	
-	if (iattr.mask & IATTR_TAG) {
-		iattr.xid = atoi(argv[optind]);
+	if (attr.mask & IATTR_TAG) {
+		attr.xid = atoi(argv[optind]);
 		
-		iattr.flags |= IATTR_TAG;
-		iattr.mask  |= IATTR_TAG;
+		attr.flags |= IATTR_TAG;
+		attr.mask  |= IATTR_TAG;
 		
-		if (vx_set_iattr(&iattr) == -1)
-			perr("vx_set_iattr");
+		if (ix_set_attr(&attr) == -1)
+			perr("ix_set_attr");
 		
 		goto out;
 	}
 	
 	else
-		err("%s: IATTR_XID not available", iattr.filename);
+		err("%s: IATTR_XID not available", attr.filename);
 	
 	goto out;
 	

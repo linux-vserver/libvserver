@@ -33,8 +33,8 @@ static const char *rcsid = "$Id: dx.c 267 2006-07-06 08:25:19Z hollow $";
 static
 struct option long_opts[] = {
 	COMMON_LONG_OPTS
-	{ "add-path",  1, 0, 0x10 },
-	{ "rem-path",  1, 0, 0x11 },
+	{ "add-limit", 1, 0, 0x10 },
+	{ "rem-limit", 1, 0, 0x11 },
 	{ "set-limit", 1, 0, 0x12 },
 	{ "get-limit", 1, 0, 0x13 },
 	{ NULL,        0, 0, 0 },
@@ -44,8 +44,8 @@ static inline
 void usage(int rc)
 {
 	printf("Usage:\n\n"
-	       "dx -add-path  <xid> <path>\n"
-	       "   -rem-path  <xid> <path>\n"
+	       "dx -add-limit <xid> <path>\n"
+	       "   -rem-limit <xid> <path>\n"
 	       "   -set-limit <xid> <path> <su>,<st>,<iu>,<it>,<rr>\n"
 	       "   -get-limit <xid> <path>\n");
 	exit(rc);
@@ -60,12 +60,7 @@ int main(int argc, char *argv[])
 	char *buf;
 	
 	/* syscall data */
-	struct vx_dlimit_base base = {
-		.filename = NULL,
-		.flags    = 0,
-	};
-	
-	struct vx_dlimit dlimit = {
+	struct dx_limit limit = {
 		.filename     = NULL,
 		.space_used   = CDLIM_KEEP,
 		.space_total  = CDLIM_KEEP,
@@ -82,8 +77,8 @@ int main(int argc, char *argv[])
 		switch (c) {
 			COMMON_GETOPT_CASES
 			
-			CASE_GOTO(0x10, addpath);
-			CASE_GOTO(0x11, rempath);
+			CASE_GOTO(0x10, addlimit);
+			CASE_GOTO(0x11, remlimit);
 			CASE_GOTO(0x12, setlimit);
 			CASE_GOTO(0x13, getlimit);
 			
@@ -95,25 +90,25 @@ int main(int argc, char *argv[])
 	
 	goto usage;
 	
-addpath:
+addlimit:
 	if (argc <= optind)
 		goto usage;
 	
-	base.filename = argv[optind];
+	limit.filename = argv[optind];
 	
-	if (vx_add_dlimit(xid, &base) == -1)
-		perr("vx_add_dlimit");
+	if (dx_add_limit(xid, &limit) == -1)
+		perr("dx_add_limit");
 	
 	goto out;
 	
-rempath:
+remlimit:
 	if (argc <= optind)
 		goto usage;
 	
-	base.filename = argv[optind];
+	limit.filename = argv[optind];
 	
-	if (vx_rem_dlimit(xid, &base) == -1)
-		perr("vx_rem_dlimit");
+	if (dx_rem_limit(xid, &limit) == -1)
+		perr("dx_rem_limit");
 	
 	goto out;
 	
@@ -121,7 +116,7 @@ setlimit:
 	if (argc <= optind)
 		goto usage;
 	
-	dlimit.filename = argv[optind];
+	limit.filename = argv[optind];
 	
 	i = 0;
 	
@@ -136,11 +131,11 @@ setlimit:
 } while(0)
 		
 		switch (i) {
-			case 0: BUF2LIM(dlimit.space_used); break;
-			case 1: BUF2LIM(dlimit.space_total); break;
-			case 2: BUF2LIM(dlimit.inodes_used); break;
-			case 3: BUF2LIM(dlimit.inodes_total); break;
-			case 4: BUF2LIM(dlimit.reserved); break;
+			case 0: BUF2LIM(limit.space_used); break;
+			case 1: BUF2LIM(limit.space_total); break;
+			case 2: BUF2LIM(limit.inodes_used); break;
+			case 3: BUF2LIM(limit.inodes_total); break;
+			case 4: BUF2LIM(limit.reserved); break;
 		}
 		
 #undef BUF2LIM
@@ -151,8 +146,8 @@ setlimit:
 	if (i != 5)
 		goto usage;
 	
-	if (vx_set_dlimit(xid, &dlimit) == -1)
-		perr("vx_set_dlimit");
+	if (dx_set_limit(xid, &limit) == -1)
+		perr("dx_set_limit");
 	
 	goto out;
 	
@@ -160,10 +155,10 @@ getlimit:
 	if (argc <= optind)
 		goto usage;
 	
-	dlimit.filename = argv[optind];
+	limit.filename = argv[optind];
 	
-	if (vx_get_dlimit(xid, &dlimit) == -1)
-		perr("vx_get_dlimit");
+	if (dx_get_limit(xid, &limit) == -1)
+		perr("dx_get_limit");
 	
 #define LIM2OUT(LIM, DELIM) do { \
 	if (LIM == CDLIM_INFINITY) printf("%s", "inf"); \
@@ -171,11 +166,11 @@ getlimit:
 	printf("%c", DELIM); \
 } while(0)
 	
-	LIM2OUT(dlimit.space_used,   ',');
-	LIM2OUT(dlimit.space_total,  ',');
-	LIM2OUT(dlimit.inodes_used,  ',');
-	LIM2OUT(dlimit.inodes_total, ',');
-	LIM2OUT(dlimit.reserved,     '\n');
+	LIM2OUT(limit.space_used,   ',');
+	LIM2OUT(limit.space_total,  ',');
+	LIM2OUT(limit.inodes_used,  ',');
+	LIM2OUT(limit.inodes_total, ',');
+	LIM2OUT(limit.reserved,     '\n');
 	
 #undef LIM2OUT
 	

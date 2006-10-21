@@ -78,13 +78,13 @@ int main(int argc, char *argv[])
 	goto usage;
 	
 create:
-	switch((pid = vx_clone_namespace(SIGCHLD, NULL))) {
+	switch((pid = ns_clone(SIGCHLD, NULL))) {
 		case -1:
-			perr("vx_clone_namespace");
+			perr("ns_clone");
 		
 		case 0:
-			if (vx_set_namespace(xid) == -1)
-				perr("vx_set_namespace");
+			if (ns_set(xid) == -1)
+				perr("ns_set");
 			
 			goto out;
 		
@@ -102,8 +102,8 @@ create:
 	goto out;
 	
 migrate:
-	if (vx_enter_namespace(xid) == -1)
-		perr("vx_enter_namespace");
+	if (ns_enter(xid) == -1)
+		perr("ns_enter");
 	
 	if (argc > optind+1)
 		execvp(argv[optind+1], argv+optind+1);

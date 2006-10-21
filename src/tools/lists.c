@@ -110,8 +110,8 @@ FLIST64_NODE(VXM, SET_INIT)
 FLIST64_NODE(VXM, SET_REAPER)
 FLIST64_END
 
-/* virtual host information (VHI/UTS) types */
-FLIST32_START(vhiname_list)
+/* virtual system information types */
+FLIST32_START(uname_list)
 FLIST32_NODE1(VHIN, CONTEXT)
 FLIST32_NODE1(VHIN, SYSNAME)
 FLIST32_NODE1(VHIN, NODENAME)
