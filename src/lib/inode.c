@@ -19,36 +19,40 @@
 #include <config.h>
 #endif
 
-#include "vserver.h"
+#include <stdint.h>
 
 #include "linux/vserver/switch.h"
 #include "linux/vserver/inode_cmd.h"
 
-int vx_set_iattr(struct vx_iattr *iattr)
+#include "vserver.h"
+
+int ix_set_attr(struct ix_attr *attr)
 {
 	struct vcmd_ctx_iattr_v1 res;
-
-	res.name  = iattr->filename;
-	res.xid   = iattr->xid;
-	res.flags = iattr->flags;
-	res.mask  = iattr->mask;
-
+	
+	res.name  = attr->filename;
+	res.xid   = attr->xid;
+	res.flags = attr->flags;
+	res.mask  = attr->mask;
+	
 	return sys_vserver(VCMD_set_iattr, 0, &res);
 }
 
-int vx_get_iattr(struct vx_iattr *iattr)
+int ix_get_attr(struct ix_attr *attr)
 {
+	int rc;
 	struct vcmd_ctx_iattr_v1 res;
-
-	res.name = iattr->filename;
-	int rc = sys_vserver(VCMD_get_iattr, 0, &res);
+	
+	res.name = attr->filename;
+	
+	rc = sys_vserver(VCMD_get_iattr, 0, &res);
 	
 	if (rc == -1)
 		return rc;
-
-	iattr->xid   = res.xid;
-	iattr->flags = res.flags;
-	iattr->mask  = res.mask;
-
+	
+	attr->xid   = res.xid;
+	attr->flags = res.flags;
+	attr->mask  = res.mask;
+	
 	return rc;
 }

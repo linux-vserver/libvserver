@@ -22,22 +22,24 @@
 #include <sched.h>
 #include <signal.h>
 
-#include "vserver.h"
+#include <stdint.h>
 
 #include "linux/vserver/switch.h"
 #include "linux/vserver/namespace_cmd.h"
 
-int vx_clone_namespace(int flags, void *child_stack)
+#include "vserver.h"
+
+int ns_clone(int flags, void *child_stack)
 {
 	return sys_clone(flags|CLONE_NEWNS, child_stack);
 }
 
-int vx_enter_namespace(xid_t xid)
+int ns_enter(xid_t xid)
 {
 	return sys_vserver(VCMD_enter_namespace, xid, NULL);
 }
 
-int vx_set_namespace(xid_t xid)
+int ns_set(xid_t xid)
 {
 	return sys_vserver(VCMD_set_namespace, xid, NULL);
 }

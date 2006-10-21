@@ -22,17 +22,13 @@ include_HEADERS = vserver.h
 
 lib_LTLIBRARIES = libvserver.la
 
-libvserver_la_SOURCES = cacct.c \
-                        context.c \
-                        cvirt.c \
-                        debug.c \
+libvserver_la_SOURCES = context.c \
                         dlimit.c \
                         inode.c \
                         limit.c \
                         namespace.c \
                         network.c \
                         sched.c \
-                        signal.c \
                         switch.c \
                         syscall.c
 

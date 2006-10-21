@@ -46,7 +46,9 @@ int vx_set_sched(xid_t xid, struct vx_sched *sched)
 		res4.bucket_id     = sched->bucket_id;
 		
 		return sys_vserver(VCMD_set_sched, xid, &res4);
-	} else {
+	}
+	
+	else {
 		res3.set_mask      = sched->set_mask & VXSM_V3_MASK;
 		res3.fill_rate     = sched->fill_rate;
 		res3.interval      = sched->interval;

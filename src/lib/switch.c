@@ -19,12 +19,19 @@
 #include <config.h>
 #endif
 
-#include "vserver.h"
+#include <stdint.h>
 
 #include "linux/vserver/switch.h"
+#include "linux/vserver/debug_cmd.h"
+
+#include "vserver.h"
 
 int vs_get_version(void)
 {
 	return sys_vserver(VCMD_get_version, 0, NULL);
 }
 
+int vs_dump_history(void)
+{
+	return sys_vserver(VCMD_dump_history, 0, NULL);
+}

@@ -19,12 +19,31 @@
 #include <config.h>
 #endif
 
+#include <stdint.h>
 #include <string.h>
+
+#include "linux/vserver/switch.h"
+#include "linux/vserver/cacct_cmd.h"
+#include "linux/vserver/network_cmd.h"
 
 #include "vserver.h"
 
-#include "linux/vserver/switch.h"
-#include "linux/vserver/network_cmd.h"
+int nx_create(nid_t nid, struct nx_flags *flags)
+{
+	struct vcmd_net_create res = {
+		.flagword = 0,
+	};
+	
+	if (flags != NULL)
+		res.flagword = flags->flags;
+	
+	return sys_vserver(VCMD_net_create, nid, &res);
+}
+
+int nx_migrate(nid_t nid)
+{
+	return sys_vserver(VCMD_net_migrate, nid, NULL);
+}
 
 int nx_get_task_nid(pid_t pid)
 {
@@ -44,23 +63,6 @@ int nx_get_info(nid_t nid, struct nx_info *info)
 		info->nid = res.nid;
 
 	return rc;
-}
-
-int nx_create(nid_t nid, struct nx_create_flags *create_flags)
-{
-	struct vcmd_net_create res = {
-		.flagword = 0,
-	};
-
-	if (create_flags != NULL)
-		res.flagword = create_flags->flags;
-
-	return sys_vserver(VCMD_net_create, nid, &res);
-}
-
-int nx_migrate(nid_t nid)
-{
-	return sys_vserver(VCMD_net_migrate, nid, NULL);
 }
 
 int nx_add_addr(nid_t nid, struct nx_addr *addr)
@@ -134,5 +136,27 @@ int nx_get_caps(nid_t nid, struct nx_caps *caps)
 	caps->caps = res.ncaps;
 	caps->mask = res.cmask;
 
+	return rc;
+}
+
+int nx_get_sock_stat(nid_t nid, struct nx_sock_stat *stat)
+{
+	struct vcmd_sock_stat_v0 res;
+
+	res.field = stat->id;
+
+	int rc = sys_vserver(VCMD_sock_stat, nid, &res);
+	
+	if (rc == -1)
+		return rc;
+	
+	stat->count[0] = res.count[0];
+	stat->count[1] = res.count[1];
+	stat->count[2] = res.count[2];
+	
+	stat->total[0] = res.total[0];
+	stat->total[1] = res.total[1];
+	stat->total[2] = res.total[2];
+	
 	return rc;
 }

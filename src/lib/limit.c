@@ -19,75 +19,82 @@
 #include <config.h>
 #endif
 
-#include "vserver.h"
+#include <stdint.h>
 
 #include "linux/vserver/switch.h"
 #include "linux/vserver/limit_cmd.h"
 
-int vx_set_rlimit(xid_t xid, struct vx_rlimit *rlimit)
+#include "vserver.h"
+
+int vx_get_limit_mask(struct vx_limit_mask *mask)
+{
+	int rc;
+	struct vcmd_ctx_rlimit_mask_v0 res;
+	
+	rc = sys_vserver(VCMD_get_rlimit_mask, 0, &res);
+	
+	if (rc == -1)
+		return rc;
+	
+	mask->minimum   = res.minimum;
+	mask->softlimit = res.softlimit;
+	mask->maximum   = res.maximum;
+	
+	return rc;
+}
+
+int vx_set_limit(xid_t xid, struct vx_limit *limit)
 {
 	struct vcmd_ctx_rlimit_v0 res;
 	
-	res.id        = rlimit->id;
-	res.minimum   = rlimit->minimum;
-	res.softlimit = rlimit->softlimit;
-	res.maximum   = rlimit->maximum;
+	res.id        = limit->id;
+	res.minimum   = limit->minimum;
+	res.softlimit = limit->softlimit;
+	res.maximum   = limit->maximum;
 	
 	return sys_vserver(VCMD_set_rlimit, xid, &res);
 }
 
-int vx_get_rlimit(xid_t xid, struct vx_rlimit *rlimit)
+int vx_get_limit(xid_t xid, struct vx_limit *limit)
 {
+	int rc;
 	struct vcmd_ctx_rlimit_v0 res;
 	
-	res.id = rlimit->id;
-	int rc = sys_vserver(VCMD_get_rlimit, xid, &res);
+	res.id = limit->id;
+	
+	rc = sys_vserver(VCMD_get_rlimit, xid, &res);
 	
 	if (rc == -1)
 		return rc;
 	
-	rlimit->minimum   = res.minimum;
-	rlimit->softlimit = res.softlimit;
-	rlimit->maximum   = res.maximum;
+	limit->minimum   = res.minimum;
+	limit->softlimit = res.softlimit;
+	limit->maximum   = res.maximum;
 	
 	return rc;
 }
 
-int vx_get_rlimit_stat(xid_t xid, struct vx_rlimit_stat *rlimit_stat)
+int vx_get_limit_stat(xid_t xid, struct vx_limit_stat *stat)
 {
+	int rc;
 	struct vcmd_rlimit_stat_v0 res;
 	
-	res.id = rlimit_stat->id;
-	int rc = sys_vserver(VCMD_rlimit_stat, xid, &res);
+	res.id = stat->id;
+	
+	rc = sys_vserver(VCMD_rlimit_stat, xid, &res);
 	
 	if (rc == -1)
 		return rc;
 	
-	rlimit_stat->hits    = res.hits;
-	rlimit_stat->value   = res.value;
-	rlimit_stat->minimum = res.minimum;
-	rlimit_stat->maximum = res.maximum;
+	stat->hits    = res.hits;
+	stat->value   = res.value;
+	stat->minimum = res.minimum;
+	stat->maximum = res.maximum;
 	
 	return rc;
 }
 
-int vx_reset_rlimit(xid_t xid)
+int vx_reset_limit_stat(xid_t xid)
 {
 	return sys_vserver(VCMD_reset_minmax, xid, NULL);
-}
-
-int vx_get_rlimit_mask(struct vx_rlimit_mask *rmask)
-{
-	struct vcmd_ctx_rlimit_mask_v0 res;
-	
-	int rc = sys_vserver(VCMD_get_rlimit_mask, 0, &res);
-	
-	if (rc == -1)
-		return rc;
-	
-	rmask->minimum   = res.minimum;
-	rmask->softlimit = res.softlimit;
-	rmask->maximum   = res.maximum;
-	
-	return rc;
 }
