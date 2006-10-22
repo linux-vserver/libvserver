@@ -30,8 +30,3 @@ int vs_get_version(void)
 {
 	return sys_vserver(VCMD_get_version, 0, NULL);
 }
-
-int vs_dump_history(void)
-{
-	return sys_vserver(VCMD_dump_history, 0, NULL);
-}

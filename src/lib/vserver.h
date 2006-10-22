@@ -68,10 +68,6 @@ int sys_clone(int flags, void *child_stack);
  */
 int vs_get_version(void);
 
-/*!
- * @brief Dump command history
- */
-int vs_dump_history(void);
 
 
 /*!
