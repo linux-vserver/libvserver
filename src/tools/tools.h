@@ -30,24 +30,14 @@
 
 #define GETOPT(VAL) ((VAL = getopt_long_only(argc, argv, "", long_opts, NULL)) != -1)
 
-/* msg.c */
-#define INIT_ARGV0 argv0 = argv[0];
-
-extern const char *argv0;
-
-void warn  (const char *fmt, /*args*/ ...);
-void pwarn (const char *fmt, /*args*/ ...);
-void err   (const char *fmt, /*args*/ ...);
-void perr  (const char *fmt, /*args*/ ...);
-
 /* lists.c */
-extern const flist64_t bcaps_list[];
-extern const flist64_t ccaps_list[];
-extern const flist64_t cflags_list[];
-extern const flist64_t mflags_list[];
-extern const flist32_t uname_list[];
-extern const flist32_t iattr_list[];
-extern const flist32_t rlimit_list[];
-extern const flist64_t nflags_list[];
-extern const flist32_t sched_list[];
-extern const flist32_t sock_list[];
+extern const flist32_t ix_attr_list[];
+extern const flist64_t nx_flags_list[];
+extern const flist32_t nx_sock_list[];
+extern const flist64_t vx_bcaps_list[];
+extern const flist64_t vx_ccaps_list[];
+extern const flist64_t vx_cflags_list[];
+extern const flist32_t vx_limit_list[];
+extern const flist64_t vx_mflags_list[];
+extern const flist32_t vx_sched_list[];
+extern const flist32_t vx_uname_list[];

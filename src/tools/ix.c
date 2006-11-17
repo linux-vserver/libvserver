@@ -25,6 +25,9 @@
 #include <inttypes.h>
 #include <string.h>
 
+#include <lucid/log.h>
+#include <lucid/str.h>
+
 #include "tools.h"
 #include "vserver.h"
 
@@ -33,10 +36,10 @@ static const char *rcsid = "$Id: ix.c 294 2006-07-09 08:46:15Z hollow $";
 static
 struct option long_opts[] = {
 	COMMON_LONG_OPTS
-	{ "get-attr", 1, 0, 0x10 },
-	{ "set-attr", 1, 0, 0x11 },
-	{ "get-xid",  1, 0, 0x12 },
-	{ "set-xid",  1, 0, 0x13 },
+	{ "attr-set", 0, 0, 0x10 },
+	{ "attr-get", 0, 0, 0x11 },
+	{ "xid-set",  0, 0, 0x12 },
+	{ "xid-get",  0, 0, 0x13 },
 	{ NULL,       0, 0, 0 },
 };
 
@@ -44,39 +47,42 @@ static inline
 void usage(int rc)
 {
 	printf("Usage:\n\n"
-	          "ix -get-attr <file>\n"
-	          "   -set-attr <file> <list>\n"
-	          "   -get-xid  <file>\n"
-	          "   -set-xid  <file> <xid>\n");
+	          "ix -attr-set <file>=<list>*\n"
+	          "   -attr-get <file>*\n"
+	          "   -xid-set  <file>=<xid>*\n"
+	          "   -xid-get  <file>*\n");
 	exit(rc);
 }
 
 int main(int argc, char *argv[])
 {
-	INIT_ARGV0
-	
-	int c;
+	int c, i, rc = EXIT_SUCCESS;
 	char *buf;
 	
 	/* syscall data */
-	struct ix_attr attr = {
-		.filename = NULL,
-		.xid      = 0,
-		.flags    = 0,
-		.mask     = 0,
+	ix_attr_t data;
+	
+	bzero(&data, sizeof(data));
+	
+	/* logging */
+	log_options_t log_options = {
+		.ident  = argv[0],
+		.stderr = true,
 	};
 	
-#define CASE_GOTO(ID, P) case ID: attr.filename = optarg; goto P; break
+	log_init(&log_options);
+	
+#define CASE_GOTO(ID, P) case ID: goto P; break
 	
 	/* parse command line */
 	while (GETOPT(c)) {
 		switch (c) {
 			COMMON_GETOPT_CASES
 			
-			CASE_GOTO(0x10, getattr);
-			CASE_GOTO(0x11, setattr);
-			CASE_GOTO(0x12, getxid);
-			CASE_GOTO(0x13, setxid);
+			CASE_GOTO(0x10, attrset);
+			CASE_GOTO(0x11, attrget);
+			CASE_GOTO(0x12, xidset);
+			CASE_GOTO(0x13, xidget);
 			
 			DEFAULT_GETOPT_CASES
 		}
@@ -86,64 +92,95 @@ int main(int argc, char *argv[])
 	
 	goto usage;
 	
-getattr:
-	if (ix_get_attr(&attr) == -1)
-		perr("ix_get_attr");
-	
-	if (!(buf = flist32_to_str(iattr_list, attr.flags & attr.mask, ',')))
-		perr("flist32_to_str");
-	
-	if (strlen(buf) > 0)
-		printf("%s\n", buf);
-	
-	free(buf);
-	goto out;
-	
-setattr:
+attrset:
 	if (argc <= optind)
 		goto usage;
 	
-	if (flist32_from_str(argv[optind], iattr_list, &attr.flags, &attr.mask, '~', ',') == -1)
-		perr("flist32_parse");
-	
-	if (ix_set_attr(&attr) == -1)
-		perr("ix_set_attr");
-	
-	goto out;
-	
-getxid:
-	if (ix_get_attr(&attr) == -1)
-		perr("ix_get_attr");
-	
-	if (attr.mask & IATTR_TAG)
-		printf("%" PRIu32 "\n", attr.xid);
-	
-	else
-		err("%s: IATTR_XID not available", attr.filename);
-	
-	goto out;
-	
-setxid:
-	if (argc <= optind)
-		goto usage;
-	
-	if (ix_get_attr(&attr) == -1)
-		perr("ix_get_attr");
-	
-	if (attr.mask & IATTR_TAG) {
-		attr.xid = atoi(argv[optind]);
+	for (i = optind; i < argc; i++) {
+		data.filename = strtok(argv[i], "=");
+		buf = strtok(NULL, "=");
 		
-		attr.flags |= IATTR_TAG;
-		attr.mask  |= IATTR_TAG;
+		if (str_isempty(data.filename) || str_isempty(buf))
+			rc = log_error("Invalid argument: %s", argv[i]);
 		
-		if (ix_set_attr(&attr) == -1)
-			perr("ix_set_attr");
+		else if (flist32_from_str(buf, ix_attr_list, &data.flags, &data.mask, '~', ',') == -1)
+			rc = log_perror("flist32_parse(%s)", data.filename);
 		
-		goto out;
+		else if (ix_attr_set(&data) == -1)
+			rc = log_perror("ix_attr_set(%s)", data.filename);
 	}
 	
-	else
-		err("%s: IATTR_XID not available", attr.filename);
+	goto out;
+	
+attrget:
+	if (argc <= optind)
+		goto usage;
+	
+	for (i = optind; i < argc; i++) {
+		data.filename = argv[i];
+		
+		if (ix_attr_get(&data) == -1)
+			rc = log_perror("ix_attr_get(%s)", data.filename);
+		
+		else if (!(buf = flist32_to_str(ix_attr_list, data.flags & data.mask, ',')))
+			rc = log_perror("flist32_to_str(%s)", data.filename);
+		
+		else {
+			if (!str_isempty(buf))
+				printf("%s\n", buf);
+			
+			free(buf);
+		}
+	}
+	
+	goto out;
+	
+xidset:
+	if (argc <= optind)
+		goto usage;
+	
+	for (i = optind; i < argc; i++) {
+		data.filename = strtok(argv[i], "=");
+		buf = strtok(NULL, "=");
+		
+		if (str_isempty(data.filename) || str_isempty(buf))
+			rc = log_error("Invalid argument: %s", argv[i]);
+		
+		else if (ix_attr_get(&data) == -1)
+			rc = log_perror("ix_attr_get(%s)", data.filename);
+		
+		else if (data.mask & IATTR_TAG) {
+			data.xid = atoi(buf);
+			
+			data.flags |= IATTR_TAG;
+			data.mask  |= IATTR_TAG;
+			
+			if (ix_attr_set(&data) == -1)
+				rc = log_perror("ix_attr_set(%s)", data.filename);
+		}
+		
+		else
+			rc = log_error("IATTR_TAG not available: %s", data.filename);
+	}
+	
+	goto out;
+	
+xidget:
+	if (argc <= optind)
+		goto usage;
+	
+	for (i = optind; i < argc; i++) {
+		data.filename = argv[i];
+		
+		if (ix_attr_get(&data) == -1)
+			rc = log_perror("ix_attr_get(%s)", data.filename);
+		
+		else if (data.mask & IATTR_TAG)
+			printf("%" PRIu32 "\n", data.xid);
+		
+		else
+			rc = log_error("IATTR_TAG not available: %s", data.filename);
+	}
 	
 	goto out;
 	
@@ -151,5 +188,5 @@ usage:
 	usage(EXIT_FAILURE);
 
 out:
-	exit(EXIT_SUCCESS);
+	exit(rc);
 }

@@ -40,22 +40,22 @@ sbin_PROGRAMS = dx \
 TOOLLIBS = $(LUCID_LIBS) \
            $(top_builddir)/src/lib/libvserver.la
 
-dx_SOURCES = dx.c msg.c
+dx_SOURCES = dx.c
 dx_LDADD = $(TOOLLIBS)
 
-ix_SOURCES = ix.c msg.c lists.c
+ix_SOURCES = ix.c lists.c
 ix_LDADD = $(TOOLLIBS)
 
-ns_SOURCES = ns.c msg.c
+ns_SOURCES = ns.c
 ns_LDADD = $(TOOLLIBS)
 
-nx_SOURCES = nx.c msg.c lists.c
+nx_SOURCES = nx.c lists.c
 nx_LDADD = $(TOOLLIBS)
 
-vr_SOURCES = vr.c msg.c
+vr_SOURCES = vr.c
 vr_LDADD = $(TOOLLIBS)
 
-vx_SOURCES = vx.c msg.c lists.c
+vx_SOURCES = vx.c lists.c
 vx_LDADD = $(TOOLLIBS)
 
 endif

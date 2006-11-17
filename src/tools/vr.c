@@ -23,6 +23,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/ioctl.h>
+
+#include <lucid/log.h>
 #include <lucid/open.h>
 
 #include "tools.h"
@@ -41,28 +43,33 @@ static const char *rcsid = "$Id: vr.c 238 2006-06-30 06:37:25Z hollow $";
 static
 struct option long_opts[] = {
 	COMMON_LONG_OPTS
-	{ "set-dev",   1, 0, 0x10 },
-	{ "clear-dev", 1, 0, 0x11 },
-	{ NULL,        0, 0, 0 },
+	{ "set",   1, 0, 0x10 },
+	{ "clear", 1, 0, 0x11 },
+	{ NULL,    0, 0, 0 },
 };
 
 static inline
 void usage(int rc)
 {
 	printf("Usage:\n\n"
-	          "vr -set-dev   <dev> <realdev>\n"
-	          "   -clear-dev <dev>\n");
+	          "vr -set   <dev> <realdev>\n"
+	          "   -clear <dev>\n");
 	exit(rc);
 }
 
 int main(int argc, char *argv[])
 {
-	INIT_ARGV0
-	
-	int c, fd;
+	int c, fd, realfd, rc = EXIT_SUCCESS;
 	char *dev;
 	
-	/* syscall data */
+	/* logging */
+	log_options_t log_options = {
+		.ident  = argv[0],
+		.stderr = true,
+	};
+	
+	log_init(&log_options);
+	
 #define CASE_GOTO(ID, P) case ID: dev = optarg; goto P; break
 	
 	/* parse command line */
@@ -70,8 +77,8 @@ int main(int argc, char *argv[])
 		switch (c) {
 			COMMON_GETOPT_CASES
 			
-			CASE_GOTO(0x10, setdev);
-			CASE_GOTO(0x11, cleardev);
+			CASE_GOTO(0x10, set);
+			CASE_GOTO(0x11, clear);
 			
 			DEFAULT_GETOPT_CASES
 		}
@@ -81,39 +88,41 @@ int main(int argc, char *argv[])
 	
 	goto usage;
 	
-setdev:
+set:
 	if (argc <= optind)
 		goto usage;
 	
-	fd = open_read(dev);
+	if ((fd = open_read(dev)) == -1)
+		rc = log_perror("open_read");
 	
-	if (fd == -1)
-		perr("open_read");
+	else if ((realfd = open_read(argv[optind])) == -1) {
+		close(fd);
+		rc = log_perror("open_read");
+	}
 	
-	int realfd = open_read(argv[optind]);
-	
-	if (realfd == -1)
-		perr("open_read");
-	
-	/* TODO: vr.c:97: warning: cast to pointer from integer of different size */
-	if (ioctl(fd, VROOT_SET_DEV, (void *)realfd) == -1)
-		perr("ioctl");
-	
-	close(realfd);
-	close(fd);
+	else {
+		/* TODO: vr.c:97: warning: cast to pointer from integer of different size */
+		if (ioctl(fd, VROOT_SET_DEV, (void *)realfd) == -1)
+			rc = log_perror("ioctl");
+		
+		close(realfd);
+		close(fd);
+	}
 	
 	goto out;
 	
-cleardev:
+clear:
 	fd = open_read(dev);
 	
 	if (fd == -1)
-		perr("open_read");
+		rc = log_perror("open_read");
 	
-	if (ioctl(fd, VROOT_CLR_DEV, 0) == -1)
-		perr("ioctl");
-	
-	close(fd);
+	else {
+		if (ioctl(fd, VROOT_CLR_DEV, 0) == -1)
+			rc = log_perror("ioctl");
+		
+		close(fd);
+	}
 	
 	goto out;
 	
@@ -121,5 +130,5 @@ usage:
 	usage(EXIT_FAILURE);
 
 out:
-	exit(EXIT_SUCCESS);
+	exit(rc);
 }

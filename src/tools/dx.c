@@ -25,6 +25,9 @@
 #include <string.h>
 #include <inttypes.h>
 
+#include <lucid/log.h>
+#include <lucid/str.h>
+
 #include "tools.h"
 #include "vserver.h"
 
@@ -33,42 +36,70 @@ static const char *rcsid = "$Id: dx.c 267 2006-07-06 08:25:19Z hollow $";
 static
 struct option long_opts[] = {
 	COMMON_LONG_OPTS
-	{ "add-limit", 1, 0, 0x10 },
-	{ "rem-limit", 1, 0, 0x11 },
-	{ "set-limit", 1, 0, 0x12 },
-	{ "get-limit", 1, 0, 0x13 },
-	{ NULL,        0, 0, 0 },
+	{ "limit-add",    1, 0, 0x10 },
+	{ "limit-remove", 1, 0, 0x11 },
+	{ "limit-set",    1, 0, 0x12 },
+	{ "limit-get",    1, 0, 0x13 },
+	{ NULL,           0, 0, 0 },
 };
+
+static
+uint32_t str_to_dlim(char *str)
+{
+	if (str == NULL)
+		return CDLIM_KEEP;
+	
+	if (strcmp(str, "inf") == 0)
+		return CDLIM_INFINITY;
+	
+	if (strcmp(str, "keep") == 0)
+		return CDLIM_KEEP;
+	
+	return atoi(str);
+}
+
+static
+char *dlim_to_str(uint32_t lim)
+{
+	char *buf;
+	
+	if (lim == CDLIM_INFINITY)
+		asprintf(&buf, "%s", "inf");
+	else
+		asprintf(&buf, "%" PRIu32, lim);
+	
+	return buf;
+}
 
 static inline
 void usage(int rc)
 {
 	printf("Usage:\n\n"
-	       "dx -add-limit <xid> <path>\n"
-	       "   -rem-limit <xid> <path>\n"
-	       "   -set-limit <xid> <path> <su>,<st>,<iu>,<it>,<rr>\n"
-	       "   -get-limit <xid> <path>\n");
+	       "dx -limit-add    <xid> <path>*\n"
+	       "   -limit-remove <xid> <path>*\n"
+	       "   -limit-set    <xid> <path>=<su>,<st>,<iu>,<it>,<rr>*\n"
+	       "   -limit-get    <xid> <path>*\n");
 	exit(rc);
 }
 
 int main(int argc, char *argv[])
 {
-	INIT_ARGV0
-	
-	int c, i;
-	xid_t xid = 0;
 	char *buf;
+	int c, i, rc = EXIT_SUCCESS;
+	xid_t xid = 0;
 	
 	/* syscall data */
-	struct dx_limit limit = {
-		.filename     = NULL,
-		.space_used   = CDLIM_KEEP,
-		.space_total  = CDLIM_KEEP,
-		.inodes_used  = CDLIM_KEEP,
-		.inodes_total = CDLIM_KEEP,
-		.reserved     = CDLIM_KEEP,
-		.flags        = 0,
+	dx_limit_t data;
+	
+	bzero(&data, sizeof(data));
+	
+	/* logging */
+	log_options_t log_options = {
+		.ident  = argv[0],
+		.stderr = true,
 	};
+	
+	log_init(&log_options);
 	
 #define CASE_GOTO(ID, P) case ID: xid = atoi(optarg); goto P; break
 	
@@ -77,10 +108,10 @@ int main(int argc, char *argv[])
 		switch (c) {
 			COMMON_GETOPT_CASES
 			
-			CASE_GOTO(0x10, addlimit);
-			CASE_GOTO(0x11, remlimit);
-			CASE_GOTO(0x12, setlimit);
-			CASE_GOTO(0x13, getlimit);
+			CASE_GOTO(0x10, limitadd);
+			CASE_GOTO(0x11, limitremove);
+			CASE_GOTO(0x12, limitset);
+			CASE_GOTO(0x13, limitget);
 			
 			DEFAULT_GETOPT_CASES
 		}
@@ -90,95 +121,105 @@ int main(int argc, char *argv[])
 	
 	goto usage;
 	
-addlimit:
+limitadd:
 	if (argc <= optind)
 		goto usage;
 	
-	limit.filename = argv[optind];
-	
-	if (dx_add_limit(xid, &limit) == -1)
-		perr("dx_add_limit");
-	
-	goto out;
-	
-remlimit:
-	if (argc <= optind)
-		goto usage;
-	
-	limit.filename = argv[optind];
-	
-	if (dx_rem_limit(xid, &limit) == -1)
-		perr("dx_rem_limit");
-	
-	goto out;
-	
-setlimit:
-	if (argc <= optind)
-		goto usage;
-	
-	limit.filename = argv[optind];
-	
-	i = 0;
-	
-	for (buf = strtok(argv[optind+1], ","); buf != NULL; i++) {
-		if (strlen(buf) < 1)
-			continue;
+	for (i = optind; i < argc; i++) {
+		data.filename = argv[i];
 		
-#define BUF2LIM(LIM) do { \
-	if (strcasecmp(buf, "inf") == 0)       LIM = CDLIM_INFINITY; \
-	else if (strcasecmp(buf, "keep") == 0) LIM = CDLIM_KEEP; \
-	else                                   LIM = (uint32_t) atoi(buf); \
-} while(0)
-		
-		switch (i) {
-			case 0: BUF2LIM(limit.space_used); break;
-			case 1: BUF2LIM(limit.space_total); break;
-			case 2: BUF2LIM(limit.inodes_used); break;
-			case 3: BUF2LIM(limit.inodes_total); break;
-			case 4: BUF2LIM(limit.reserved); break;
-		}
-		
-#undef BUF2LIM
-		
-		buf = strtok(NULL, ",");
+		if (dx_limit_add(xid, &data) == -1)
+			rc = log_perror("dx_limit_add(%s)", data.filename);
 	}
 	
-	if (i != 5)
-		goto usage;
-	
-	if (dx_set_limit(xid, &limit) == -1)
-		perr("dx_set_limit");
-	
 	goto out;
 	
-getlimit:
+limitremove:
 	if (argc <= optind)
 		goto usage;
 	
-	limit.filename = argv[optind];
+	for (i = optind; i < argc; i++) {
+		data.filename = argv[i];
+		
+		if (dx_limit_remove(xid, &data) == -1)
+			rc = log_perror("dx_limit_remove(%s)", data.filename);
+	}
 	
-	if (dx_get_limit(xid, &limit) == -1)
-		perr("dx_get_limit");
+	goto out;
 	
-#define LIM2OUT(LIM, DELIM) do { \
-	if (LIM == CDLIM_INFINITY) printf("%s", "inf"); \
-	else printf("%" PRIu32, LIM); \
-	printf("%c", DELIM); \
-} while(0)
+limitset:
+	if (argc <= optind)
+		goto usage;
 	
-	LIM2OUT(limit.space_used,   ',');
-	LIM2OUT(limit.space_total,  ',');
-	LIM2OUT(limit.inodes_used,  ',');
-	LIM2OUT(limit.inodes_total, ',');
-	LIM2OUT(limit.reserved,     '\n');
+	for (i = optind; i < argc; i++) {
+		data.filename = strtok(argv[i], "=");
+		
+		if (str_isempty(data.filename))
+			rc = log_error("Invalid argument: %s", argv[i]);
+		
+		else {
+			buf = strtok(NULL, ",");
+			data.space_used = str_to_dlim(buf);
+			
+			buf = strtok(NULL, ",");
+			data.space_total = str_to_dlim(buf);
+			
+			buf = strtok(NULL, ",");
+			data.inodes_used = str_to_dlim(buf);
+			
+			buf = strtok(NULL, ",");
+			data.inodes_total = str_to_dlim(buf);
+			
+			buf = strtok(NULL, ",");
+			data.reserved = str_to_dlim(buf);
+			
+			if (dx_limit_set(xid, &data) == -1)
+				rc = log_perror("dx_limit_set(%s)", data.filename);
+		}
+	}
 	
-#undef LIM2OUT
+	goto out;
+	
+limitget:
+	if (argc <= optind)
+		goto usage;
+	
+	for (i = optind; i < argc; i++) {
+		data.filename = argv[i];
+		
+		if (dx_limit_get(xid, &data) == -1)
+			rc = log_perror("dx_limit_get(%s)", data.filename);
+		
+		else {
+			printf("%s=", argv[i]);
+			
+			buf = dlim_to_str(data.space_used);
+			printf("%s,", buf);
+			free(buf);
+			
+			buf = dlim_to_str(data.space_total);
+			printf("%s,", buf);
+			free(buf);
+			
+			buf = dlim_to_str(data.inodes_used);
+			printf("%s,", buf);
+			free(buf);
+			
+			buf = dlim_to_str(data.inodes_total);
+			printf("%s,", buf);
+			free(buf);
+			
+			buf = dlim_to_str(data.reserved);
+			printf("%s,", buf);
+			free(buf);
+		}
+	}
 	
 	goto out;
 	
 usage:
 	usage(EXIT_FAILURE);
-
+	
 out:
-	exit(EXIT_SUCCESS);
+	exit(rc);
 }

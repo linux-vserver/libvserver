@@ -24,6 +24,8 @@
 #include <stdio.h>
 #include <wait.h>
 
+#include <lucid/log.h>
+
 #include "tools.h"
 #include "vserver.h"
 
@@ -53,11 +55,17 @@ void usage(int rc)
 
 int main(int argc, char *argv[])
 {
-	INIT_ARGV0
-	
-	int c, status;
+	int c, status, rc = EXIT_SUCCESS;
 	xid_t xid = 0;
 	pid_t pid;
+	
+	/* logging */
+	log_options_t log_options = {
+		.ident  = argv[0],
+		.stderr = true,
+	};
+	
+	log_init(&log_options);
 	
 #define CASE_GOTO(ID, P) case ID: xid = atoi(optarg); goto P; break
 	
@@ -80,33 +88,34 @@ int main(int argc, char *argv[])
 create:
 	switch((pid = ns_clone(SIGCHLD, NULL))) {
 		case -1:
-			perr("ns_clone");
+			rc = log_perror("ns_clone");
+			break;
 		
 		case 0:
 			if (ns_set(xid) == -1)
-				perr("ns_set");
+				rc = log_perror("ns_set");
 			
 			goto out;
 		
 		default:
 			if (waitpid(pid, &status, 0) == -1)
-				perr("waitpid");
-			
-			if (WIFEXITED(status))
-				exit(WEXITSTATUS(status));
+				rc = log_perror("waitpid");
 			
 			if (WIFSIGNALED(status))
-				kill(getpid(), WTERMSIG(status));
+				rc = log_error("Caught signal %d", WTERMSIG(status));
+			
+			if (WIFEXITED(status))
+				rc = WEXITSTATUS(status);
 	}
 	
 	goto out;
 	
 migrate:
 	if (ns_enter(xid) == -1)
-		perr("ns_enter");
+		rc = log_perror("ns_enter");
 	
-	if (argc > optind+1)
-		execvp(argv[optind+1], argv+optind+1);
+	else if (argc > optind+1 && execvp(argv[optind+1], argv+optind+1) == -1)
+		rc = log_perror("execvp");
 	
 	goto out;
 	
@@ -114,5 +123,5 @@ usage:
 	usage(EXIT_FAILURE);
 
 out:
-	exit(EXIT_SUCCESS);
+	exit(rc);
 }
