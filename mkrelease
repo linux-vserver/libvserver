@@ -1,7 +1,7 @@
 #!/bin/bash
 
 proj="libvserver"
-svnroot="http://dev.croup.de/repos/${proj}"
+svnroot="svn+ssh://hollow@svn.linux-vserver.org/var/svn/${proj}"
 
 usage() {
 	echo "Usage: mkrelease"

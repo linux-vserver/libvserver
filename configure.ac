@@ -1,5 +1,4 @@
-# Copyright 2005 The libvserver Developers
-# See AUTHORS for details
+# Copyright 2005-2006 Benedikt Böhm <hollow@gentoo.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by  *
@@ -18,7 +17,7 @@
 
 # Generic configuration
 AC_PREREQ(2.59)
-AC_INIT(libvserver, 2.0, hollow@gentoo.org)
+AC_INIT(libvserver, 2.0_rc1, hollow@gentoo.org)
 AC_CONFIG_HEADER([config.h])
 AC_GNU_SOURCE
 
@@ -27,7 +26,7 @@ AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
 # Automake
-AM_INIT_AUTOMAKE([1.9 gnu dist-bzip2])
+AM_INIT_AUTOMAKE([1.9 foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
 # Checks for programs.
