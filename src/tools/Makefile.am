@@ -21,15 +21,6 @@ INCLUDES = -I$(top_srcdir)/src/lib
 
 noinst_HEADERS = tools.h
 
-man_MANS = dx.8 \
-           ix.8 \
-           ns.8 \
-           nx.8 \
-           vr.8 \
-           vx.8
-
-EXTRA_DIST = $(man_MANS)
-
 sbin_PROGRAMS = dx \
                 ix \
                 ns \
