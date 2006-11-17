@@ -20,81 +20,94 @@
 #endif
 
 #include <stdint.h>
+#include <errno.h>
 
 #include "linux/vserver/switch.h"
 #include "linux/vserver/limit_cmd.h"
 
 #include "vserver.h"
 
-int vx_get_limit_mask(struct vx_limit_mask *mask)
+int vx_limit_mask_get(vx_limit_t *data)
 {
 	int rc;
-	struct vcmd_ctx_rlimit_mask_v0 res;
+	struct vcmd_ctx_rlimit_mask_v0 kdata;
 	
-	rc = sys_vserver(VCMD_get_rlimit_mask, 0, &res);
+	if (!data)
+		return errno = EINVAL, -1;
+	
+	rc = sys_vserver(VCMD_get_rlimit_mask, 0, &kdata);
 	
 	if (rc == -1)
 		return rc;
 	
-	mask->minimum   = res.minimum;
-	mask->softlimit = res.softlimit;
-	mask->maximum   = res.maximum;
+	data->minimum   = kdata.minimum;
+	data->softlimit = kdata.softlimit;
+	data->maximum   = kdata.maximum;
 	
 	return rc;
 }
 
-int vx_set_limit(xid_t xid, struct vx_limit *limit)
+int vx_limit_set(xid_t xid, vx_limit_t *data)
 {
-	struct vcmd_ctx_rlimit_v0 res;
+	struct vcmd_ctx_rlimit_v0 kdata;
 	
-	res.id        = limit->id;
-	res.minimum   = limit->minimum;
-	res.softlimit = limit->softlimit;
-	res.maximum   = limit->maximum;
+	if (!data)
+		return errno = EINVAL, -1;
 	
-	return sys_vserver(VCMD_set_rlimit, xid, &res);
+	kdata.id        = data->id;
+	kdata.minimum   = data->minimum;
+	kdata.softlimit = data->softlimit;
+	kdata.maximum   = data->maximum;
+	
+	return sys_vserver(VCMD_set_rlimit, xid, &kdata);
 }
 
-int vx_get_limit(xid_t xid, struct vx_limit *limit)
+int vx_limit_get(xid_t xid, vx_limit_t *data)
 {
 	int rc;
-	struct vcmd_ctx_rlimit_v0 res;
+	struct vcmd_ctx_rlimit_v0 kdata;
 	
-	res.id = limit->id;
+	if (!data)
+		return errno = EINVAL, -1;
 	
-	rc = sys_vserver(VCMD_get_rlimit, xid, &res);
+	kdata.id = data->id;
+	
+	rc = sys_vserver(VCMD_get_rlimit, xid, &kdata);
 	
 	if (rc == -1)
 		return rc;
 	
-	limit->minimum   = res.minimum;
-	limit->softlimit = res.softlimit;
-	limit->maximum   = res.maximum;
+	data->minimum   = kdata.minimum;
+	data->softlimit = kdata.softlimit;
+	data->maximum   = kdata.maximum;
 	
 	return rc;
 }
 
-int vx_get_limit_stat(xid_t xid, struct vx_limit_stat *stat)
+int vx_limit_stat(xid_t xid, vx_limit_stat_t *data)
 {
 	int rc;
-	struct vcmd_rlimit_stat_v0 res;
+	struct vcmd_rlimit_stat_v0 kdata;
 	
-	res.id = stat->id;
+	if (!data)
+		return errno = EINVAL, -1;
 	
-	rc = sys_vserver(VCMD_rlimit_stat, xid, &res);
+	kdata.id = data->id;
+	
+	rc = sys_vserver(VCMD_rlimit_stat, xid, &kdata);
 	
 	if (rc == -1)
 		return rc;
 	
-	stat->hits    = res.hits;
-	stat->value   = res.value;
-	stat->minimum = res.minimum;
-	stat->maximum = res.maximum;
+	data->hits    = kdata.hits;
+	data->value   = kdata.value;
+	data->minimum = kdata.minimum;
+	data->maximum = kdata.maximum;
 	
 	return rc;
 }
 
-int vx_reset_limit_stat(xid_t xid)
+int vx_limit_reset(xid_t xid)
 {
 	return sys_vserver(VCMD_reset_minmax, xid, NULL);
 }

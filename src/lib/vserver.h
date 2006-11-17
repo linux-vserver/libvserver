@@ -64,9 +64,16 @@ int sys_clone(int flags, void *child_stack);
 /*!
  * @brief Get vserver version of running kernel
  * 
- * @return API version
+ * @return Kernel version
  */
 int vs_get_version(void);
+
+/*!
+ * @brief Get vserver configuration of running kernel
+ * 
+ * @return Kernel configuration
+ */
+int vs_get_config(void);
 
 
 
@@ -74,44 +81,7 @@ int vs_get_version(void);
  * @defgroup syscall_context Context commands
  * @{
  */
-#ifndef _LINUX_CAPABILITY_H
-#define CAP_CHOWN            0
-#define CAP_DAC_OVERRIDE     1
-#define CAP_DAC_READ_SEARCH  2
-#define CAP_FOWNER           3
-#define CAP_FSETID           4
-#define CAP_FS_MASK          0x1f
-#define CAP_KILL             5
-#define CAP_SETGID           6
-#define CAP_SETUID           7
-#define CAP_SETPCAP          8
-#define CAP_LINUX_IMMUTABLE  9
-#define CAP_NET_BIND_SERVICE 10
-#define CAP_NET_BROADCAST    11
-#define CAP_NET_ADMIN        12
-#define CAP_NET_RAW          13
-#define CAP_IPC_LOCK         14
-#define CAP_IPC_OWNER        15
-#define CAP_SYS_MODULE       16
-#define CAP_SYS_RAWIO        17
-#define CAP_SYS_CHROOT       18
-#define CAP_SYS_PTRACE       19
-#define CAP_SYS_PACCT        20
-#define CAP_SYS_ADMIN        21
-#define CAP_SYS_BOOT         22
-#define CAP_SYS_NICE         23
-#define CAP_SYS_RESOURCE     24
-#define CAP_SYS_TIME         25
-#define CAP_SYS_TTY_CONFIG   26
-#define CAP_MKNOD            27
-#define CAP_LEASE            28
-#define CAP_AUDIT_WRITE      29
-#define CAP_AUDIT_CONTROL    30
-#define CAP_CONTEXT          31
-#endif
-
 #ifndef _VX_CONTEXT_H
-#define VXC_CAP_MASK       0x00000000  /*!< ?? */
 #define VXC_SET_UTSNAME    0x00000001  /*!< Allow setdomainname(2) and sethostname(2) */
 #define VXC_SET_RLIMIT     0x00000002  /*!< Allow setrlimit(2) */
 #define VXC_RAW_ICMP       0x00000100  /*!< Allow raw ICMP sockets */
@@ -120,8 +90,8 @@ int vs_get_version(void);
 #define VXC_SECURE_REMOUNT 0x00020000  /*!< Allow secure remount */
 #define VXC_BINARY_MOUNT   0x00040000  /*!< Allow binary/network mounts */
 #define VXC_QUOTA_CTL      0x00100000  /*!< Allow quota ioctl */
-#define VXC_ADMIN_MAPPER   0x00200000  /*!< Allow device mapper */
-#define VXC_ADMIN_CLOOP    0x00400000  /*!< Allow loop devices */
+#define VXC_ADMIN_MAPPER   0x00200000  /*!< Allow access to device mapper */
+#define VXC_ADMIN_CLOOP    0x00400000  /*!< Allow access to loop devices */
 
 #define VXF_INFO_LOCK    0x00000001  /*!< Prohibit further context migration */
 #define VXF_INFO_SCHED   0x00000002  /*!< Account all processes as one (L) */
@@ -142,9 +112,9 @@ int vs_get_version(void);
 #define VXF_HIDE_MOUNT   0x01000000  /*!< Hide entries in /proc/$pid/mounts */
 #define VXF_HIDE_NETIF   0x02000000  /*!< Hide foreign network interfaces */
 #define VXF_HIDE_VINFO   0x04000000  /*!< Hide context information in task status */
-#define VXF_STATE_SETUP  (1ULL<<32)  /*!< Context is in setup state */
-#define VXF_STATE_INIT   (1ULL<<33)  /*!< Context is in init state */
-#define VXF_STATE_ADMIN  (1ULL<<34)  /*!< Context is in admin state */
+#define VXF_STATE_SETUP  (1ULL<<32)  /*!< Enable setup state */
+#define VXF_STATE_INIT   (1ULL<<33)  /*!< Enable init state */
+#define VXF_STATE_ADMIN  (1ULL<<34)  /*!< Enable admin state */
 #define VXF_SC_HELPER    (1ULL<<36)  /*!< Context state change helper */
 #define VXF_REBOOT_KILL  (1ULL<<37)  /*!< Kill all processes on reboot(2) */
 #define VXF_PERSISTENT   (1ULL<<38)  /*!< Make context persistent */
@@ -171,15 +141,15 @@ typedef uint32_t xid_t; /*!< Context ID type */
 /*!
  * @brief Context information
  */
-struct vx_info {
+typedef struct _vx_info {
 	xid_t xid;     /*!< Context ID */
 	pid_t initpid; /*!< Process ID of init */
-};
+} vx_info_t;
 
 /*!
  * @brief Context statistics
  */
-struct vx_stat {
+typedef struct _vx_stat {
 	uint32_t usecnt;     /*!< Number of context references */
 	uint32_t tasks;      /*!< Number of tasks */
 	uint32_t nr_threads; /*!< Total number of threads */
@@ -190,55 +160,47 @@ struct vx_stat {
 	uint32_t load[3];    /*!< Load average */
 	uint64_t offset;     /*!< Offset to the system time */
 	uint64_t uptime;     /*!< Context uptime */
-};
+} vx_stat_t;
 
 /*!
  * @brief Context/migration flags
  */
-struct vx_flags {
+typedef struct _vx_flags {
 	uint64_t flags; /*!< Flags */
 	uint64_t mask;  /*!< Set mask */
-};
-
-/*!
- * @brief System/context capabilities
- */
-struct vx_caps {
-	uint64_t caps; /*!< Capabilities */
-	uint64_t mask; /*!< Set mask */
-};
+} vx_flags_t;
 
 /*!
  * @brief Virtual system information data
  */
-struct vx_uname {
+typedef struct _vx_uname {
 	uint32_t id;    /*!< Name ID */
 	char value[65]; /*!< Name value */
-};
+} vx_uname_t;
 
 /*!
  * @brief Wait results
  */
-struct vx_wait_result {
+typedef struct _vx_wait {
 	int32_t reboot_cmd; /*!< Context reboot command */
 	int32_t exit_code;  /*!< Context exit code */
-};
+} vx_wait_t;
 
 /*!
- * @brief Create context
+ * @brief Create a new context
  * 
- * @param xid   Context ID
- * @param flags Initial context flags
+ * @param xid  Context ID
+ * @param data Initial context flags
  */
-int vx_create(xid_t xid, struct vx_flags *flags);
+int vx_create(xid_t xid, vx_flags_t *data);
 
 /*!
  * @brief Migrate to an existing context
  * 
- * @param xid   Context ID
- * @param flags Migration flags
+ * @param xid  Context ID
+ * @param data Migration flags
  */
-int vx_migrate(xid_t xid, struct vx_flags *flags);
+int vx_migrate(xid_t xid, vx_flags_t *data);
 
 /*!
  * @brief Get the context ID of a process
@@ -247,87 +209,87 @@ int vx_migrate(xid_t xid, struct vx_flags *flags);
  * 
  * @return Context ID
  */
-int vx_get_task_xid(pid_t pid);
+int vx_task_xid(pid_t pid);
 
 /*!
  * @brief Get context information
  * 
  * @param xid  Context ID
- * @param info Empty vx_info struct to be filled
+ * @param data Empty vx_info_t struct to be filled
  */
-int vx_get_info(xid_t xid, struct vx_info *info);
+int vx_info(xid_t xid, vx_info_t *data);
 
 /*!
  * @brief Get context statistics
  *
  * @param xid  Context ID
- * @param stat Empty vx_stat struct to be filled
+ * @param data Empty vx_stat_t struct to be filled
  */
-int vx_get_stat(xid_t xid, struct vx_stat *stat);
+int vx_stat(xid_t xid, vx_stat_t *data);
 
 /*!
  * @brief Set system capabilities
  * 
  * @param xid  Context ID
- * @param caps System capabilities
+ * @param data System capabilities
  */
-int vx_set_bcaps(xid_t xid, struct vx_caps *caps);
+int vx_bcaps_set(xid_t xid, vx_flags_t *data);
 
 /*!
  * @brief Get system capabilities
  * 
  * @param xid  Context ID
- * @param caps Empty vx_caps struct to be filled
+ * @param data Empty vx_flags_t struct to be filled
  */
-int vx_get_bcaps(xid_t xid, struct vx_caps *caps);
+int vx_bcaps_get(xid_t xid, vx_flags_t *data);
 
 /*!
  * @brief Set context capabilities
  * 
  * @param xid  Context ID
- * @param caps Context capabilities
+ * @param data Context capabilities
  */
-int vx_set_ccaps(xid_t xid, struct vx_caps *caps);
+int vx_ccaps_set(xid_t xid, vx_flags_t *data);
 
 /*!
  * @brief Get context capabilities
  * 
  * @param xid  Context ID
- * @param caps Empty vx_caps struct to be filled
+ * @param data Empty vx_flags_t struct to be filled
  */
-int vx_get_ccaps(xid_t xid, struct vx_caps *caps);
+int vx_ccaps_get(xid_t xid, vx_flags_t *data);
 
 /*!
  * @brief Set context flags
  * 
- * @param xid   Context ID
- * @param flags Context flags
+ * @param xid  Context ID
+ * @param data Context flags
  */
-int vx_set_flags(xid_t xid, struct vx_flags *flags);
+int vx_flags_set(xid_t xid, vx_flags_t *data);
 
 /*!
  * @brief Get context flags
  * 
  * @param xid   Context ID
- * @param flags Empty vx_flags struct to be filled
+ * @param data Empty vx_flags_t struct to be filled
  */
-int vx_get_flags(xid_t xid, struct vx_flags *flags);
+int vx_flags_get(xid_t xid, vx_flags_t *data);
 
 /*!
  * @brief Set virtual system information
  * 
- * @param xid   Context ID
- * @param uname Virtual system information data
+ * @param xid  Context ID
+ * @param data Virtual system information data
  */
-int vx_set_uname(xid_t xid, struct vx_uname *uname);
+int vx_uname_set(xid_t xid, vx_uname_t *data);
 
 /*!
  * @brief Get virtual system information
  * 
- * @param xid   Context ID
- * @param uname Empty vx_uname struct to be filled
+ * @param xid  Context ID
+ * @param data Empty vx_uname_t struct to be filled
  */
-int vx_get_uname(xid_t xid, struct vx_uname *uname);
+int vx_uname_get(xid_t xid, vx_uname_t *data);
 
 /*!
  * @brief Kill one or more processes
@@ -341,10 +303,10 @@ int vx_kill(xid_t xid, pid_t pid, int sig);
 /*!
  * @brief Wait for context death
  * 
- * @param xid    Context ID
- * @param result Empty vx_wait_result struct to be filled
+ * @param xid  Context ID
+ * @param data Empty vx_wait_t struct to be filled
  */
-int vx_wait(xid_t xid, struct vx_wait_result *result);
+int vx_wait(xid_t xid, vx_wait_t *data);
 /*! @} syscall_context */
 
 
@@ -375,7 +337,7 @@ int vx_wait(xid_t xid, struct vx_wait_result *result);
 /*!
  * @brief Scheduler values
  */
-struct vx_sched {
+typedef struct _vx_sched {
 	uint32_t set_mask;  /*!< Set mask */
 	int32_t fill_rate;  /*!< Fill rate */
 	int32_t interval;   /*!< Interval between fills */
@@ -385,15 +347,15 @@ struct vx_sched {
 	int32_t prio_bias;  /*!< Priority bias */
 	int32_t cpu_id;     /*!< CPU ID (for SMP machines) */
 	int32_t bucket_id;  /*!< Token Bucket ID */
-};
+} vx_sched_t;
 
 /*!
  * @brief Set scheduler values
  * 
- * @param xid   Context ID
- * @param sched Scheduler values
+ * @param xid  Context ID
+ * @param data Scheduler values
  */
-int vx_set_sched(xid_t xid, struct vx_sched *sched);
+int vx_sched_set(xid_t xid, vx_sched_t *data);
 /*! @} syscall_sched */
 
 
@@ -408,8 +370,6 @@ int vx_set_sched(xid_t xid, struct vx_sched *sched);
 #define CRLIM_KEEP     (~1ULL)  /*!< Keep current value */
 #endif
 
-#include <sys/resource.h>
-
 #ifndef _VX_LIMIT_H
 #define VLIMIT_NSOCK  16  /*!< Number of open sockets */
 #define VLIMIT_OPENFD 17  /*!< Number of open file descriptors */
@@ -421,82 +381,64 @@ int vx_set_sched(xid_t xid, struct vx_sched *sched);
 #endif
 
 /*!
- * @brief Resource limits mask
- */
-struct vx_limit_mask {
-	uint32_t minimum;   /*!< Minimum */
-	uint32_t softlimit; /*!< Softlimit */
-	uint32_t maximum;   /*!< Maximum */
-};
-
-/*!
  * @brief Resource limits
  */
-struct vx_limit {
+typedef struct _vx_limit {
 	uint32_t id;        /*!< Limit ID */
 	uint64_t minimum;   /*!< Minimum */
 	uint64_t softlimit; /*!< Softlimit */
 	uint64_t maximum;   /*!< Maximum */
-};
+} vx_limit_t;
 
 /*!
  * @brief Resource limit accounting
  */
-struct vx_limit_stat {
+typedef struct _vx_limit_stat {
 	uint32_t id;      /*!< Limit ID */
 	uint32_t hits;    /*!< Number of hits */
 	uint64_t value;   /*!< Current value */
 	uint64_t minimum; /*!< Minimum value */
 	uint64_t maximum; /*!< Maximum value */
-};
+} vx_limit_stat_t;
 
 /*!
  * @brief Get resource limits mask
  * 
- * @param mask Empty vx_rlimit_mask struct to be filled
+ * @param data Empty vx_limit_t struct to be filled
  */
-int vx_get_limit_mask(struct vx_limit_mask *mask);
+int vx_limit_mask_get(vx_limit_t *data);
 
 /*!
  * @brief Set resource limit
  * 
- * @param xid    Context ID
- * @param limit Resource limits
+ * @param xid  Context ID
+ * @param data Resource limits
  */
-int vx_set_limit(xid_t xid, struct vx_limit *limit);
+int vx_limit_set(xid_t xid, vx_limit_t *data);
 
 /*!
  * @brief Get resource limits
  * 
- * @param xid    Context ID
- * @param limit Empty vx_rlimit struct to be filled
+ * @param xid  Context ID
+ * @param data Empty vx_limit_t struct to be filled
  */
-int vx_get_limit(xid_t xid, struct vx_limit *limit);
+int vx_limit_get(xid_t xid, vx_limit_t *data);
 
 /*!
  * @brief Get resource limit accounting data
  * 
  * @param xid  Context ID
- * @param stat Empty vx_limit_stat struct to be filled
+ * @param data Empty vx_limit_stat_t struct to be filled
  */
-int vx_get_limit_stat(xid_t xid, struct vx_limit_stat *stat);
+int vx_limit_stat(xid_t xid, vx_limit_stat_t *data);
 
 /*!
  * @brief Reset resource limit accounting data
  * 
  * @param xid Context ID
  */
-int vx_reset_limit_stat(xid_t xid);
+int vx_limit_reset(xid_t xid);
 /*! @} syscall_rlimit */
-
-
-
-/*!
- * @defgroup syscall_acct Accounting commands
- * @{
- */
-
-/*! @} syscall_cacct */
 
 
 
@@ -513,7 +455,7 @@ int vx_reset_limit_stat(xid_t xid);
 /*!
  * @brief Disk limit values
  */
-struct dx_limit {
+typedef struct _dx_limit {
 	const char *filename;  /*!< Mount point */
 	uint32_t space_used;   /*!< Currently used space */
 	uint32_t space_total;  /*!< Total space */
@@ -521,39 +463,39 @@ struct dx_limit {
 	uint32_t inodes_total; /*!< Total inodes */
 	uint32_t reserved;     /*!< Space reserved for the root user */
 	uint32_t flags;        /*!< Disk limit flags */
-};
+} dx_limit_t;
 
 /*!
  * @brief Add disk limit entry
  * 
- * @param xid   Context ID
- * @param limit Disk limit information
+ * @param xid  Context ID
+ * @param data Disk limit information
  */
-int dx_add_limit(xid_t xid, struct dx_limit *limit);
+int dx_limit_add(xid_t xid, dx_limit_t *data);
 
 /*!
  * @brief Remove disk limit
  * 
- * @param xid   Context ID
- * @param limit Disk limit information
+ * @param xid  Context ID
+ * @param data Disk limit information
  */
-int dx_rem_limit(xid_t xid, struct dx_limit *limit);
+int dx_limit_remove(xid_t xid, dx_limit_t *data);
 
 /*!
  * @brief Set disk limit values
  * 
- * @param xid   Context ID
- * @param limit Disk limit values
+ * @param xid  Context ID
+ * @param data Disk limit values
  */
-int dx_set_limit(xid_t xid, struct dx_limit *limit);
+int dx_limit_set(xid_t xid, dx_limit_t *data);
 
 /*!
  * @brief Get disk limit values
  * 
- * @param xid   Context ID
- * @param limit Empty vx_limit struct to be filled
+ * @param xid  Context ID
+ * @param data Empty dx_limit_t struct to be filled
  */
-int dx_get_limit(xid_t xid, struct dx_limit *limit);
+int dx_limit_get(xid_t xid, dx_limit_t *data);
 /*! @} syscall_dlimit */
 
 
@@ -576,26 +518,26 @@ int dx_get_limit(xid_t xid, struct dx_limit *limit);
 /*!
  * @brief Inode attributes
  */
-struct ix_attr {
+typedef struct _ix_attr {
 	const char *filename; /*!< Filename */
 	xid_t xid;            /*!< Context ID */
 	uint32_t flags;       /*!< Inode flags */
 	uint32_t mask;        /*!< Set mask */
-};
+} ix_attr_t;
 
 /*!
  * @brief Set inode attributes
  * 
- * @param attr Inode attributes
+ * @param data Inode attributes
  */
-int ix_set_attr(struct ix_attr *attr);
+int ix_attr_set(ix_attr_t *data);
 
 /*!
  * @brief Get inode attributes
  * 
- * @param attr Inode attributes
+ * @param data Empty ix_attr_t struct to be filled
  */
-int ix_get_attr(struct ix_attr *attr);
+int ix_attr_get(ix_attr_t *data);
 /*! @} syscall_inode */
 
 
@@ -662,75 +604,49 @@ int ns_set(xid_t xid);
 #define NXA_SOCK_PACKET VXA_SOCK_PACKET
 #define NXA_SOCK_OTHER  VXA_SOCK_OTHER
 
-
 typedef uint32_t nid_t; /*!< Network context ID type */
 
 /*!
  * @brief Network context information
  */
-struct nx_info {
+typedef struct _nx_info {
 	nid_t nid; /*!< Network context ID */
-};
+} nx_info_t;
 
 /*!
  * @brief Network address information
  */
-struct nx_addr {
+typedef struct _nx_addr {
 	uint16_t type;    /*!< Address type */
 	uint16_t count;   /*!< Number of addresses in ip/mask */
 	uint32_t ip[4];   /*!< Up to four adresses */
 	uint32_t mask[4]; /*!< Up to four netmasks */
-};
+} nx_addr_t;
 
 /*!
  * @brief Network context flags
  */
-struct nx_flags {
+typedef struct _nx_flags {
 	uint64_t flags; /*!< Network context flags */
 	uint64_t mask;  /*!< Set mask */
-};
-
-/*!
- * @brief Network context capabilities
- */
-struct nx_caps {
-	uint64_t caps; /*!< Network context capabilities */
-	uint64_t mask; /*!< Network context capability mask */
-};
+} nx_flags_t;
 
 /*!
  * @brief Accounting data
  */
-struct nx_sock_stat {
+typedef struct _nx_sock_stat {
 	uint32_t id;       /*!< Socket type ID */
 	uint32_t count[3]; /*!< Number of packets */
 	uint64_t total[3]; /*!< Number of bytes */
-};
-
-/*!
- * @brief Get the network context ID of a process
- * 
- * @param pid Process ID
- * 
- * @return Network context ID
- */
-int nx_get_task_nid(pid_t pid);
-
-/*!
- * @brief Get network context information
- * 
- * @param nid  Network context ID
- * @param info Empty nx_info struct to be filled
- */
-int nx_get_info(nid_t nid, struct nx_info *info);
+} nx_sock_stat_t;
 
 /*!
  * @brief Create network context
  * 
- * @param nid   Network context ID
- * @param flags Initial network context flags
+ * @param nid  Network context ID
+ * @param data Initial network context flags
  */
-int nx_create(nid_t nid, struct nx_flags *flags);
+int nx_create(nid_t nid, nx_flags_t *data);
 
 /*!
  * @brief Migrate to an existing network context
@@ -740,60 +656,77 @@ int nx_create(nid_t nid, struct nx_flags *flags);
 int nx_migrate(nid_t nid);
 
 /*!
+ * @brief Get the network context ID of a process
+ * 
+ * @param pid Process ID
+ * 
+ * @return Network context ID
+ */
+int nx_task_nid(pid_t pid);
+
+/*!
+ * @brief Get network context information
+ * 
+ * @param nid  Network context ID
+ * @param data Empty nx_info_t struct to be filled
+ */
+int nx_info(nid_t nid, nx_info_t *data);
+
+/*!
  * @brief Add network context addresses
  * 
  * @param nid  Network context ID
- * @param addr Network address information
+ * @param data Network address information
  */
-int nx_add_addr(nid_t nid, struct nx_addr *addr);
+int nx_addr_add(nid_t nid, nx_addr_t *data);
 
 /*!
  * @brief Remove network context addresses
  * 
  * @param nid  Network context ID
- * @param addr Address information
+ * @param data Network address information
  */
-int nx_rem_addr(nid_t nid, struct nx_addr *addr);
+int nx_addr_remove(nid_t nid, nx_addr_t *data);
 
 /*!
  * @brief Set network context flags
  * 
- * @param nid   Network context ID
- * @param flags Network context flags
+ * @param nid  Network context ID
+ * @param data Network context flags
  */
-int nx_set_flags(nid_t nid, struct nx_flags *flags);
+int nx_flags_set(nid_t nid, nx_flags_t *data);
 
 /*!
  * @brief Get network context flags
  * 
- * @param nid   Network context ID
- * @param flags Empty nx_flags struct to be filled
+ * @param nid  Network context ID
+ * @param data Empty nx_flags_t struct to be filled
  */
-int nx_get_flags(nid_t nid, struct nx_flags *flags);
+int nx_flags_get(nid_t nid, nx_flags_t *data);
 
 /*!
  * @brief Set network context capabilities
  * 
  * @param nid  Network context ID
- * @param caps Network context capabilities
+ * @param data Network context capabilities
  */
-int nx_set_caps(nid_t nid, struct nx_caps *caps);
+int nx_caps_set(nid_t nid, nx_flags_t *data);
 
 /*!
  * @brief Get network context capabilities
  * 
  * @param nid  Network context ID
- * @param caps Empty nx_caps struct to be filled
+ * @param data Empty nx_flags_t struct to be filled
  */
-int nx_get_caps(nid_t nid, struct nx_caps *caps);
+int nx_caps_get(nid_t nid, nx_flags_t *data);
 
 /*!
  * @brief Get network socket accounting data
  *
- * @param xid  Context ID
- * @param stat Empty nx_sock_stat struct to be filled
+ * @param nid  Network context ID
+ * @param data Empty nx_sock_stat_t struct to be filled
  */
-int nx_get_sock_stat(nid_t nid, struct nx_sock_stat *stat);
+int nx_sock_stat(nid_t nid, nx_sock_stat_t *data);
 /*! @} syscall_network */
 
 #endif /* _VSERVER_H_ */

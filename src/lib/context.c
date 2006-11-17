@@ -30,221 +30,242 @@
 
 #include "vserver.h"
 
-int vx_create(xid_t xid, struct vx_flags *flags)
+int vx_create(xid_t xid, vx_flags_t *data)
 {
-	struct vcmd_ctx_create res = {
+	struct vcmd_ctx_create kdata = {
 		.flagword = 0,
 	};
 	
-	if (flags != NULL)
-		res.flagword = flags->flags;
+	if (data)
+		kdata.flagword = data->flags;
 	
-	return sys_vserver(VCMD_ctx_create, xid, &res);
+	return sys_vserver(VCMD_ctx_create, xid, &kdata);
 }
 
-int vx_migrate(xid_t xid, struct vx_flags *flags)
+int vx_migrate(xid_t xid, vx_flags_t *data)
 {
-	struct vcmd_ctx_migrate res = {
+	struct vcmd_ctx_migrate kdata = {
 		.flagword = 0,
 	};
 	
-	if (flags != NULL)
-		res.flagword = flags->flags;
+	if (data)
+		kdata.flagword = data->flags;
 	
-	return sys_vserver(VCMD_ctx_migrate, xid, &res);
+	return sys_vserver(VCMD_ctx_migrate, xid, &kdata);
 }
 
-int vx_get_task_xid(pid_t pid)
+int vx_task_xid(pid_t pid)
 {
 	return sys_vserver(VCMD_task_xid, pid, NULL);
 }
 
-int vx_get_info(xid_t xid, struct vx_info *info)
+int vx_info(xid_t xid, vx_info_t *data)
 {
-	struct vcmd_vx_info_v0 res;
+	struct vcmd_vx_info_v0 kdata;
 	
-	int rc = sys_vserver(VCMD_vx_info, xid, &res);
+	int rc = sys_vserver(VCMD_vx_info, xid, &kdata);
 	
 	if (rc == -1)
 		return rc;
 	
-	if (info != NULL) {
-		info->xid     = res.xid;
-		info->initpid = res.initpid;
+	if (data) {
+		data->xid     = kdata.xid;
+		data->initpid = kdata.initpid;
 	}
 	
 	return rc;
 }
 
-int vx_get_stat(xid_t xid, struct vx_stat *stat)
+int vx_stat(xid_t xid, vx_stat_t *data)
 {
 	int rc;
-	struct vcmd_ctx_stat_v0 res1;
-	struct vcmd_virt_stat_v0 res2;
+	struct vcmd_ctx_stat_v0 kdata1;
+	struct vcmd_virt_stat_v0 kdata2;
 	
-	rc = sys_vserver(VCMD_ctx_stat, xid, &res1);
+	rc = sys_vserver(VCMD_ctx_stat, xid, &kdata1);
 	
 	if (rc == -1)
 		return rc;
 	
-	rc = sys_vserver(VCMD_virt_stat, xid, &res2);
-
+	rc = sys_vserver(VCMD_virt_stat, xid, &kdata2);
+	
 	if (rc == -1)
 		return rc;
-
-	if (stat != NULL) {
-		stat->usecnt     = res1.usecnt;
-		stat->tasks      = res1.tasks;
-		stat->nr_threads = res2.nr_threads;
-		stat->nr_running = res2.nr_running;
-		stat->nr_unintr  = res2.nr_uninterruptible;
-		stat->nr_onhold  = res2.nr_onhold;
-		stat->nr_forks   = res2.nr_forks;
-		stat->load[0]    = res2.load[0];
-		stat->load[1]    = res2.load[1];
-		stat->load[2]    = res2.load[2];
-		stat->offset     = res2.offset;
-		stat->uptime     = res2.uptime;
+	
+	if (data) {
+		data->usecnt     = kdata1.usecnt;
+		data->tasks      = kdata1.tasks;
+		data->nr_threads = kdata2.nr_threads;
+		data->nr_running = kdata2.nr_running;
+		data->nr_unintr  = kdata2.nr_uninterruptible;
+		data->nr_onhold  = kdata2.nr_onhold;
+		data->nr_forks   = kdata2.nr_forks;
+		data->load[0]    = kdata2.load[0];
+		data->load[1]    = kdata2.load[1];
+		data->load[2]    = kdata2.load[2];
+		data->offset     = kdata2.offset;
+		data->uptime     = kdata2.uptime;
 	}
 	
 	return rc;
 }
 
-int vx_set_bcaps(xid_t xid, struct vx_caps *caps)
+int vx_bcaps_set(xid_t xid, vx_flags_t *data)
 {
-	struct vcmd_bcaps res;
+	struct vcmd_bcaps kdata;
 	
-	res.bcaps = caps->caps;
-	res.bmask = caps->mask;
-	
-	return sys_vserver(VCMD_set_bcaps, xid, &res);
-}
-
-int vx_get_bcaps(xid_t xid, struct vx_caps *caps)
-{
-	struct vcmd_bcaps res;
-	
-	int rc = sys_vserver(VCMD_get_bcaps, xid, &res);
-	
-	if (rc == -1)
-		return rc;
-	
-	caps->caps = res.bcaps;
-	caps->mask = res.bmask;
-	
-	return rc;
-}
-
-int vx_set_ccaps(xid_t xid, struct vx_caps *caps)
-{
-	struct vcmd_ctx_caps_v1 res;
-	
-	res.ccaps = caps->caps;
-	res.cmask = caps->mask;
-	
-	return sys_vserver(VCMD_set_ccaps, xid, &res);
-}
-
-int vx_get_ccaps(xid_t xid, struct vx_caps *caps)
-{
-	struct vcmd_ctx_caps_v1 res;
-	
-	int rc = sys_vserver(VCMD_get_ccaps, xid, &res);
-	
-	if (rc == -1)
-		return rc;
-	
-	caps->caps = res.ccaps;
-	caps->mask = res.cmask;
-	
-	return rc;
-}
-
-int vx_set_flags(xid_t xid, struct vx_flags *flags)
-{
-	struct vcmd_ctx_flags_v0 res;
-	
-	res.flagword = flags->flags;
-	res.mask     = flags->mask;
-	
-	return sys_vserver(VCMD_set_cflags, xid, &res);
-}
-
-int vx_get_flags(xid_t xid, struct vx_flags *flags)
-{
-	struct vcmd_ctx_flags_v0 res;
-	
-	int rc = sys_vserver(VCMD_get_cflags, xid, &res);
-	
-	if (rc == -1)
-		return rc;
-	
-	flags->flags = res.flagword;
-	flags->mask  = res.mask;
-	
-	return rc;
-}
-
-int vx_set_uname(xid_t xid, struct vx_uname *uname)
-{
-	struct vcmd_vhi_name_v0 res;
-	
-	if (strlen(uname->value) > 64)
+	if (!data)
 		return errno = EINVAL, -1;
 	
-	res.field = uname->id;
+	kdata.bcaps = data->flags;
+	kdata.bmask = data->mask;
 	
-	bzero(res.name, sizeof res.name);
-	memcpy(res.name, uname->value, sizeof res.name);
-	
-	return sys_vserver(VCMD_set_vhi_name, xid, &res);
+	return sys_vserver(VCMD_set_bcaps, xid, &kdata);
 }
 
-int vx_get_uname(xid_t xid, struct vx_uname *uname)
+int vx_bcaps_get(xid_t xid, vx_flags_t *data)
 {
-	int rc;
-	struct vcmd_vhi_name_v0 res;
+	struct vcmd_bcaps kdata;
 	
-	res.field = uname->id;
+	if (!data)
+		return errno = EINVAL, -1;
 	
-	rc = sys_vserver(VCMD_get_vhi_name, xid, &res);
+	int rc = sys_vserver(VCMD_get_bcaps, xid, &kdata);
 	
 	if (rc == -1)
 		return rc;
 	
-	bzero(uname->value, sizeof uname->value);
-	memcpy(uname->value, res.name, sizeof uname->value - 1);
+	data->flags = kdata.bcaps;
+	data->mask  = kdata.bmask;
+	
+	return rc;
+}
+
+int vx_ccaps_set(xid_t xid, vx_flags_t *data)
+{
+	struct vcmd_ctx_caps_v1 kdata;
+	
+	if (!data)
+		return errno = EINVAL, -1;
+	
+	kdata.ccaps = data->flags;
+	kdata.cmask = data->mask;
+	
+	return sys_vserver(VCMD_set_ccaps, xid, &kdata);
+}
+
+int vx_ccaps_get(xid_t xid, vx_flags_t *data)
+{
+	struct vcmd_ctx_caps_v1 kdata;
+	
+	if (!data)
+		return errno = EINVAL, -1;
+	
+	int rc = sys_vserver(VCMD_get_ccaps, xid, &kdata);
+	
+	if (rc == -1)
+		return rc;
+	
+	data->flags = kdata.ccaps;
+	data->mask  = kdata.cmask;
+	
+	return rc;
+}
+
+int vx_flags_set(xid_t xid, vx_flags_t *data)
+{
+	struct vcmd_ctx_flags_v0 kdata;
+	
+	if (!data)
+		return errno = EINVAL, -1;
+	
+	kdata.flagword = data->flags;
+	kdata.mask     = data->mask;
+	
+	return sys_vserver(VCMD_set_cflags, xid, &kdata);
+}
+
+int vx_flags_get(xid_t xid, vx_flags_t *data)
+{
+	struct vcmd_ctx_flags_v0 kdata;
+	
+	if (!data)
+		return errno = EINVAL, -1;
+	
+	int rc = sys_vserver(VCMD_get_cflags, xid, &kdata);
+	
+	if (rc == -1)
+		return rc;
+	
+	data->flags = kdata.flagword;
+	data->mask  = kdata.mask;
+	
+	return rc;
+}
+
+int vx_uname_set(xid_t xid, vx_uname_t *data)
+{
+	struct vcmd_vhi_name_v0 kdata;
+	
+	if (!data)
+		return errno = EINVAL, -1;
+	
+	if (strlen(data->value) >= sizeof(kdata.name))
+		return errno = EINVAL, -1;
+	
+	kdata.field = data->id;
+	
+	bzero(kdata.name, sizeof(kdata.name));
+	memcpy(kdata.name, data->value, sizeof(kdata.name) - 1);
+	
+	return sys_vserver(VCMD_set_vhi_name, xid, &kdata);
+}
+
+int vx_uname_get(xid_t xid, vx_uname_t *data)
+{
+	int rc;
+	struct vcmd_vhi_name_v0 kdata;
+	
+	if (!data)
+		return errno = EINVAL, -1;
+	
+	kdata.field = data->id;
+	
+	rc = sys_vserver(VCMD_get_vhi_name, xid, &kdata);
+	
+	if (rc == -1)
+		return rc;
+	
+	bzero(data->value, sizeof(kdata.name));
+	memcpy(data->value, kdata.name, sizeof(kdata.name) - 1);
 	
 	return rc;
 }
 
 int vx_kill(xid_t xid, pid_t pid, int sig)
 {
-	struct vcmd_ctx_kill_v0 res;
+	struct vcmd_ctx_kill_v0 kdata;
 	
-	res.pid = pid;
-	res.sig = sig;
+	kdata.pid = pid;
+	kdata.sig = sig;
 	
-	return sys_vserver(VCMD_ctx_kill, xid, &res);
+	return sys_vserver(VCMD_ctx_kill, xid, &kdata);
 }
 
-int vx_wait(xid_t xid, struct vx_wait_result *result)
+int vx_wait(xid_t xid, vx_wait_t *data)
 {
-	struct vcmd_wait_exit_v0 res;
+	struct vcmd_wait_exit_v0 kdata;
 	
-	int rc, version = vs_get_version();
+	int rc;
 	
-	if (version == -1)
-		return -1;
-	
-	rc = sys_vserver(VCMD_wait_exit, xid, &res);
+	rc = sys_vserver(VCMD_wait_exit, xid, &kdata);
 	
 	if (rc == -1)
 		return -1;
 	
-	if (result != NULL) {
-		result->reboot_cmd = res.reboot_cmd;
-		result->exit_code  = res.exit_code;
+	if (data) {
+		data->reboot_cmd = kdata.reboot_cmd;
+		data->exit_code  = kdata.exit_code;
 	}
 	
 	return rc;

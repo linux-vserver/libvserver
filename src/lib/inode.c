@@ -20,39 +20,46 @@
 #endif
 
 #include <stdint.h>
+#include <errno.h>
 
 #include "linux/vserver/switch.h"
 #include "linux/vserver/inode_cmd.h"
 
 #include "vserver.h"
 
-int ix_set_attr(struct ix_attr *attr)
+int ix_attr_set(ix_attr_t *data)
 {
-	struct vcmd_ctx_iattr_v1 res;
+	struct vcmd_ctx_iattr_v1 kdata;
 	
-	res.name  = attr->filename;
-	res.xid   = attr->xid;
-	res.flags = attr->flags;
-	res.mask  = attr->mask;
+	if (!data)
+		return errno = EINVAL, -1;
 	
-	return sys_vserver(VCMD_set_iattr, 0, &res);
+	kdata.name  = data->filename;
+	kdata.xid   = data->xid;
+	kdata.flags = data->flags;
+	kdata.mask  = data->mask;
+	
+	return sys_vserver(VCMD_set_iattr, 0, &kdata);
 }
 
-int ix_get_attr(struct ix_attr *attr)
+int ix_attr_get(ix_attr_t *data)
 {
 	int rc;
-	struct vcmd_ctx_iattr_v1 res;
+	struct vcmd_ctx_iattr_v1 kdata;
 	
-	res.name = attr->filename;
+	if (!data)
+		return errno = EINVAL, -1;
 	
-	rc = sys_vserver(VCMD_get_iattr, 0, &res);
+	kdata.name = data->filename;
+	
+	rc = sys_vserver(VCMD_get_iattr, 0, &kdata);
 	
 	if (rc == -1)
 		return rc;
 	
-	attr->xid   = res.xid;
-	attr->flags = res.flags;
-	attr->mask  = res.mask;
+	data->xid   = kdata.xid;
+	data->flags = kdata.flags;
+	data->mask  = kdata.mask;
 	
 	return rc;
 }

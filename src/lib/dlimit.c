@@ -20,64 +20,77 @@
 #endif
 
 #include <stdint.h>
+#include <errno.h>
 
 #include "linux/vserver/switch.h"
 #include "linux/vserver/dlimit_cmd.h"
 
 #include "vserver.h"
 
-int dx_add_limit(xid_t xid, struct dx_limit *limit)
+int dx_limit_add(xid_t xid, dx_limit_t *data)
 {
-	struct vcmd_ctx_dlimit_base_v0 res;
+	struct vcmd_ctx_dlimit_base_v0 kdata;
 	
-	res.name  = limit->filename;
-	res.flags = limit->flags;
+	if (!data)
+		return errno = EINVAL, -1;
 	
-	return sys_vserver(VCMD_add_dlimit, xid, &res);
+	kdata.name  = data->filename;
+	kdata.flags = data->flags;
+	
+	return sys_vserver(VCMD_add_dlimit, xid, &kdata);
 }
 
-int dx_rem_limit(xid_t xid, struct dx_limit *limit)
+int dx_limit_remove(xid_t xid, dx_limit_t *data)
 {
-	struct vcmd_ctx_dlimit_base_v0 res;
+	struct vcmd_ctx_dlimit_base_v0 kdata;
 	
-	res.name = limit->filename;
+	if (!data)
+		return errno = EINVAL, -1;
 	
-	return sys_vserver(VCMD_rem_dlimit, xid, &res);
+	kdata.name = data->filename;
+	
+	return sys_vserver(VCMD_rem_dlimit, xid, &kdata);
 }
 
-int dx_set_limit(xid_t xid, struct dx_limit *limit)
+int dx_limit_set(xid_t xid, dx_limit_t *data)
 {
-	struct vcmd_ctx_dlimit_v0 res;
+	struct vcmd_ctx_dlimit_v0 kdata;
 	
-	res.name         = limit->filename;
-	res.space_used   = limit->space_used;
-	res.space_total  = limit->space_total;
-	res.inodes_used  = limit->inodes_used;
-	res.inodes_total = limit->inodes_total;
-	res.reserved     = limit->reserved;
-	res.flags        = limit->flags;
+	if (!data)
+		return errno = EINVAL, -1;
 	
-	return sys_vserver(VCMD_set_dlimit, xid, &res);
+	kdata.name         = data->filename;
+	kdata.space_used   = data->space_used;
+	kdata.space_total  = data->space_total;
+	kdata.inodes_used  = data->inodes_used;
+	kdata.inodes_total = data->inodes_total;
+	kdata.reserved     = data->reserved;
+	kdata.flags        = data->flags;
+	
+	return sys_vserver(VCMD_set_dlimit, xid, &kdata);
 }
 
-int dx_get_limit(xid_t xid, struct dx_limit *limit)
+int dx_limit_get(xid_t xid, dx_limit_t *data)
 {
 	int rc;
-	struct vcmd_ctx_dlimit_v0 res;
+	struct vcmd_ctx_dlimit_v0 kdata;
 	
-	res.name = limit->filename;
+	if (!data)
+		return errno = EINVAL, -1;
 	
-	rc = sys_vserver(VCMD_get_dlimit, xid, &res);
+	kdata.name = data->filename;
+	
+	rc = sys_vserver(VCMD_get_dlimit, xid, &kdata);
 	
 	if (rc == -1)
 		return rc;
 
-	limit->space_used   = res.space_used;
-	limit->space_total  = res.space_total;
-	limit->inodes_used  = res.inodes_used;
-	limit->inodes_total = res.inodes_total;
-	limit->reserved     = res.reserved;
-	limit->flags        = res.flags;
+	data->space_used   = kdata.space_used;
+	data->space_total  = kdata.space_total;
+	data->inodes_used  = kdata.inodes_used;
+	data->inodes_total = kdata.inodes_total;
+	data->reserved     = kdata.reserved;
+	data->flags        = kdata.flags;
 	
 	return rc;
 }

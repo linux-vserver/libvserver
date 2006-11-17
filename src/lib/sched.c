@@ -24,10 +24,10 @@
 #include "linux/vserver/switch.h"
 #include "linux/vserver/sched_cmd.h"
 
-int vx_set_sched(xid_t xid, struct vx_sched *sched)
+int vx_sched_set(xid_t xid, vx_sched_t *data)
 {
-	struct vcmd_set_sched_v3 res3;
-	struct vcmd_set_sched_v4 res4;
+	struct vcmd_set_sched_v3 kdata3;
+	struct vcmd_set_sched_v4 kdata4;
 	
 	int version = vs_get_version();
 	
@@ -35,28 +35,28 @@ int vx_set_sched(xid_t xid, struct vx_sched *sched)
 		return -1;
 	
 	if (version >= 0x020100) {
-		res4.set_mask      = sched->set_mask;
-		res4.fill_rate     = sched->fill_rate;
-		res4.interval      = sched->interval;
-		res4.tokens        = sched->tokens;
-		res4.tokens_min    = sched->tokens_min;
-		res4.tokens_max    = sched->tokens_max;
-		res4.prio_bias     = sched->prio_bias;
-		res4.cpu_id        = sched->cpu_id;
-		res4.bucket_id     = sched->bucket_id;
+		kdata4.set_mask      = data->set_mask;
+		kdata4.fill_rate     = data->fill_rate;
+		kdata4.interval      = data->interval;
+		kdata4.tokens        = data->tokens;
+		kdata4.tokens_min    = data->tokens_min;
+		kdata4.tokens_max    = data->tokens_max;
+		kdata4.prio_bias     = data->prio_bias;
+		kdata4.cpu_id        = data->cpu_id;
+		kdata4.bucket_id     = data->bucket_id;
 		
-		return sys_vserver(VCMD_set_sched, xid, &res4);
+		return sys_vserver(VCMD_set_sched, xid, &kdata4);
 	}
 	
 	else {
-		res3.set_mask      = sched->set_mask & VXSM_V3_MASK;
-		res3.fill_rate     = sched->fill_rate;
-		res3.interval      = sched->interval;
-		res3.tokens        = sched->tokens;
-		res3.tokens_min    = sched->tokens_min;
-		res3.tokens_max    = sched->tokens_max;
-		res3.priority_bias = sched->prio_bias;
+		kdata3.set_mask      = data->set_mask & VXSM_V3_MASK;
+		kdata3.fill_rate     = data->fill_rate;
+		kdata3.interval      = data->interval;
+		kdata3.tokens        = data->tokens;
+		kdata3.tokens_min    = data->tokens_min;
+		kdata3.tokens_max    = data->tokens_max;
+		kdata3.priority_bias = data->prio_bias;
 		
-		return sys_vserver(VCMD_set_sched_v3, xid, &res3);
+		return sys_vserver(VCMD_set_sched_v3, xid, &kdata3);
 	}
 }

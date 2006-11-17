@@ -30,3 +30,8 @@ int vs_get_version(void)
 {
 	return sys_vserver(VCMD_get_version, 0, NULL);
 }
+
+int vs_get_config(void)
+{
+	return sys_vserver(VCMD_get_vci, 0, NULL);
+}

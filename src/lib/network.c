@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <errno.h>
 
 #include "linux/vserver/switch.h"
 #include "linux/vserver/cacct_cmd.h"
@@ -28,16 +29,16 @@
 
 #include "vserver.h"
 
-int nx_create(nid_t nid, struct nx_flags *flags)
+int nx_create(nid_t nid, nx_flags_t *data)
 {
-	struct vcmd_net_create res = {
+	struct vcmd_net_create kdata = {
 		.flagword = 0,
 	};
 	
-	if (flags != NULL)
-		res.flagword = flags->flags;
+	if (data)
+		kdata.flagword = data->flags;
 	
-	return sys_vserver(VCMD_net_create, nid, &res);
+	return sys_vserver(VCMD_net_create, nid, &kdata);
 }
 
 int nx_migrate(nid_t nid)
@@ -45,118 +46,141 @@ int nx_migrate(nid_t nid)
 	return sys_vserver(VCMD_net_migrate, nid, NULL);
 }
 
-int nx_get_task_nid(pid_t pid)
+int nx_task_nid(pid_t pid)
 {
 	return sys_vserver(VCMD_task_nid, pid, NULL);
 }
 
-int nx_get_info(nid_t nid, struct nx_info *info)
+int nx_info(nid_t nid, nx_info_t *data)
 {
-	struct vcmd_nx_info_v0 res;
+	struct vcmd_nx_info_v0 kdata;
 	
-	int rc = sys_vserver(VCMD_nx_info, nid, &res);
+	int rc = sys_vserver(VCMD_nx_info, nid, &kdata);
+	
+	if (rc == -1)
+		return rc;
+	
+	if (data)
+		data->nid = kdata.nid;
+	
+	return rc;
+}
+
+int nx_addr_add(nid_t nid, nx_addr_t *data)
+{
+	struct vcmd_net_addr_v0 kdata;
+	
+	if (!data)
+		return errno = EINVAL, -1;
+	
+	kdata.type  = data->type;
+	kdata.count = data->count;
+	
+	memcpy(kdata.ip,   data->ip,   sizeof(kdata.ip));
+	memcpy(kdata.mask, data->mask, sizeof(kdata.mask));
+	
+	return sys_vserver(VCMD_net_add, nid, &kdata);
+}
+
+int nx_addr_remove(nid_t nid, nx_addr_t *data)
+{
+	struct vcmd_net_addr_v0 kdata;
+	
+	if (!data)
+		return errno = EINVAL, -1;
+	
+	kdata.type  = data->type;
+	kdata.count = data->count;
+	
+	memcpy(kdata.ip,   data->ip,   sizeof(kdata.ip));
+	memcpy(kdata.mask, data->mask, sizeof(kdata.mask));
+	
+	return sys_vserver(VCMD_net_remove, nid, &kdata);
+}
+
+int nx_flags_set(nid_t nid, nx_flags_t *data)
+{
+	struct vcmd_net_flags_v0 kdata;
+	
+	if (!data)
+		return errno = EINVAL, -1;
+	
+	kdata.flagword = data->flags;
+	kdata.mask     = data->mask;
+	
+	return sys_vserver(VCMD_set_nflags, nid, &kdata);
+}
+
+int nx_flags_get(nid_t nid, nx_flags_t *data)
+{
+	struct vcmd_net_flags_v0 kdata;
+	
+	if (!data)
+		return errno = EINVAL, -1;
+	
+	int rc = sys_vserver(VCMD_get_nflags, nid, &kdata);
 
 	if (rc == -1)
 		return rc;
 
-	if (info != NULL)
-		info->nid = res.nid;
+	data->flags = kdata.flagword;
+	data->mask  = kdata.mask;
 
 	return rc;
 }
 
-int nx_add_addr(nid_t nid, struct nx_addr *addr)
+int nx_caps_set(nid_t nid, nx_flags_t *data)
 {
-	struct vcmd_net_addr_v0 res;
+	struct vcmd_net_caps_v0 kdata;
 
-	res.type = addr->type;
-	res.count = addr->count;
-	memcpy(res.ip, addr->ip, sizeof res.ip);
-	memcpy(res.mask, addr->mask, sizeof res.mask);
-
-	return sys_vserver(VCMD_net_add, nid, &res);
-}
-
-int nx_rem_addr(nid_t nid, struct nx_addr *addr)
-{
-	struct vcmd_net_addr_v0 res;
-
-	res.type = addr->type;
-	res.count = addr->count;
-	memcpy(res.ip, addr->ip, sizeof res.ip);
-	memcpy(res.mask, addr->mask, sizeof res.mask);
-
-	return sys_vserver(VCMD_net_remove, nid, &res);
-}
-
-int nx_set_flags(nid_t nid, struct nx_flags *flags)
-{
-	struct vcmd_net_flags_v0 res;
-
-	res.flagword = flags->flags;
-	res.mask     = flags->mask;
-
-	return sys_vserver(VCMD_set_nflags, nid, &res);
-}
-
-int nx_get_flags(nid_t nid, struct nx_flags *flags)
-{
-	struct vcmd_net_flags_v0 res;
+	if (!data)
+		return errno = EINVAL, -1;
 	
-	int rc = sys_vserver(VCMD_get_nflags, nid, &res);
+	kdata.ncaps = data->flags;
+	kdata.cmask = data->mask;
+
+	return sys_vserver(VCMD_get_ncaps, nid, &kdata);
+}
+
+int nx_caps_get(nid_t nid, nx_flags_t *data)
+{
+	struct vcmd_net_caps_v0 kdata;
+	
+	if (!data)
+		return errno = EINVAL, -1;
+	
+	int rc = sys_vserver(VCMD_get_ncaps, nid, &kdata);
 
 	if (rc == -1)
 		return rc;
 
-	flags->flags = res.flagword;
-	flags->mask  = res.mask;
+	data->flags = kdata.ncaps;
+	data->mask  = kdata.cmask;
 
 	return rc;
 }
 
-int nx_set_caps(nid_t nid, struct nx_caps *caps)
+int nx_sock_stat(nid_t nid, nx_sock_stat_t *data)
 {
-	struct vcmd_net_caps_v0 res;
+	struct vcmd_sock_stat_v0 kdata;
 
-	res.ncaps = caps->caps;
-	res.cmask = caps->mask;
-
-	return sys_vserver(VCMD_get_ncaps, nid, &res);
-}
-
-int nx_get_caps(nid_t nid, struct nx_caps *caps)
-{
-	struct vcmd_net_caps_v0 res;
+	if (!data)
+		return errno = EINVAL, -1;
 	
-	int rc = sys_vserver(VCMD_get_ncaps, nid, &res);
+	kdata.field = data->id;
 
-	if (rc == -1)
-		return rc;
-
-	caps->caps = res.ncaps;
-	caps->mask = res.cmask;
-
-	return rc;
-}
-
-int nx_get_sock_stat(nid_t nid, struct nx_sock_stat *stat)
-{
-	struct vcmd_sock_stat_v0 res;
-
-	res.field = stat->id;
-
-	int rc = sys_vserver(VCMD_sock_stat, nid, &res);
+	int rc = sys_vserver(VCMD_sock_stat, nid, &kdata);
 	
 	if (rc == -1)
 		return rc;
 	
-	stat->count[0] = res.count[0];
-	stat->count[1] = res.count[1];
-	stat->count[2] = res.count[2];
+	data->count[0] = kdata.count[0];
+	data->count[1] = kdata.count[1];
+	data->count[2] = kdata.count[2];
 	
-	stat->total[0] = res.total[0];
-	stat->total[1] = res.total[1];
-	stat->total[2] = res.total[2];
+	data->total[0] = kdata.total[0];
+	data->total[1] = kdata.total[1];
+	data->total[2] = kdata.total[2];
 	
 	return rc;
 }
