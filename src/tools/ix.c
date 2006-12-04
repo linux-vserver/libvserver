@@ -19,13 +19,14 @@
 #include <config.h>
 #endif
 
-#include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <inttypes.h>
-#include <string.h>
 
+#define _LUCID_PRINTF_MACROS
+#define _LUCID_SCANF_MACROS
 #include <lucid/log.h>
+#include <lucid/printf.h>
+#include <lucid/scanf.h>
 #include <lucid/str.h>
 
 #include "tools.h"
@@ -62,7 +63,7 @@ int main(int argc, char *argv[])
 	/* syscall data */
 	ix_attr_t data;
 	
-	bzero(&data, sizeof(data));
+	str_zero(&data, sizeof(data));
 	
 	/* logging */
 	log_options_t log_options = {
@@ -97,8 +98,12 @@ attrset:
 		goto usage;
 	
 	for (i = optind; i < argc; i++) {
-		data.filename = strtok(argv[i], "=");
-		buf = strtok(NULL, "=");
+		data.filename = argv[i];
+		
+		buf = str_index(argv[i], '=', str_len(argv[i]));
+		
+		if (buf)
+			*buf++ = '\0';
 		
 		if (str_isempty(data.filename) || str_isempty(buf))
 			rc = log_error("Invalid argument: %s", argv[i]);
@@ -140,8 +145,12 @@ xidset:
 		goto usage;
 	
 	for (i = optind; i < argc; i++) {
-		data.filename = strtok(argv[i], "=");
-		buf = strtok(NULL, "=");
+		data.filename = argv[i];
+		
+		buf = str_index(argv[i], '=', str_len(argv[i]));
+		
+		if (buf)
+			*buf++ = '\0';
 		
 		if (str_isempty(data.filename) || str_isempty(buf))
 			rc = log_error("Invalid argument: %s", argv[i]);
@@ -150,7 +159,7 @@ xidset:
 			rc = log_perror("ix_attr_get(%s)", data.filename);
 		
 		else if (data.mask & IATTR_TAG) {
-			data.xid = atoi(buf);
+			sscanf(buf, "%" SCNu32, &data.xid);
 			
 			data.flags |= IATTR_TAG;
 			data.mask  |= IATTR_TAG;

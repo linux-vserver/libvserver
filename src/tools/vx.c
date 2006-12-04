@@ -21,13 +21,15 @@
 
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <inttypes.h>
-#include <string.h>
 #include <signal.h>
 
+#define _LUCID_PRINTF_MACROS
+#define _LUCID_SCANF_MACROS
 #include <lucid/bitmap.h>
 #include <lucid/log.h>
+#include <lucid/printf.h>
+#include <lucid/scanf.h>
 #include <lucid/str.h>
 
 #include "tools.h"
@@ -68,13 +70,16 @@ uint64_t str_to_rlim(char *str)
 	if (str == NULL)
 		return CRLIM_KEEP;
 	
-	if (strcmp(str, "inf") == 0)
+	if (str_cmp(str, "inf") == 0)
 		return CRLIM_INFINITY;
 	
-	if (strcmp(str, "keep") == 0)
+	if (str_cmp(str, "keep") == 0)
 		return CRLIM_KEEP;
 	
-	return atol(str);
+	uint64_t lim;
+	sscanf(str, "%" SCNu64, &lim);
+	
+	return lim;
 }
 
 static
@@ -137,7 +142,7 @@ int main(int argc, char *argv[])
 		vx_wait_t       w;
 	} data;
 	
-	bzero(&data, sizeof(data));
+	str_zero(&data, sizeof(data));
 	
 	/* logging */
 	log_options_t log_options = {
@@ -147,7 +152,7 @@ int main(int argc, char *argv[])
 	
 	log_init(&log_options);
 	
-#define CASE_GOTO(ID, P) case ID: xid = atoi(optarg); goto P; break
+#define CASE_GOTO(ID, P) case ID: sscanf(optarg, "%" SCNu32, &xid); goto P; break
 	
 	/* parse command line */
 	while (GETOPT(c)) {
@@ -183,7 +188,7 @@ int main(int argc, char *argv[])
 	goto usage;
 	
 create:
-	if (argc > optind && strcmp(argv[optind], "--") != 0) {
+	if (argc > optind && str_cmp(argv[optind], "--") != 0) {
 		if (flist64_from_str(argv[optind], vx_cflags_list,
 		                     &data.f.flags, &data.f.mask, '~', ',') == -1)
 			rc = log_perror("flist64_from_str");
@@ -206,7 +211,7 @@ create:
 	goto out;
 	
 migrate:
-	if (argc > optind && strcmp(argv[optind], "--") != 0) {
+	if (argc > optind && str_cmp(argv[optind], "--") != 0) {
 		if (flist64_from_str(argv[optind], vx_mflags_list,
 		                     &data.f.flags, &data.f.mask, '~', ',') == -1)
 			rc = log_perror("flist64_from_str");
@@ -352,7 +357,12 @@ limitset:
 		goto usage;
 	
 	for (i = optind; i < argc; i++) {
-		buf = strtok(argv[i], "=");
+		buf = argv[i];
+		
+		buf2 = str_index(buf, '=', str_len(buf));
+		
+		if (buf2)
+			*buf2++ = '\0';
 		
 		if (!(data.l.id = flist32_getval(vx_limit_list, buf)))
 			rc = log_perror("flist32_getval(%s)", argv[i]);
@@ -360,13 +370,16 @@ limitset:
 		else {
 			data.l.id = v2i32(data.l.id);
 			
-			buf = strtok(NULL, ",");
+			buf = buf2;
+			buf2 = str_index(buf, ',', str_len(buf)); if (buf2) *buf2++ = '\0';
 			data.l.minimum = str_to_rlim(buf);
 			
-			buf = strtok(NULL, ",");
+			buf = buf2;
+			buf2 = str_index(buf, ',', str_len(buf)); if (buf2) *buf2++ = '\0';
 			data.l.softlimit = str_to_rlim(buf);
 			
-			buf = strtok(NULL, ",");
+			buf = buf2;
+			buf2 = str_index(buf, ',', str_len(buf)); if (buf2) *buf2++ = '\0';
 			data.l.maximum = str_to_rlim(buf);
 			
 			if (vx_limit_set(xid, &data.l) == -1)
@@ -445,8 +458,11 @@ schedset:
 		goto usage;
 	
 	for (i = optind; i < argc; i++) {
-		buf  = strtok(argv[i], "=");
-		buf2 = strtok(NULL, "=");
+		buf  = argv[i];
+		buf2 = str_index(buf, '=', str_len(buf));
+		
+		if (buf2)
+			*buf2++ = '\0';
 		
 		if (str_isempty(buf))
 			rc = log_error("Invalid argument: %s", argv[i]);
@@ -485,10 +501,13 @@ unameset:
 		goto usage;
 	
 	for (i = optind; i < argc; i++) {
-		buf  = strtok(argv[i], "=");
-		buf2 = strtok(NULL, "=");
+		buf  = argv[i];
+		buf2 = str_index(buf, '=', str_len(buf));
 		
-		if (str_isempty(buf) || str_isempty(buf2))
+		if (buf2)
+			*buf2++ = '\0';
+		
+		if (str_isempty(buf) || str_isempty(buf2) || str_len(buf2) > 64)
 			rc = log_error("Invalid argument: %s", argv[i]);
 		
 		else if (!(data.u.id = flist32_getval(vx_uname_list, buf)))
@@ -497,8 +516,8 @@ unameset:
 		else {
 			data.u.id = v2i32(data.u.id);
 			
-			bzero(data.u.value, 65);
-			strncpy(data.u.value, buf2, 64);
+			str_zero(data.u.value, 65);
+			str_cpyn(data.u.value, buf2, str_len(buf2));
 			
 			if (vx_uname_set(xid, &data.u) == -1)
 				rc = log_perror("vx_uname_set(%s)", buf);

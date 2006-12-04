@@ -21,11 +21,14 @@
 
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
+#include <inttypes.h>
 #include <sys/ioctl.h>
 
+#define _LUCID_PRINTF_MACROS
 #include <lucid/log.h>
 #include <lucid/open.h>
+#include <lucid/printf.h>
+#include <lucid/str.h>
 
 #include "tools.h"
 #include "vserver.h"

@@ -21,14 +21,15 @@
 
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <inttypes.h>
-#include <string.h>
-#include <arpa/inet.h>
 
+#define _LUCID_PRINTF_MACROS
+#define _LUCID_SCANF_MACROS
 #include <lucid/addr.h>
 #include <lucid/bitmap.h>
 #include <lucid/log.h>
+#include <lucid/printf.h>
+#include <lucid/scanf.h>
 #include <lucid/str.h>
 
 #include "tools.h"
@@ -79,7 +80,7 @@ int main(int argc, char *argv[])
 		nx_sock_stat_t s;
 	} data;
 	
-	bzero(&data, sizeof(data));
+	str_zero(&data, sizeof(data));
 	
 	/* logging */
 	log_options_t log_options = {
@@ -89,7 +90,7 @@ int main(int argc, char *argv[])
 	
 	log_init(&log_options);
 	
-#define CASE_GOTO(ID, P) case ID: nid = atoi(optarg); goto P; break
+#define CASE_GOTO(ID, P) case ID: sscanf(optarg, "%" SCNu32, &nid); goto P; break
 	
 	/* parse command line */
 	while (GETOPT(c)) {
@@ -114,7 +115,7 @@ int main(int argc, char *argv[])
 	goto usage;
 	
 create:
-	if (argc > optind && strcmp(argv[optind], "--") != 0) {
+	if (argc > optind && str_cmp(argv[optind], "--") != 0) {
 		if (flist64_from_str(argv[optind], nx_flags_list,
 		                     &data.f.flags, &data.f.mask, '~', ',') == -1)
 			rc = log_perror("flist64_from_str");

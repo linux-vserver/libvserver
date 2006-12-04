@@ -19,13 +19,14 @@
 #include <config.h>
 #endif
 
-#include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <inttypes.h>
 
+#define _LUCID_PRINTF_MACROS
+#define _LUCID_SCANF_MACROS
 #include <lucid/log.h>
+#include <lucid/printf.h>
+#include <lucid/scanf.h>
 #include <lucid/str.h>
 
 #include "tools.h"
@@ -49,13 +50,16 @@ uint32_t str_to_dlim(char *str)
 	if (str == NULL)
 		return CDLIM_KEEP;
 	
-	if (strcmp(str, "inf") == 0)
+	if (str_cmp(str, "inf") == 0)
 		return CDLIM_INFINITY;
 	
-	if (strcmp(str, "keep") == 0)
+	if (str_cmp(str, "keep") == 0)
 		return CDLIM_KEEP;
 	
-	return atoi(str);
+	uint32_t lim;
+	sscanf(str, "%" SCNu32, &lim);
+	
+	return lim;
 }
 
 static
@@ -84,14 +88,14 @@ void usage(int rc)
 
 int main(int argc, char *argv[])
 {
-	char *buf;
+	char *buf, *buf2;
 	int c, i, rc = EXIT_SUCCESS;
 	xid_t xid = 0;
 	
 	/* syscall data */
 	dx_limit_t data;
 	
-	bzero(&data, sizeof(data));
+	str_zero(&data, sizeof(data));
 	
 	/* logging */
 	log_options_t log_options = {
@@ -101,7 +105,7 @@ int main(int argc, char *argv[])
 	
 	log_init(&log_options);
 	
-#define CASE_GOTO(ID, P) case ID: xid = atoi(optarg); goto P; break
+#define CASE_GOTO(ID, P) case ID: sscanf(optarg, "%" SCNu32, &xid); goto P; break
 	
 	/* parse command line */
 	while (GETOPT(c)) {
@@ -152,25 +156,35 @@ limitset:
 		goto usage;
 	
 	for (i = optind; i < argc; i++) {
-		data.filename = strtok(argv[i], "=");
+		data.filename = argv[i];
+		
+		buf2 = str_index(argv[i], '=', str_len(argv[i]));
+		
+		if (buf2)
+			*buf2++ = '\0';
 		
 		if (str_isempty(data.filename))
 			rc = log_error("Invalid argument: %s", argv[i]);
 		
 		else {
-			buf = strtok(NULL, ",");
+			buf = buf2;
+			buf2 = str_index(buf, ',', str_len(buf)); if (buf2) *buf2++ = '\0';
 			data.space_used = str_to_dlim(buf);
 			
-			buf = strtok(NULL, ",");
+			buf = buf2;
+			buf2 = str_index(buf, ',', str_len(buf)); if (buf2) *buf2++ = '\0';
 			data.space_total = str_to_dlim(buf);
 			
-			buf = strtok(NULL, ",");
+			buf = buf2;
+			buf2 = str_index(buf, ',', str_len(buf)); if (buf2) *buf2++ = '\0';
 			data.inodes_used = str_to_dlim(buf);
 			
-			buf = strtok(NULL, ",");
+			buf = buf2;
+			buf2 = str_index(buf, ',', str_len(buf)); if (buf2) *buf2++ = '\0';
 			data.inodes_total = str_to_dlim(buf);
 			
-			buf = strtok(NULL, ",");
+			buf = buf2;
+			buf2 = str_index(buf, ',', str_len(buf)); if (buf2) *buf2++ = '\0';
 			data.reserved = str_to_dlim(buf);
 			
 			if (dx_limit_set(xid, &data) == -1)

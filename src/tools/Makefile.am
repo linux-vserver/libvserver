@@ -17,7 +17,8 @@
 
 if ENABLE_TOOLS
 
-INCLUDES = -I$(top_srcdir)/src/lib
+INCLUDES = -I$(top_srcdir) \
+           -I$(top_srcdir)/src/lib
 
 noinst_HEADERS = tools.h
 
@@ -25,6 +26,7 @@ sbin_PROGRAMS = dx \
                 ix \
                 ns \
                 nx \
+                vlist \
                 vr \
                 vx
 
@@ -42,6 +44,9 @@ ns_LDADD = $(TOOLLIBS)
 
 nx_SOURCES = nx.c lists.c
 nx_LDADD = $(TOOLLIBS)
+
+vlist_SOURCES = vlist.c lists.c
+vlist_LDADD = $(TOOLLIBS)
 
 vr_SOURCES = vr.c
 vr_LDADD = $(TOOLLIBS)

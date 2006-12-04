@@ -20,9 +20,9 @@
 #endif
 
 #include <stdlib.h>
-
-#include <sys/capability.h>
 #include <sys/resource.h>
+
+#include "linux/capability.h"
 
 #include "tools.h"
 #include "vserver.h"
