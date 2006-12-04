@@ -15,7 +15,7 @@
 ## Free Software Foundation, Inc.,
 ## 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-AC_DEFUN([AC_LV_SYSCALL_NR],
+AC_DEFUN([LV_NR_VSERVER],
 [
 	AC_MSG_CHECKING([for vserver syscall number])
 	
@@ -36,17 +36,17 @@ AC_DEFUN([AC_LV_SYSCALL_NR],
 #elif	defined(__ia64__)
 #define __NR_vserver	1269
 #elif	defined(__m32r__)
-#define __NR_vserver	*
+#define __NR_vserver	273
 #elif	defined(__mc68000__)
 #define __NR_vserver	278
 #elif	defined(__mips__) && (_MIPS_SIM == _MIPS_SIM_ABI32)
 #define __NR_vserver	277
 #elif	defined(__mips__) && (_MIPS_SIM == _MIPS_SIM_ABI64)
-#define __NR_vserver	240
-#elif	defined(__mips__) && (_MIPS_SIM == _MIPS_SIM_NABI32)
 #define __NR_vserver	236
+#elif	defined(__mips__) && (_MIPS_SIM == _MIPS_SIM_NABI32)
+#define __NR_vserver	240
 #elif	defined(__hppa__)
-#define __NR_vserver	273
+#define __NR_vserver	263
 #elif	defined(__powerpc__)
 #define __NR_vserver	257
 #elif	defined(__s390__)
@@ -55,22 +55,80 @@ AC_DEFUN([AC_LV_SYSCALL_NR],
 #define __NR_vserver	273
 #elif	defined(__sparc__)
 #define __NR_vserver	267
-#elif	defined(__v850__)
-#define __NR_vserver	*
 #elif	defined(__x86_64__)
 #define __NR_vserver	236
 #endif
 
-ac_lv_syscall_nr=__NR_vserver
+lv_nr_vserver=__NR_vserver
 	])
 	
-	eval $(${CPP} conftest.c | ${EGREP} '^ac_lv_syscall_nr=.*$')
+	eval $(${CPP} conftest.c | ${EGREP} '^lv_nr_vserver=.*$')
 	
-	if test x"$ac_lv_syscall_nr" = x; then
+	if test x"$lv_nr_vserver" = x; then
 		AC_MSG_ERROR([Cannot determine vserver syscall number])
 	else
-		AC_DEFINE_UNQUOTED(__NR_vserver, $ac_lv_syscall_nr, [VServer syscall number])
-		AC_MSG_RESULT([$ac_lv_syscall_nr])
+		AC_DEFINE_UNQUOTED(__NR_vserver, $lv_nr_vserver, [vserver syscall number])
+		AC_MSG_RESULT([$lv_nr_vserver])
+	fi
+	
+	AC_LANG_POP
+])
+AC_DEFUN([LV_NR_CLONE],
+[
+	AC_MSG_CHECKING([for clone syscall number])
+	
+	AC_LANG_PUSH(C)
+	AC_LANG_CONFTEST([
+#if 	defined(__alpha__)
+#define __NR_clone	312
+#elif	defined(__arm__)
+#define __NR_clone	120
+#elif	defined(__cris__)
+#define __NR_clone	120
+#elif	defined(__frv__)
+#define __NR_clone	120
+#elif	defined(__h8300__)
+#define __NR_clone	120
+#elif	defined(__i386__)
+#define __NR_clone	120
+#elif	defined(__ia64__)
+#define __NR_clone	1128
+#elif	defined(__m32r__)
+#define __NR_clone	120
+#elif	defined(__mc68000__)
+#define __NR_clone	120
+#elif	defined(__mips__) && (_MIPS_SIM == _MIPS_SIM_ABI32)
+#define __NR_clone	120
+#elif	defined(__mips__) && (_MIPS_SIM == _MIPS_SIM_ABI64)
+#define __NR_clone	55
+#elif	defined(__mips__) && (_MIPS_SIM == _MIPS_SIM_NABI32)
+#define __NR_clone	55
+#elif	defined(__hppa__)
+#define __NR_clone	120
+#elif	defined(__powerpc__)
+#define __NR_clone	120
+#elif	defined(__s390__)
+#define __NR_clone	120
+#elif	defined(__sh__)
+#define __NR_clone	120
+#elif	defined(__sparc__)
+#define __NR_clone	217
+#elif	defined(__v850__)
+#define __NR_clone	120
+#elif	defined(__x86_64__)
+#define __NR_clone	56
+#endif
+
+lv_nr_clone=__NR_clone
+	])
+	
+	eval $(${CPP} conftest.c | ${EGREP} '^lv_nr_clone=.*$')
+	
+	if test x"$lv_nr_clone" = x; then
+		AC_MSG_ERROR([Cannot determine clone syscall number])
+	else
+		AC_DEFINE_UNQUOTED(__NR_clone, $lv_nr_clone, [clone syscall number])
+		AC_MSG_RESULT([$lv_nr_clone])
 	fi
 	
 	AC_LANG_POP

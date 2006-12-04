@@ -17,8 +17,6 @@
 
 SUBDIRS = src
 
-EXTRA_DIST = Doxyfile
-
 noinst_HEADERS = linux/vserver/context_cmd.h \
                  linux/vserver/context.h \
                  linux/vserver/cvirt_cmd.h \
@@ -46,3 +44,16 @@ noinst_HEADERS = linux/vserver/context_cmd.h \
                  linux/vserver/signal.h \
                  linux/vserver/switch.h \
                  linux/vserver/tag.h
+
+include aminclude.am
+
+MOSTLYCLEANFILES = $(DX_CLEANFILES)
+EXTRA_DIST = $(DX_CONFIG)
+
+dist-hook: doxygen-doc
+	rm -rf $(top_builddir)/$(DX_DOCDIR)/latex \
+	       $(top_builddir)/$(DX_DOCDIR)/lucid.tag \
+	       $(top_builddir)/$(DX_DOCDIR)/html/*.md5 \
+	       $(top_builddir)/$(DX_DOCDIR)/html/*.map \
+	       $(top_builddir)/$(DX_DOCDIR)/html/*.dot
+	mv $(top_builddir)/$(DX_DOCDIR) $(distdir)/

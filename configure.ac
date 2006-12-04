@@ -25,9 +25,19 @@ AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
+# Doxygen
+DX_HTML_FEATURE(ON)
+DX_CHM_FEATURE(OFF)
+DX_CHI_FEATURE(OFF)
+DX_MAN_FEATURE(OFF)
+DX_RTF_FEATURE(OFF)
+DX_XML_FEATURE(OFF)
+DX_PDF_FEATURE(ON)
+DX_PS_FEATURE(OFF)
+DX_INIT_DOXYGEN(libvserver, Doxyfile, doc)
+
 # Automake
 AM_INIT_AUTOMAKE([1.9 foreign dist-bzip2])
-AM_MAINTAINER_MODE
 
 # Checks for programs.
 AC_PROG_CC
@@ -59,15 +69,47 @@ fi
 AC_SUBST(LUCID_LIBS)
 
 # Checks for header files.
-AC_HEADER_STDC
-AC_CHECK_HEADERS([errno.h sys/resource.h sys/syscall.h],
+AC_CHECK_HEADERS([stdint.h \
+                  errno.h \
+                  sys/types.h],
                  [], AC_MSG_ERROR([Required headers not found]))
+
+if test x$enable_tools = xtrue; then
+AC_CHECK_HEADERS([unistd.h \
+                  stdlib.h \
+                  inttypes.h \
+                  getopt.h \
+                  signal.h \
+                  wait.h \
+                  sys/ioctl.h \
+                  sys/resource.h],
+                 [], AC_MSG_ERROR([Required headers not found]))
+
+AC_CHECK_HEADERS([lucid/addr.h \
+                  lucid/bitmap.h \
+                  lucid/flist.h \
+                  lucid/log.h \
+                  lucid/open.h \
+                  lucid/printf.h \
+                  lucid/scanf.h \
+                  lucid/str.h],
+                 [], AC_MSG_ERROR([Required lucid headers not found]))
+fi
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_INLINE
 
 # Checks for library functions.
+if test x$enable_tools = xtrue; then
+AC_CHECK_FUNCS(close \
+               execvp \
+               exit \
+               free \
+               getopt_long_only \
+               waitpid,
+               [], AC_MSG_ERROR([Required library functions not found]))
+fi
 
 # Compiler settings
 CFLAGS="${CFLAGS} -std=gnu99 -pedantic -fno-omit-frame-pointer"
@@ -75,7 +117,8 @@ CFLAGS="${CFLAGS} -Wall -Wpointer-arith -Wcast-qual -Winline"
 CFLAGS="${CFLAGS} -Wredundant-decls -Wcast-align -Wno-unused-parameter"
 
 # Site settings
-AC_LV_SYSCALL_NR
+LV_NR_CLONE
+LV_NR_VSERVER
 
 # Final info page
 AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
