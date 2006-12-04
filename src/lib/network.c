@@ -20,7 +20,6 @@
 #endif
 
 #include <stdint.h>
-#include <string.h>
 #include <errno.h>
 
 #include "linux/vserver/switch.h"
@@ -28,6 +27,39 @@
 #include "linux/vserver/network_cmd.h"
 
 #include "vserver.h"
+
+/* we don't want to use those from libc, but don't want lucid either */
+static inline
+int str_len(const char *str)
+{
+	int i = 0;
+	
+	while (*str++)
+		i++;
+	
+	return i;
+}
+
+static inline
+void str_zero(void *str, int n)
+{
+	char *p = str;
+	
+	while (n--)
+		*p++ = 0;
+}
+
+static inline
+int str_cpyn(void *dst, const void *src, int n)
+{
+	char *d = dst;
+	const char *s = src;
+	
+	while (n--)
+		*d++ = *s++;
+	
+	return d - (char *) dst;
+}
 
 int nx_create(nid_t nid, nx_flags_t *data)
 {
@@ -76,8 +108,8 @@ int nx_addr_add(nid_t nid, nx_addr_t *data)
 	kdata.type  = data->type;
 	kdata.count = data->count;
 	
-	memcpy(kdata.ip,   data->ip,   sizeof(kdata.ip));
-	memcpy(kdata.mask, data->mask, sizeof(kdata.mask));
+	str_cpyn(kdata.ip,   data->ip,   sizeof(kdata.ip));
+	str_cpyn(kdata.mask, data->mask, sizeof(kdata.mask));
 	
 	return sys_vserver(VCMD_net_add, nid, &kdata);
 }
@@ -92,8 +124,8 @@ int nx_addr_remove(nid_t nid, nx_addr_t *data)
 	kdata.type  = data->type;
 	kdata.count = data->count;
 	
-	memcpy(kdata.ip,   data->ip,   sizeof(kdata.ip));
-	memcpy(kdata.mask, data->mask, sizeof(kdata.mask));
+	str_cpyn(kdata.ip,   data->ip,   sizeof(kdata.ip));
+	str_cpyn(kdata.mask, data->mask, sizeof(kdata.mask));
 	
 	return sys_vserver(VCMD_net_remove, nid, &kdata);
 }

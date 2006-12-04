@@ -19,18 +19,8 @@
 #include <config.h>
 #endif
 
-#include <unistd.h>
 #include <stdint.h>
 #include <errno.h>
-#include <sys/syscall.h>
-
-#undef _syscall0
-#undef _syscall1
-#undef _syscall2
-#undef _syscall3
-#undef _syscall4
-#undef _syscall5
-#undef _syscall6
 
 #include "syscall.h"
 #include "vserver.h"

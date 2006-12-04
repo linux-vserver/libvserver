@@ -19,11 +19,9 @@
 #include <config.h>
 #endif
 
-#include <sched.h>
-#include <signal.h>
-
 #include <stdint.h>
 
+#include "linux/sched.h"
 #include "linux/vserver/switch.h"
 #include "linux/vserver/namespace_cmd.h"
 

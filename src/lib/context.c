@@ -21,7 +21,6 @@
 
 #include <stdint.h>
 #include <errno.h>
-#include <string.h>
 
 #include "linux/vserver/switch.h"
 #include "linux/vserver/context_cmd.h"
@@ -29,6 +28,39 @@
 #include "linux/vserver/signal_cmd.h"
 
 #include "vserver.h"
+
+/* we don't want to use those from libc, but don't want lucid either */
+static inline
+int str_len(const char *str)
+{
+	int i = 0;
+	
+	while (*str++)
+		i++;
+	
+	return i;
+}
+
+static inline
+void str_zero(void *str, int n)
+{
+	char *p = str;
+	
+	while (n--)
+		*p++ = 0;
+}
+
+static inline
+int str_cpyn(void *dst, const void *src, int n)
+{
+	char *d = dst;
+	const char *s = src;
+	
+	while (n--)
+		*d++ = *s++;
+	
+	return d - (char *) dst;
+}
 
 int vx_create(xid_t xid, vx_flags_t *data)
 {
@@ -210,13 +242,13 @@ int vx_uname_set(xid_t xid, vx_uname_t *data)
 	if (!data)
 		return errno = EINVAL, -1;
 	
-	if (strlen(data->value) >= sizeof(kdata.name))
+	if (str_len(data->value) >= sizeof(kdata.name))
 		return errno = EINVAL, -1;
 	
 	kdata.field = data->id;
 	
-	bzero(kdata.name, sizeof(kdata.name));
-	memcpy(kdata.name, data->value, sizeof(kdata.name) - 1);
+	str_zero(kdata.name, sizeof(kdata.name));
+	str_cpyn(kdata.name, data->value, sizeof(kdata.name) - 1);
 	
 	return sys_vserver(VCMD_set_vhi_name, xid, &kdata);
 }
@@ -236,8 +268,8 @@ int vx_uname_get(xid_t xid, vx_uname_t *data)
 	if (rc == -1)
 		return rc;
 	
-	bzero(data->value, sizeof(kdata.name));
-	memcpy(data->value, kdata.name, sizeof(kdata.name) - 1);
+	str_zero(data->value, sizeof(kdata.name));
+	str_cpyn(data->value, kdata.name, sizeof(kdata.name) - 1);
 	
 	return rc;
 }
