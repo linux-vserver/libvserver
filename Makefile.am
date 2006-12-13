@@ -17,33 +17,21 @@
 
 SUBDIRS = src
 
-noinst_HEADERS = linux/vserver/context_cmd.h \
-                 linux/vserver/context.h \
+noinst_HEADERS = linux/vserver/cacct_cmd.h \
+                 linux/vserver/context_cmd.h \
                  linux/vserver/cvirt_cmd.h \
-                 linux/vserver/cvirt_def.h \
-                 linux/vserver/cvirt.h \
                  linux/vserver/debug_cmd.h \
-                 linux/vserver/debug.h \
                  linux/vserver/dlimit_cmd.h \
-                 linux/vserver/dlimit.h \
-                 linux/vserver/global.h \
                  linux/vserver/inode_cmd.h \
-                 linux/vserver/inode.h \
                  linux/vserver/limit_cmd.h \
-                 linux/vserver/limit_def.h \
-                 linux/vserver/limit_int.h \
-                 linux/vserver/limit.h \
-                 linux/vserver/namespace_cmd.h \
-                 linux/vserver/namespace.h \
+                 linux/vserver/monitor.h \
                  linux/vserver/network_cmd.h \
-                 linux/vserver/network.h \
                  linux/vserver/sched_cmd.h \
-                 linux/vserver/sched_def.h \
-                 linux/vserver/sched.h \
                  linux/vserver/signal_cmd.h \
-                 linux/vserver/signal.h \
+                 linux/vserver/space_cmd.h \
                  linux/vserver/switch.h \
-                 linux/vserver/tag.h
+                 linux/capability.h \
+                 linux/sched.h
 
 include aminclude.am
 

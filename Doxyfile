@@ -76,7 +76,7 @@ INPUT                  = $(SRCDIR)/src/lib
 FILE_PATTERNS          = *.c \
                          *.h
 RECURSIVE              = YES
-EXCLUDE                = syscall.h
+EXCLUDE                = $(SRCDIR)/src/lib/syscall.h
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = 
 EXAMPLE_PATH           = $(SRCDIR)

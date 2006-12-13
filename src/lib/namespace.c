@@ -23,7 +23,7 @@
 
 #include "linux/sched.h"
 #include "linux/vserver/switch.h"
-#include "linux/vserver/namespace_cmd.h"
+#include "linux/vserver/space_cmd.h"
 
 #include "vserver.h"
 
@@ -34,10 +34,10 @@ int ns_clone(int flags, void *child_stack)
 
 int ns_enter(xid_t xid)
 {
-	return sys_vserver(VCMD_enter_namespace, xid, NULL);
+	return sys_vserver(VCMD_enter_space, xid, NULL);
 }
 
 int ns_set(xid_t xid)
 {
-	return sys_vserver(VCMD_set_namespace, xid, NULL);
+	return sys_vserver(VCMD_set_space, xid, NULL);
 }
