@@ -31,8 +31,6 @@
 #include <lucid/scanf.h>
 #include <lucid/str.h>
 
-#include "linux/sched.h"
-
 #include "tools.h"
 #include "vserver.h"
 

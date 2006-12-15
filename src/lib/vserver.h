@@ -81,6 +81,41 @@ int vs_get_config(void);
  * @defgroup syscall_context Context commands
  * @{
  */
+#ifndef _LINUX_CAPABILITY_H
+#define CAP_CHOWN            0
+#define CAP_DAC_OVERRIDE     1
+#define CAP_DAC_READ_SEARCH  2
+#define CAP_FOWNER           3
+#define CAP_FSETID           4
+#define CAP_KILL             5
+#define CAP_SETGID           6
+#define CAP_SETUID           7
+#define CAP_SETPCAP          8
+#define CAP_LINUX_IMMUTABLE  9
+#define CAP_NET_BIND_SERVICE 10
+#define CAP_NET_BROADCAST    11
+#define CAP_NET_ADMIN        12
+#define CAP_NET_RAW          13
+#define CAP_IPC_LOCK         14
+#define CAP_IPC_OWNER        15
+#define CAP_SYS_MODULE       16
+#define CAP_SYS_RAWIO        17
+#define CAP_SYS_CHROOT       18
+#define CAP_SYS_PTRACE       19
+#define CAP_SYS_PACCT        20
+#define CAP_SYS_ADMIN        21
+#define CAP_SYS_BOOT         22
+#define CAP_SYS_NICE         23
+#define CAP_SYS_RESOURCE     24
+#define CAP_SYS_TIME         25
+#define CAP_SYS_TTY_CONFIG   26
+#define CAP_MKNOD            27
+#define CAP_LEASE            28
+#define CAP_AUDIT_WRITE      29
+#define CAP_AUDIT_CONTROL    30
+#define CAP_CONTEXT          31
+#endif
+
 #ifndef _VX_CONTEXT_H
 #define VXC_SET_UTSNAME    0x00000001  /*!< Allow setdomainname(2) and sethostname(2) */
 #define VXC_SET_RLIMIT     0x00000002  /*!< Allow setrlimit(2) */
@@ -543,9 +578,32 @@ int ix_attr_get(ix_attr_t *data);
 
 
 /*!
- * @defgroup syscall_namespace Filesystem namespace commands
+ * @defgroup syscall_space Namespace commands
  * @{
  */
+#ifndef _LINUX_SCHED_H
+#define CLONE_VM        0x00000100
+#define CLONE_FS        0x00000200
+#define CLONE_FILES     0x00000400
+#define CLONE_SIGHAND   0x00000800
+#define CLONE_PTRACE    0x00002000
+#define CLONE_VFORK     0x00004000
+#define CLONE_PARENT    0x00008000
+#define CLONE_THREAD    0x00010000
+#define CLONE_NEWNS     0x00020000
+#define CLONE_SYSVSEM   0x00040000
+#define CLONE_SETTLS    0x00080000
+#define CLONE_PARENT_SETTID     0x00100000
+#define CLONE_CHILD_CLEARTID    0x00200000
+#define CLONE_DETACHED          0x00400000
+#define CLONE_UNTRACED          0x00800000
+#define CLONE_CHILD_SETTID      0x01000000
+#define CLONE_STOPPED           0x02000000
+#define CLONE_NEWUTS            0x04000000
+#define CLONE_NEWIPC            0x08000000
+#define CLONE_KTHREAD           0x10000000
+#endif
+
 /*!
  * @brief Clone the current namespace
  *

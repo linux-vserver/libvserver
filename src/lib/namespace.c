@@ -21,7 +21,6 @@
 
 #include <stdint.h>
 
-#include "linux/sched.h"
 #include "linux/vserver/switch.h"
 #include "linux/vserver/space_cmd.h"
 

@@ -29,9 +29,7 @@ noinst_HEADERS = linux/vserver/cacct_cmd.h \
                  linux/vserver/sched_cmd.h \
                  linux/vserver/signal_cmd.h \
                  linux/vserver/space_cmd.h \
-                 linux/vserver/switch.h \
-                 linux/capability.h \
-                 linux/sched.h
+                 linux/vserver/switch.h
 
 include aminclude.am
 
