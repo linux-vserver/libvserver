@@ -30,15 +30,15 @@
 int ix_attr_set(ix_attr_t *data)
 {
 	struct vcmd_ctx_iattr_v1 kdata;
-	
+
 	if (!data)
 		return errno = EINVAL, -1;
-	
+
 	kdata.name  = data->filename;
 	kdata.xid   = data->xid;
 	kdata.flags = data->flags;
 	kdata.mask  = data->mask;
-	
+
 	return sys_vserver(VCMD_set_iattr, 0, &kdata);
 }
 
@@ -46,20 +46,20 @@ int ix_attr_get(ix_attr_t *data)
 {
 	int rc;
 	struct vcmd_ctx_iattr_v1 kdata;
-	
+
 	if (!data)
 		return errno = EINVAL, -1;
-	
+
 	kdata.name = data->filename;
-	
+
 	rc = sys_vserver(VCMD_get_iattr, 0, &kdata);
-	
+
 	if (rc == -1)
 		return rc;
-	
+
 	data->xid   = kdata.xid;
 	data->flags = kdata.flags;
 	data->mask  = kdata.mask;
-	
+
 	return rc;
 }

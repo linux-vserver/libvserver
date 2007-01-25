@@ -128,10 +128,9 @@ int vs_get_config(void);
 #define VXC_ADMIN_MAPPER   0x00200000  /*!< Allow access to device mapper */
 #define VXC_ADMIN_CLOOP    0x00400000  /*!< Allow access to loop devices */
 
-#define VXF_INFO_LOCK    0x00000001  /*!< Prohibit further context migration */
 #define VXF_INFO_SCHED   0x00000002  /*!< Account all processes as one (L) */
 #define VXF_INFO_NPROC   0x00000004  /*!< Apply process limits to context (L) */
-#define VXF_INFO_PRIVATE 0x00000008  /*!< Context cannot be entered (L) */
+#define VXF_INFO_PRIVATE 0x00000008  /*!< Context cannot be entered */
 #define VXF_INFO_INIT    0x00000010  /*!< Show a fake init process */
 #define VXF_INFO_HIDE    0x00000020  /*!< Hide context information in task status */
 #define VXF_INFO_ULIMIT  0x00000040  /*!< Apply ulimits to context (L) */
@@ -364,6 +363,7 @@ int vx_wait(xid_t xid, vx_wait_t *data);
 #define VXSM_FORCE      0x0400  /*!< Force scheduler reload (SMP only) */
 #define VXSM_CPU_ID     0x1000  /*!< CPU ID (SMP only) */
 #define VXSM_BUCKET_ID  0x2000  /*!< Bucket ID */
+#define VXSM_MSEC       0x4000  /*!< ?? */
 
 #define VXSM_V3_MASK    0x0173  /*!< Mask all fields for scheduler v3 */
 #define VXSM_SET_MASK   0x01FF  /*!< Mask all fields for set_sched */
@@ -373,16 +373,29 @@ int vx_wait(xid_t xid, vx_wait_t *data);
  * @brief Scheduler values
  */
 typedef struct _vx_sched {
-	uint32_t set_mask;  /*!< Set mask */
-	int32_t fill_rate;  /*!< Fill rate */
-	int32_t interval;   /*!< Interval between fills */
-	int32_t tokens;     /*!< Number of tokens in the bucket */
-	int32_t tokens_min; /*!< Minimum tokens to unhold the context */
-	int32_t tokens_max; /*!< Maximum number of tokens in the bucket */
-	int32_t prio_bias;  /*!< Priority bias */
-	int32_t cpu_id;     /*!< CPU ID (for SMP machines) */
-	int32_t bucket_id;  /*!< Token Bucket ID */
+	uint32_t mask;        /*!< Set mask */
+	int32_t cpu_id;       /*!< CPU ID (for SMP machines) */
+	int32_t bucket_id;    /*!< Token Bucket ID */
+	int32_t fill_rate[2]; /*!< Fill rate */
+	int32_t interval[2];  /*!< Interval between fills */
+	int32_t tokens;       /*!< Number of tokens in the bucket */
+	int32_t tokens_min;   /*!< Minimum tokens to unhold the context */
+	int32_t tokens_max;   /*!< Maximum number of tokens in the bucket */
+	int32_t prio_bias;    /*!< Priority bias */
 } vx_sched_t;
+
+/*!
+ * @brief Scheduler information
+ */
+typedef struct _vx_sched_info {
+	int32_t cpu_id;
+	int32_t bucket_id;
+	uint64_t user_msec;
+	uint64_t sys_msec;
+	uint64_t hold_msec;
+	uint32_t token_usec;
+	int32_t vavavoom;
+} vx_sched_info_t;
 
 /*!
  * @brief Set scheduler values
@@ -391,6 +404,24 @@ typedef struct _vx_sched {
  * @param data Scheduler values
  */
 int vx_sched_set(xid_t xid, vx_sched_t *data);
+
+/*!
+ * @brief Get scheduler values
+ * 
+ * @param xid  Context ID
+ * @param data Scheduler values
+ */
+int vx_sched_get(xid_t xid, vx_sched_t *data);
+
+/*!
+ * @brief Get scheduler information
+ * 
+ * @param xid  Context ID
+ * @param data Scheduler information
+ */
+int vx_sched_info(xid_t xid, vx_sched_info_t *data);
+
+
 /*! @} syscall_sched */
 
 
@@ -413,6 +444,7 @@ int vx_sched_set(xid_t xid, vx_sched_t *data);
 #define VLIMIT_SEMARY 20  /*!< Size of semary */
 #define VLIMIT_NSEMS  21  /*!< Number of semaphores */
 #define VLIMIT_DENTRY 22  /*!< Size of the dentry cache */
+#define VLIMIT_MAPPED 23  /*!< ?? */
 #endif
 
 /*!
@@ -605,7 +637,7 @@ int ix_attr_get(ix_attr_t *data);
 #endif
 
 /*!
- * @brief Clone the current namespace
+ * @brief Clone the current namespace (FS/IPC/UTS)
  *
  * @param flags       Clone flags
  * @param child_stack Child stack
@@ -617,14 +649,14 @@ int ns_clone(int flags, void *child_stack);
  * 
  * @param xid Context ID
  */
-int ns_enter(xid_t xid);
+int ns_enter(xid_t xid, uint64_t mask);
 
 /*!
  * @brief Set namespace
  * 
  * @param xid Context ID
  */
-int ns_set(xid_t xid);
+int ns_set(xid_t xid, uint64_t mask);
 /*! @} syscall_namespace */
 
 
@@ -634,11 +666,11 @@ int ns_set(xid_t xid);
  * @{
  */
 #ifndef _VX_NETWORK_H
-#define NXF_INFO_LOCK   0x00000001  /*!< Prohibit further context migration */
-#define NXF_STATE_SETUP (1ULL<<32)  /*!< Network context is in setup state */
-#define NXF_STATE_ADMIN (1ULL<<34)  /*!< Context is in admin state */
-#define NXF_SC_HELPER   (1ULL<<36)  /*!< Network state change helper */
-#define NXF_PERSISTENT  (1ULL<<38)  /*!< Make network context persistent */
+#define NXF_INFO_PRIVATE 0x00000008  /*!< Network context cannot be entered */
+#define NXF_STATE_SETUP  (1ULL<<32)  /*!< Network context is in setup state */
+#define NXF_STATE_ADMIN  (1ULL<<34)  /*!< Context is in admin state */
+#define NXF_SC_HELPER    (1ULL<<36)  /*!< Network state change helper */
+#define NXF_PERSISTENT   (1ULL<<38)  /*!< Make network context persistent */
 
 #define NXA_TYPE_IPV4  1              /*!< Address is IPv4 */
 #define NXA_TYPE_IPV6  2              /*!< Address is IPv6 */

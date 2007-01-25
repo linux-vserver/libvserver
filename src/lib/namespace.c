@@ -28,15 +28,17 @@
 
 int ns_clone(int flags, void *child_stack)
 {
-	return sys_clone(flags|CLONE_NEWNS, child_stack);
+	return sys_clone(flags|CLONE_NEWNS|CLONE_NEWUTS|CLONE_NEWIPC, child_stack);
 }
 
-int ns_enter(xid_t xid)
+int ns_enter(xid_t xid, uint64_t mask)
 {
-	return sys_vserver(VCMD_enter_space, xid, NULL);
+	struct vcmd_space_mask kdata = { .mask = mask };
+	return sys_vserver(VCMD_enter_space, xid, &kdata);
 }
 
-int ns_set(xid_t xid)
+int ns_set(xid_t xid, uint64_t mask)
 {
-	return sys_vserver(VCMD_set_space, xid, NULL);
+	struct vcmd_space_mask kdata = { .mask = mask };
+	return sys_vserver(VCMD_set_space, xid, &kdata);
 }

@@ -19,44 +19,82 @@
 #include <config.h>
 #endif
 
+#include <errno.h>
+
 #include "vserver.h"
 
 #include "linux/vserver/switch.h"
 #include "linux/vserver/sched_cmd.h"
 
+int vx_sched_get(xid_t xid, vx_sched_t *data)
+{
+	struct vcmd_sched_v5 kdata;
+
+	if (!data)
+		return errno = EINVAL, -1;
+
+	kdata.cpu_id    = data->cpu_id;
+	kdata.bucket_id = data->bucket_id;
+	kdata.mask      = data->mask;
+
+	int rc = sys_vserver(VCMD_get_sched, xid, &kdata);
+
+	if (rc == -1)
+		return -1;
+
+	data->fill_rate[0] = kdata.fill_rate[0];
+	data->fill_rate[1] = kdata.fill_rate[1];
+	data->interval[0]  = kdata.interval[0];
+	data->interval[1]  = kdata.interval[1];
+	data->tokens       = kdata.tokens;
+	data->tokens_min   = kdata.tokens_min;
+	data->tokens_max   = kdata.tokens_max;
+	data->prio_bias    = kdata.prio_bias;
+
+	return rc;
+}
+
 int vx_sched_set(xid_t xid, vx_sched_t *data)
 {
-	struct vcmd_set_sched_v3 kdata3;
-	struct vcmd_set_sched_v4 kdata4;
-	
-	int version = vs_get_version();
-	
-	if (version == -1)
+	struct vcmd_sched_v5 kdata;
+
+	if (!data)
+		return errno = EINVAL, -1;
+
+	kdata.mask         = data->mask;
+	kdata.cpu_id       = data->cpu_id;
+	kdata.fill_rate[0] = data->fill_rate[0];
+	kdata.fill_rate[1] = data->fill_rate[1];
+	kdata.interval[0]  = data->interval[0];
+	kdata.interval[1]  = data->interval[1];
+	kdata.tokens       = data->tokens;
+	kdata.tokens_min   = data->tokens_min;
+	kdata.tokens_max   = data->tokens_max;
+	kdata.prio_bias    = data->prio_bias;
+
+	return sys_vserver(VCMD_set_sched, xid, &kdata);
+}
+
+int vx_sched_info(xid_t xid, vx_sched_info_t *data)
+{
+	struct vcmd_sched_info kdata;
+
+	if (!data)
+		return errno = EINVAL, -1;
+
+	kdata.cpu_id = data->cpu_id;
+	kdata.bucket_id = data->bucket_id;
+
+	int rc = sys_vserver(VCMD_sched_info, xid, &kdata);
+
+	if (rc == -1)
 		return -1;
-	
-	if (version >= 0x020100) {
-		kdata4.set_mask      = data->set_mask;
-		kdata4.fill_rate     = data->fill_rate;
-		kdata4.interval      = data->interval;
-		kdata4.tokens        = data->tokens;
-		kdata4.tokens_min    = data->tokens_min;
-		kdata4.tokens_max    = data->tokens_max;
-		kdata4.prio_bias     = data->prio_bias;
-		kdata4.cpu_id        = data->cpu_id;
-		kdata4.bucket_id     = data->bucket_id;
-		
-		return sys_vserver(VCMD_set_sched, xid, &kdata4);
-	}
-	
-	else {
-		kdata3.set_mask      = data->set_mask & VXSM_V3_MASK;
-		kdata3.fill_rate     = data->fill_rate;
-		kdata3.interval      = data->interval;
-		kdata3.tokens        = data->tokens;
-		kdata3.tokens_min    = data->tokens_min;
-		kdata3.tokens_max    = data->tokens_max;
-		kdata3.priority_bias = data->prio_bias;
-		
-		return sys_vserver(VCMD_set_sched_v3, xid, &kdata3);
-	}
+
+	data->user_msec  = kdata.user_msec;
+	data->sys_msec   = kdata.sys_msec;
+	data->hold_msec  = kdata.hold_msec;
+	data->token_usec = kdata.token_usec;
+	data->vavavoom   = kdata.vavavoom;
+
+	return rc;
 }
