@@ -58,67 +58,69 @@ int main(int argc, char *argv[])
 	int c, status, rc = EXIT_SUCCESS;
 	xid_t xid = 0;
 	pid_t pid;
-	
+
 	/* logging */
 	log_options_t log_options = {
 		.ident  = argv[0],
 		.stderr = true,
 	};
-	
+
 	log_init(&log_options);
-	
-#define CASE_GOTO(ID, P) case ID: sscanf(optarg, "%" SCNu32, &xid); goto P; break
-	
+
+#define CASE_GOTO(ID, P) case ID: \
+	sscanf(optarg, "%" SCNu32, &xid); \
+	goto P; break
+
 	/* parse command line */
 	while (GETOPT(c)) {
 		switch (c) {
 			COMMON_GETOPT_CASES
-			
+
 			CASE_GOTO(0x10, create);
 			CASE_GOTO(0x11, migrate);
-			
+
 			DEFAULT_GETOPT_CASES
 		}
 	}
-	
+
 #undef CASE_GOTO
-	
+
 	goto usage;
-	
+
 create:
 	switch((pid = ns_clone(SIGCHLD, NULL))) {
 		case -1:
 			rc = log_perror("ns_clone");
 			break;
-		
+
 		case 0:
-			if (ns_set(xid) == -1)
+			if (ns_set(xid, 0) == -1)
 				rc = log_perror("ns_set");
 			
 			goto out;
-		
+
 		default:
 			if (waitpid(pid, &status, 0) == -1)
 				rc = log_perror("waitpid");
-			
+
 			if (WIFSIGNALED(status))
 				rc = log_error("Caught signal %d", WTERMSIG(status));
-			
+
 			if (WIFEXITED(status))
 				rc = WEXITSTATUS(status);
 	}
-	
+
 	goto out;
-	
+
 migrate:
-	if (ns_enter(xid) == -1)
+	if (ns_enter(xid, 0) == -1)
 		rc = log_perror("ns_enter");
-	
+
 	else if (argc > optind+1 && execvp(argv[optind+1], argv+optind+1) == -1)
 		rc = log_perror("execvp");
-	
+
 	goto out;
-	
+
 usage:
 	usage(EXIT_FAILURE);
 

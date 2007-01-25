@@ -28,6 +28,7 @@
 #define _LUCID_SCANF_MACROS
 #include <lucid/bitmap.h>
 #include <lucid/log.h>
+#include <lucid/mem.h>
 #include <lucid/printf.h>
 #include <lucid/scanf.h>
 #include <lucid/str.h>
@@ -142,7 +143,7 @@ int main(int argc, char *argv[])
 		vx_wait_t       w;
 	} data;
 	
-	str_zero(&data, sizeof(data));
+	mem_set(&data, 0, sizeof(data));
 	
 	/* logging */
 	log_options_t log_options = {
@@ -190,7 +191,7 @@ int main(int argc, char *argv[])
 create:
 	if (argc > optind && str_cmp(argv[optind], "--") != 0) {
 		if (flist64_from_str(argv[optind], vx_cflags_list,
-		                     &data.f.flags, &data.f.mask, '~', ',') == -1)
+		                     &data.f.flags, &data.f.mask, '~', ",") == -1)
 			rc = log_perror("flist64_from_str");
 		
 		else if (vx_create(xid, &data.f) == -1)
@@ -213,7 +214,7 @@ create:
 migrate:
 	if (argc > optind && str_cmp(argv[optind], "--") != 0) {
 		if (flist64_from_str(argv[optind], vx_mflags_list,
-		                     &data.f.flags, &data.f.mask, '~', ',') == -1)
+		                     &data.f.flags, &data.f.mask, '~', ",") == -1)
 			rc = log_perror("flist64_from_str");
 		
 		else if (vx_migrate(xid, &data.f) == -1)
@@ -273,7 +274,7 @@ bcapsset:
 		goto usage;
 	
 	if (flist64_from_str(argv[optind], vx_bcaps_list,
-	                     &data.f.flags, &data.f.mask, '~', ',') == -1)
+	                     &data.f.flags, &data.f.mask, '~', ",") == -1)
 		rc = log_perror("flist64_from_str");
 	
 	else if (vx_bcaps_set(xid, &data.f) == -1)
@@ -286,7 +287,7 @@ bcapsget:
 		rc = log_perror("vx_bcaps_get");
 	
 	else {
-		buf = flist64_to_str(vx_bcaps_list, data.f.flags, '\n');
+		buf = flist64_to_str(vx_bcaps_list, data.f.flags, "\n");
 		
 		if (!str_isempty(buf))
 			printf("%s\n", buf);
@@ -301,7 +302,7 @@ ccapsset:
 		goto usage;
 	
 	if (flist64_from_str(argv[optind], vx_ccaps_list,
-	                     &data.f.flags, &data.f.mask, '~', ',') == -1)
+	                     &data.f.flags, &data.f.mask, '~', ",") == -1)
 		rc = log_perror("flist64_from_str");
 	
 	else if (vx_ccaps_set(xid, &data.f) == -1)
@@ -314,7 +315,7 @@ ccapsget:
 		rc = log_perror("vx_ccaps_get");
 	
 	else {
-		buf = flist64_to_str(vx_ccaps_list, data.f.flags, '\n');
+		buf = flist64_to_str(vx_ccaps_list, data.f.flags, "\n");
 		
 		if (!str_isempty(buf))
 			printf("%s\n", buf);
@@ -329,7 +330,7 @@ flagsset:
 		goto usage;
 	
 	if (flist64_from_str(argv[optind], vx_cflags_list,
-	                    &data.f.flags, &data.f.mask, '~', ',') == -1)
+	                    &data.f.flags, &data.f.mask, '~', ",") == -1)
 		rc = log_perror("flist64_from_str");
 	
 	else if (vx_flags_set(xid, &data.f) == -1)
@@ -342,7 +343,7 @@ flagsget:
 		rc = log_perror("vx_flags_get");
 	
 	else {
-		buf = flist64_to_str(vx_cflags_list, data.f.flags, '\n');
+		buf = flist64_to_str(vx_cflags_list, data.f.flags, "\n");
 		
 		if (!str_isempty(buf))
 			printf("%s\n", buf);
@@ -359,7 +360,7 @@ limitset:
 	for (i = optind; i < argc; i++) {
 		buf = argv[i];
 		
-		buf2 = str_index(buf, '=', str_len(buf));
+		buf2 = str_chr(buf, '=', str_len(buf));
 		
 		if (buf2)
 			*buf2++ = '\0';
@@ -371,15 +372,15 @@ limitset:
 			data.l.id = v2i32(data.l.id);
 			
 			buf = buf2;
-			buf2 = str_index(buf, ',', str_len(buf)); if (buf2) *buf2++ = '\0';
+			buf2 = str_chr(buf, ',', str_len(buf)); if (buf2) *buf2++ = '\0';
 			data.l.minimum = str_to_rlim(buf);
 			
 			buf = buf2;
-			buf2 = str_index(buf, ',', str_len(buf)); if (buf2) *buf2++ = '\0';
+			buf2 = str_chr(buf, ',', str_len(buf)); if (buf2) *buf2++ = '\0';
 			data.l.softlimit = str_to_rlim(buf);
 			
 			buf = buf2;
-			buf2 = str_index(buf, ',', str_len(buf)); if (buf2) *buf2++ = '\0';
+			buf2 = str_chr(buf, ',', str_len(buf)); if (buf2) *buf2++ = '\0';
 			data.l.maximum = str_to_rlim(buf);
 			
 			if (vx_limit_set(xid, &data.l) == -1)
@@ -459,7 +460,7 @@ schedset:
 	
 	for (i = optind; i < argc; i++) {
 		buf  = argv[i];
-		buf2 = str_index(buf, '=', str_len(buf));
+		buf2 = str_chr(buf, '=', str_len(buf));
 		
 		if (buf2)
 			*buf2++ = '\0';
@@ -471,22 +472,22 @@ schedset:
 			rc = log_perror("flist32_getval(%s)", buf);
 		
 		else {
-			data.s.set_mask |= buf32;
+			data.s.mask |= buf32;
 			
 			if (str_isempty(buf2))
 				continue;
 			
 			switch (buf32) {
-				case VXSM_FILL_RATE:  data.s.fill_rate  = atoi(buf2); break;
-				case VXSM_FILL_RATE2: data.s.fill_rate  = atoi(buf2); break;
-				case VXSM_INTERVAL:   data.s.interval   = atoi(buf2); break;
-				case VXSM_INTERVAL2:  data.s.interval   = atoi(buf2); break;
-				case VXSM_TOKENS:     data.s.tokens     = atoi(buf2); break;
-				case VXSM_TOKENS_MIN: data.s.tokens_min = atoi(buf2); break;
-				case VXSM_TOKENS_MAX: data.s.tokens_max = atoi(buf2); break;
-				case VXSM_PRIO_BIAS:  data.s.prio_bias  = atoi(buf2); break;
-				case VXSM_CPU_ID:     data.s.cpu_id     = atoi(buf2); break;
-				case VXSM_BUCKET_ID:  data.s.bucket_id  = atoi(buf2); break;
+				case VXSM_FILL_RATE:  data.s.fill_rate[0] = atoi(buf2); break;
+				case VXSM_FILL_RATE2: data.s.fill_rate[1] = atoi(buf2); break;
+				case VXSM_INTERVAL:   data.s.interval[0]  = atoi(buf2); break;
+				case VXSM_INTERVAL2:  data.s.interval[1]  = atoi(buf2); break;
+				case VXSM_TOKENS:     data.s.tokens       = atoi(buf2); break;
+				case VXSM_TOKENS_MIN: data.s.tokens_min   = atoi(buf2); break;
+				case VXSM_TOKENS_MAX: data.s.tokens_max   = atoi(buf2); break;
+				case VXSM_PRIO_BIAS:  data.s.prio_bias    = atoi(buf2); break;
+				case VXSM_CPU_ID:     data.s.cpu_id       = atoi(buf2); break;
+				case VXSM_BUCKET_ID:  data.s.bucket_id    = atoi(buf2); break;
 			}
 		}
 	}
@@ -502,7 +503,7 @@ unameset:
 	
 	for (i = optind; i < argc; i++) {
 		buf  = argv[i];
-		buf2 = str_index(buf, '=', str_len(buf));
+		buf2 = str_chr(buf, '=', str_len(buf));
 		
 		if (buf2)
 			*buf2++ = '\0';
@@ -516,8 +517,8 @@ unameset:
 		else {
 			data.u.id = v2i32(data.u.id);
 			
-			str_zero(data.u.value, 65);
-			str_cpyn(data.u.value, buf2, str_len(buf2));
+			mem_set(data.u.value, 0, 65);
+			mem_cpy(data.u.value, buf2, str_len(buf2));
 			
 			if (vx_uname_set(xid, &data.u) == -1)
 				rc = log_perror("vx_uname_set(%s)", buf);
