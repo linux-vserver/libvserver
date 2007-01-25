@@ -6,6 +6,10 @@
 
 #define VCMD_task_xid		VC_CMD(VINFO, 1, 0)
 
+#ifdef	__KERNEL__
+extern int vc_task_xid(uint32_t, void __user *);
+
+#endif	/* __KERNEL__ */
 
 #define VCMD_vx_info		VC_CMD(VINFO, 5, 0)
 
@@ -15,6 +19,10 @@ struct	vcmd_vx_info_v0 {
 	/* more to come */
 };
 
+#ifdef	__KERNEL__
+extern int vc_vx_info(struct vx_info *, void __user *);
+
+#endif	/* __KERNEL__ */
 
 #define VCMD_ctx_stat		VC_CMD(VSTAT, 0, 0)
 
@@ -24,6 +32,10 @@ struct	vcmd_ctx_stat_v0 {
 	/* more to come */
 };
 
+#ifdef	__KERNEL__
+extern int vc_ctx_stat(struct vx_info *, void __user *);
+
+#endif	/* __KERNEL__ */
 
 /* context commands */
 
@@ -41,6 +53,11 @@ struct	vcmd_ctx_migrate {
 	uint64_t flagword;
 };
 
+#ifdef	__KERNEL__
+extern int vc_ctx_create(uint32_t, void __user *);
+extern int vc_ctx_migrate(struct vx_info *, void __user *);
+
+#endif	/* __KERNEL__ */
 
 
 /* flag commands */
@@ -53,6 +70,11 @@ struct	vcmd_ctx_flags_v0 {
 	uint64_t mask;
 };
 
+#ifdef	__KERNEL__
+extern int vc_get_cflags(struct vx_info *, void __user *);
+extern int vc_set_cflags(struct vx_info *, void __user *);
+
+#endif	/* __KERNEL__ */
 
 
 /* context caps commands */
@@ -74,6 +96,13 @@ struct	vcmd_ctx_caps_v1 {
 	uint64_t cmask;
 };
 
+#ifdef	__KERNEL__
+extern int vc_get_ccaps_v0(struct vx_info *, void __user *);
+extern int vc_set_ccaps_v0(struct vx_info *, void __user *);
+extern int vc_get_ccaps(struct vx_info *, void __user *);
+extern int vc_set_ccaps(struct vx_info *, void __user *);
+
+#endif	/* __KERNEL__ */
 
 
 /* bcaps commands */
@@ -86,4 +115,9 @@ struct	vcmd_bcaps {
 	uint64_t bmask;
 };
 
+#ifdef	__KERNEL__
+extern int vc_get_bcaps(struct vx_info *, void __user *);
+extern int vc_set_bcaps(struct vx_info *, void __user *);
+
+#endif	/* __KERNEL__ */
 #endif	/* _VX_CONTEXT_CMD_H */

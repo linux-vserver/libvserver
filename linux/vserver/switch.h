@@ -19,7 +19,7 @@
 	 |STATS  |DESTROY|ALTER  |CHANGE |LIMIT  |TEST   | |       |       |
 	 |INFO   |SETUP  |       |MOVE   |       |       | |       |       |
   -------+-------+-------+-------+-------+-------+-------+ +-------+-------+
-  SYSTEM |VERSION|VSETUP |VHOST  |       |       |       | |DEVICE |       |
+  SYSTEM |VERSION|VSETUP |VHOST  |       |       |       | |DEVICES|       |
   HOST   |     00|     01|     02|     03|     04|     05| |     06|     07|
   -------+-------+-------+-------+-------+-------+-------+ +-------+-------+
   CPU    |       |VPROC  |PROCALT|PROCMIG|PROCTRL|       | |SCHED. |       |
@@ -51,8 +51,6 @@
 #define VC_CAT_VSETUP		1
 #define VC_CAT_VHOST		2
 
-#define VC_CAT_DEVICE		6
-
 #define VC_CAT_VPROC		9
 #define VC_CAT_PROCALT		10
 #define VC_CAT_PROCMIG		11
@@ -79,17 +77,19 @@
 #define VC_CAT_SYSTEST		61
 #define VC_CAT_COMPAT		63
 
-/*  interface version */
-
-#define VCI_VERSION		0x00020102
-#define VCI_LEGACY_VERSION	0x000100FF
-
 /*  query version */
 
 #define VCMD_get_version	VC_CMD(VERSION, 0, 0)
 #define VCMD_get_vci		VC_CMD(VERSION, 1, 0)
 
 
+#ifdef	__KERNEL__
+
+#include <linux/errno.h>
+
+
+#else	/* __KERNEL__ */
 #define __user
+#endif	/* __KERNEL__ */
 
 #endif	/* _VX_SWITCH_H */
