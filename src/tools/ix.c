@@ -137,7 +137,7 @@ attrget:
 			if (!str_isempty(buf))
 				printf("%s\n", buf);
 
-			free(buf);
+			mem_free(buf);
 		}
 	}
 

@@ -215,7 +215,7 @@ flagsget:
 		if (!str_isempty(buf))
 			printf("%s", buf);
 
-		free(buf);
+		mem_free(buf);
 	}
 
 	goto out;

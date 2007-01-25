@@ -292,7 +292,7 @@ bcapsget:
 		if (!str_isempty(buf))
 			printf("%s\n", buf);
 		
-		free(buf);
+		mem_free(buf);
 	}
 	
 	goto out;
@@ -320,7 +320,7 @@ ccapsget:
 		if (!str_isempty(buf))
 			printf("%s\n", buf);
 		
-		free(buf);
+		mem_free(buf);
 	}
 	
 	goto out;
@@ -348,7 +348,7 @@ flagsget:
 		if (!str_isempty(buf))
 			printf("%s\n", buf);
 		
-		free(buf);
+		mem_free(buf);
 	}
 	
 	goto out;
@@ -409,15 +409,15 @@ limitget:
 				
 				buf = rlim_to_str(data.l.minimum);
 				printf("%s,", buf);
-				free(buf);
+				mem_free(buf);
 				
 				buf = rlim_to_str(data.l.softlimit);
 				printf("%s,", buf);
-				free(buf);
+				mem_free(buf);
 				
 				buf = rlim_to_str(data.l.maximum);
 				printf("%s\n", buf);
-				free(buf);
+				mem_free(buf);
 			}
 		}
 	}
