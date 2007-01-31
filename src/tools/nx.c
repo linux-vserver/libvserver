@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 	} data;
 
 	mem_set(&data, 0, sizeof(data));
-	
+
 	/* logging */
 	log_options_t log_options = {
 		.ident  = argv[0],

@@ -70,16 +70,16 @@ uint64_t str_to_rlim(char *str)
 {
 	if (str == NULL)
 		return CRLIM_KEEP;
-	
+
 	if (str_cmp(str, "inf") == 0)
 		return CRLIM_INFINITY;
-	
+
 	if (str_cmp(str, "keep") == 0)
 		return CRLIM_KEEP;
-	
+
 	uint64_t lim;
 	sscanf(str, "%" SCNu64, &lim);
-	
+
 	return lim;
 }
 
@@ -87,12 +87,12 @@ static
 char *rlim_to_str(uint64_t lim)
 {
 	char *buf;
-	
+
 	if (lim == CRLIM_INFINITY)
 		asprintf(&buf, "%s", "inf");
 	else
 		asprintf(&buf, "%" PRIu64, lim);
-	
+
 	return buf;
 }
 
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
 	int32_t buf32;
 	pid_t pid = 0;
 	xid_t xid = 0;
-	
+
 	/* syscall data */
 	union {
 		vx_flags_t      f;
@@ -142,24 +142,24 @@ int main(int argc, char *argv[])
 		vx_uname_t      u;
 		vx_wait_t       w;
 	} data;
-	
+
 	mem_set(&data, 0, sizeof(data));
-	
+
 	/* logging */
 	log_options_t log_options = {
 		.ident  = argv[0],
 		.stderr = true,
 	};
-	
+
 	log_init(&log_options);
-	
+
 #define CASE_GOTO(ID, P) case ID: sscanf(optarg, "%" SCNu32, &xid); goto P; break
-	
+
 	/* parse command line */
 	while (GETOPT(c)) {
 		switch (c) {
 			COMMON_GETOPT_CASES
-			
+
 			CASE_GOTO(0x10, create);
 			CASE_GOTO(0x11, migrate);
 			CASE_GOTO(0x12, info);
@@ -179,265 +179,265 @@ int main(int argc, char *argv[])
 			CASE_GOTO(0x20, unameget);
 			CASE_GOTO(0x21, kill);
 			CASE_GOTO(0x22, wait);
-			
+
 			DEFAULT_GETOPT_CASES
 		}
 	}
-	
+
 #undef CASE_GOTO
-	
+
 	goto usage;
-	
+
 create:
 	if (argc > optind && str_cmp(argv[optind], "--") != 0) {
 		if (flist64_from_str(argv[optind], vx_cflags_list,
 		                     &data.f.flags, &data.f.mask, '~', ",") == -1)
 			rc = log_perror("flist64_from_str");
-		
+
 		else if (vx_create(xid, &data.f) == -1)
 			rc = log_perror("vx_create");
-		
+
 		else if (argc > optind+2 && execvp(argv[optind+2], argv+optind+2) == -1)
 			rc = log_perror("execvp");
 	}
-	
+
 	else {
 		if (vx_create(xid, NULL) == -1)
 			rc = log_perror("vx_create");
-		
+
 		else if (argc > optind+1 && execvp(argv[optind+1], argv+optind+1) == -1)
 			rc = log_perror("execvp");
 	}
-	
+
 	goto out;
-	
+
 migrate:
 	if (argc > optind && str_cmp(argv[optind], "--") != 0) {
 		if (flist64_from_str(argv[optind], vx_mflags_list,
 		                     &data.f.flags, &data.f.mask, '~', ",") == -1)
 			rc = log_perror("flist64_from_str");
-		
+
 		else if (vx_migrate(xid, &data.f) == -1)
 			rc = log_perror("vx_migrate");
-		
+
 		else if (argc > optind+2 && execvp(argv[optind+2], argv+optind+2) == -1)
 			rc = log_perror("execvp");
 	}
-	
+
 	else {
 		if (vx_migrate(xid, NULL) == -1)
 			rc = log_perror("vx_migrate");
-		
+
 		else if (argc > optind+1 && execvp(argv[optind+1], argv+optind+1) == -1)
 			rc = log_perror("execvp");
 	}
-	
+
 	goto out;
-	
+
 info:
 	if (vx_info(xid, &data.i) == -1)
 		rc = log_perror("vx_info");
-	
+
 	else {
 		printf("xid=%" PRIu32 "\n", data.i.xid);
 		printf("initpid=%" PRIu32 "\n", data.i.initpid);
 	}
-	
+
 	goto out;
-	
+
 stat:
 	if (vx_stat(xid, &data.st) == -1)
 		rc = log_perror("vx_get_stat");
-	
+
 	else {
 		printf("usecnt=%" PRIu32 "\n", data.st.usecnt);
 		printf("tasks=%"  PRIu32 "\n", data.st.tasks);
-		
+
 		printf("nr_threads=%" PRIu32 "\n", data.st.nr_threads);
 		printf("nr_running=%" PRIu32 "\n", data.st.nr_running);
 		printf("nr_unintr=%"  PRIu32 "\n", data.st.nr_unintr);
 		printf("nr_onhold=%"  PRIu32 "\n", data.st.nr_onhold);
 		printf("nr_forks=%"   PRIu32 "\n", data.st.nr_forks);
-		
+
 		printf("load[0]=%" PRIu32 "\n", data.st.load[0]);
 		printf("load[1]=%" PRIu32 "\n", data.st.load[1]);
 		printf("load[2]=%" PRIu32 "\n", data.st.load[2]);
-		
+
 		printf("offset=%" PRIu64 "\n", data.st.offset);
 		printf("uptime=%" PRIu64 "\n", data.st.uptime);
 	}
-	
+
 	goto out;
-	
+
 bcapsset:
 	if (argc <= optind)
 		goto usage;
-	
+
 	if (flist64_from_str(argv[optind], vx_bcaps_list,
 	                     &data.f.flags, &data.f.mask, '~', ",") == -1)
 		rc = log_perror("flist64_from_str");
-	
+
 	else if (vx_bcaps_set(xid, &data.f) == -1)
 		rc = log_perror("vx_bcaps_set");
-	
+
 	goto out;
-	
+
 bcapsget:
 	if (vx_bcaps_get(xid, &data.f) == -1)
 		rc = log_perror("vx_bcaps_get");
-	
+
 	else {
 		buf = flist64_to_str(vx_bcaps_list, data.f.flags, "\n");
-		
+
 		if (!str_isempty(buf))
 			printf("%s\n", buf);
-		
+
 		mem_free(buf);
 	}
-	
+
 	goto out;
-	
+
 ccapsset:
 	if (argc <= optind)
 		goto usage;
-	
+
 	if (flist64_from_str(argv[optind], vx_ccaps_list,
 	                     &data.f.flags, &data.f.mask, '~', ",") == -1)
 		rc = log_perror("flist64_from_str");
-	
+
 	else if (vx_ccaps_set(xid, &data.f) == -1)
 		rc = log_perror("vx_ccaps_set");
-	
+
 	goto out;
-	
+
 ccapsget:
 	if (vx_ccaps_get(xid, &data.f) == -1)
 		rc = log_perror("vx_ccaps_get");
-	
+
 	else {
 		buf = flist64_to_str(vx_ccaps_list, data.f.flags, "\n");
-		
+
 		if (!str_isempty(buf))
 			printf("%s\n", buf);
-		
+
 		mem_free(buf);
 	}
-	
+
 	goto out;
-	
+
 flagsset:
 	if (argc <= optind)
 		goto usage;
-	
+
 	if (flist64_from_str(argv[optind], vx_cflags_list,
 	                    &data.f.flags, &data.f.mask, '~', ",") == -1)
 		rc = log_perror("flist64_from_str");
-	
+
 	else if (vx_flags_set(xid, &data.f) == -1)
 		rc = log_perror("vx_flags_set");
-	
+
 	goto out;
-	
+
 flagsget:
 	if (vx_flags_get(xid, &data.f) == -1)
 		rc = log_perror("vx_flags_get");
-	
+
 	else {
 		buf = flist64_to_str(vx_cflags_list, data.f.flags, "\n");
-		
+
 		if (!str_isempty(buf))
 			printf("%s\n", buf);
-		
+
 		mem_free(buf);
 	}
-	
+
 	goto out;
-	
+
 limitset:
 	if (argc <= optind)
 		goto usage;
-	
+
 	for (i = optind; i < argc; i++) {
 		buf = argv[i];
-		
+
 		buf2 = str_chr(buf, '=', str_len(buf));
-		
+
 		if (buf2)
 			*buf2++ = '\0';
-		
+
 		if (!(data.l.id = flist32_getval(vx_limit_list, buf)))
 			rc = log_perror("flist32_getval(%s)", argv[i]);
-		
+
 		else {
 			data.l.id = v2i32(data.l.id);
-			
+
 			buf = buf2;
 			buf2 = str_chr(buf, ',', str_len(buf)); if (buf2) *buf2++ = '\0';
 			data.l.minimum = str_to_rlim(buf);
-			
+
 			buf = buf2;
 			buf2 = str_chr(buf, ',', str_len(buf)); if (buf2) *buf2++ = '\0';
 			data.l.softlimit = str_to_rlim(buf);
-			
+
 			buf = buf2;
 			buf2 = str_chr(buf, ',', str_len(buf)); if (buf2) *buf2++ = '\0';
 			data.l.maximum = str_to_rlim(buf);
-			
+
 			if (vx_limit_set(xid, &data.l) == -1)
 				rc = log_perror("vx_limit_set(%s)", argv[i]);
 		}
 	}
-	
+
 	goto out;
-	
+
 limitget:
 	if (argc <= optind)
 		goto usage;
-	
+
 	for (i = optind; i < argc; i++) {
 		if (!(data.l.id = flist32_getval(vx_limit_list, argv[i])))
 			rc = log_perror("flist32_getval(%s)", argv[i]);
-		
+
 		else {
 			data.l.id = v2i32(data.l.id);
-			
+
 			if (vx_limit_get(xid, &data.l) == -1)
 				rc = log_perror("vx_limit_get(%s)", argv[i]);
-		
+
 			else {
 				printf("%s=", argv[i]);
-				
+
 				buf = rlim_to_str(data.l.minimum);
 				printf("%s,", buf);
 				mem_free(buf);
-				
+
 				buf = rlim_to_str(data.l.softlimit);
 				printf("%s,", buf);
 				mem_free(buf);
-				
+
 				buf = rlim_to_str(data.l.maximum);
 				printf("%s\n", buf);
 				mem_free(buf);
 			}
 		}
 	}
-	
+
 	goto out;
-	
+
 limitstat:
 	if (argc <= optind)
 		goto usage;
-	
+
 	for (i = optind; i < argc; i++) {
 		if (!(data.ls.id = flist32_getval(vx_limit_list, argv[i])))
 			rc = log_perror("flist32_getval(%s)", argv[i]);
-		
+
 		else {
 			data.ls.id = v2i32(data.ls.id);
-		
+
 			if (vx_limit_stat(xid, &data.ls) == -1)
 				rc = log_perror("vx_limit_stat(%s)", argv[i]);
-			
+
 			else
 				printf("%s=%" PRIu32 ",%" PRIu64 ",%" PRIu64 ",%" PRIu64 "\n",
 		           argv[i],
@@ -445,38 +445,38 @@ limitstat:
 		           data.ls.value, data.ls.maximum);
 		}
 	}
-	
+
 	goto out;
-	
+
 limitreset:
 	if (vx_limit_reset(xid) == -1)
 		rc = log_perror("vx_limit_reset");
-	
+
 	goto out;
-	
+
 schedset:
 	if (argc <= optind)
 		goto usage;
-	
+
 	for (i = optind; i < argc; i++) {
 		buf  = argv[i];
 		buf2 = str_chr(buf, '=', str_len(buf));
-		
+
 		if (buf2)
 			*buf2++ = '\0';
-		
+
 		if (str_isempty(buf))
 			rc = log_error("Invalid argument: %s", argv[i]);
-		
+
 		else if (!(buf32 = flist32_getval(vx_sched_list, buf)))
 			rc = log_perror("flist32_getval(%s)", buf);
-		
+
 		else {
 			data.s.mask |= buf32;
-			
+
 			if (str_isempty(buf2))
 				continue;
-			
+
 			switch (buf32) {
 				case VXSM_FILL_RATE:  data.s.fill_rate[0] = atoi(buf2); break;
 				case VXSM_FILL_RATE2: data.s.fill_rate[1] = atoi(buf2); break;
@@ -491,86 +491,86 @@ schedset:
 			}
 		}
 	}
-	
+
 	if (vx_sched_set(xid, &data.s) == -1)
 		log_perror("vx_sched_set");
-	
+
 	goto out;
-	
+
 unameset:
 	if (argc <= optind)
 		goto usage;
-	
+
 	for (i = optind; i < argc; i++) {
 		buf  = argv[i];
 		buf2 = str_chr(buf, '=', str_len(buf));
-		
+
 		if (buf2)
 			*buf2++ = '\0';
-		
+
 		if (str_isempty(buf) || str_isempty(buf2) || str_len(buf2) > 64)
 			rc = log_error("Invalid argument: %s", argv[i]);
-		
+
 		else if (!(data.u.id = flist32_getval(vx_uname_list, buf)))
 			rc = log_perror("flist32_getval(%s)", buf);
-		
+
 		else {
 			data.u.id = v2i32(data.u.id);
-			
+
 			mem_set(data.u.value, 0, 65);
 			mem_cpy(data.u.value, buf2, str_len(buf2));
-			
+
 			if (vx_uname_set(xid, &data.u) == -1)
 				rc = log_perror("vx_uname_set(%s)", buf);
 		}
 	}
-	
+
 	goto out;
-	
+
 unameget:
 	if (argc <= optind)
 		goto usage;
-	
+
 	for (i = optind; i < argc; i++) {
 		if (!(data.u.id = flist32_getval(vx_uname_list, argv[i])))
 			rc = log_perror("flist32_getval(%s)", argv[i]);
-		
+
 		else {
 			data.u.id = v2i32(data.u.id);
-			
+
 			if (vx_uname_get(xid, &data.u) == -1)
 				rc = log_perror("vx_uname_get(%s)", argv[i]);
-		
+
 			else
 				printf("%s=%s\n", argv[i], data.u.value);
 		}
 	}
-	
+
 	goto out;
-	
+
 wait:
 	if (vx_wait(xid, &data.w) == -1)
 		rc = log_perror("vx_wait");
-	
+
 	else {
 		printf("reboot_cmd=%" PRIi32 "\n", data.w.reboot_cmd);
 		printf("exit_code=%" PRIi32 "\n", data.w.exit_code);
 	}
-	
+
 	goto out;
-	
+
 kill:
 	if (argc > optind)
 		pid = atoi(argv[optind]);
-	
+
 	if (argc > optind+1)
 		sig = atoi(argv[optind+1]);
-	
+
 	if (vx_kill(xid, pid, sig) == -1)
 		rc = log_perror("vx_kill");
-	
+
 	goto out;
-	
+
 usage:
 	usage(EXIT_FAILURE);
 

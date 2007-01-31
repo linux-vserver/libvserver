@@ -64,71 +64,71 @@ int main(int argc, char *argv[])
 {
 	int c, fd, realfd, rc = EXIT_SUCCESS;
 	char *dev;
-	
+
 	/* logging */
 	log_options_t log_options = {
 		.ident  = argv[0],
 		.stderr = true,
 	};
-	
+
 	log_init(&log_options);
-	
+
 #define CASE_GOTO(ID, P) case ID: dev = optarg; goto P; break
-	
+
 	/* parse command line */
 	while (GETOPT(c)) {
 		switch (c) {
 			COMMON_GETOPT_CASES
-			
+
 			CASE_GOTO(0x10, set);
 			CASE_GOTO(0x11, clear);
-			
+
 			DEFAULT_GETOPT_CASES
 		}
 	}
-	
+
 #undef CASE_GOTO
-	
+
 	goto usage;
-	
+
 set:
 	if (argc <= optind)
 		goto usage;
-	
+
 	if ((fd = open_read(dev)) == -1)
 		rc = log_perror("open_read");
-	
+
 	else if ((realfd = open_read(argv[optind])) == -1) {
 		close(fd);
 		rc = log_perror("open_read");
 	}
-	
+
 	else {
 		/* TODO: vr.c:97: warning: cast to pointer from integer of different size */
 		if (ioctl(fd, VROOT_SET_DEV, (void *)realfd) == -1)
 			rc = log_perror("ioctl");
-		
+
 		close(realfd);
 		close(fd);
 	}
-	
+
 	goto out;
-	
+
 clear:
 	fd = open_read(dev);
-	
+
 	if (fd == -1)
 		rc = log_perror("open_read");
-	
+
 	else {
 		if (ioctl(fd, VROOT_CLR_DEV, 0) == -1)
 			rc = log_perror("ioctl");
-		
+
 		close(fd);
 	}
-	
+
 	goto out;
-	
+
 usage:
 	usage(EXIT_FAILURE);
 

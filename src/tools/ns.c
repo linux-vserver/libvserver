@@ -96,7 +96,7 @@ create:
 		case 0:
 			if (ns_set(xid, 0) == -1)
 				rc = log_perror("ns_set");
-			
+
 			goto out;
 
 		default:
