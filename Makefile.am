@@ -22,9 +22,11 @@ noinst_HEADERS = linux/vserver/cacct_cmd.h \
                  linux/vserver/cvirt_cmd.h \
                  linux/vserver/debug_cmd.h \
                  linux/vserver/dlimit_cmd.h \
+                 linux/vserver/inode.h \
                  linux/vserver/inode_cmd.h \
                  linux/vserver/limit_cmd.h \
                  linux/vserver/monitor.h \
+                 linux/vserver/network.h \
                  linux/vserver/network_cmd.h \
                  linux/vserver/sched_cmd.h \
                  linux/vserver/signal_cmd.h \

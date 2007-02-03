@@ -20,7 +20,6 @@ echo "Creating release tag... "
 svn copy ${svnroot}/trunk ${svnroot}/tags/release-${ver} \
 	-m "Tagging the ${ver} release of the ${proj} project" &>/dev/null || die "svn copy failed"
 
-
 echo "Running autotools..."
 
 make -f Makefile.svn &>/dev/null || die "make failed"

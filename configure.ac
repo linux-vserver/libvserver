@@ -18,7 +18,6 @@
 # Generic configuration
 AC_PREREQ(2.59)
 AC_INIT(libvserver, 2.0_rc1, hollow@gentoo.org)
-AC_CONFIG_HEADER([config.h])
 AC_GNU_SOURCE
 
 AC_CANONICAL_BUILD
