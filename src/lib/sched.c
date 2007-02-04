@@ -33,7 +33,7 @@ int vx_sched_get(xid_t xid, vx_sched_t *data)
 	kdata.bucket_id = data->bucket_id;
 	kdata.mask      = data->mask;
 
-	int rc = sys_vserver(VCMD_get_sched, xid, &kdata);
+	int rc = vserver(VCMD_get_sched, xid, &kdata);
 
 	if (rc == -1)
 		return -1;
@@ -68,7 +68,7 @@ int vx_sched_set(xid_t xid, vx_sched_t *data)
 	kdata.tokens_max   = data->tokens_max;
 	kdata.prio_bias    = data->prio_bias;
 
-	return sys_vserver(VCMD_set_sched, xid, &kdata);
+	return vserver(VCMD_set_sched, xid, &kdata);
 }
 
 int vx_sched_info(xid_t xid, vx_sched_info_t *data)
@@ -81,7 +81,7 @@ int vx_sched_info(xid_t xid, vx_sched_info_t *data)
 	kdata.cpu_id = data->cpu_id;
 	kdata.bucket_id = data->bucket_id;
 
-	int rc = sys_vserver(VCMD_sched_info, xid, &kdata);
+	int rc = vserver(VCMD_sched_info, xid, &kdata);
 
 	if (rc == -1)
 		return -1;

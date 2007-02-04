@@ -35,7 +35,7 @@ int ix_attr_set(ix_attr_t *data)
 	kdata.flags = data->flags;
 	kdata.mask  = data->mask;
 
-	return sys_vserver(VCMD_set_iattr, 0, &kdata);
+	return vserver(VCMD_set_iattr, 0, &kdata);
 }
 
 int ix_attr_get(ix_attr_t *data)
@@ -48,7 +48,7 @@ int ix_attr_get(ix_attr_t *data)
 
 	kdata.name = data->filename;
 
-	rc = sys_vserver(VCMD_get_iattr, 0, &kdata);
+	rc = vserver(VCMD_get_iattr, 0, &kdata);
 
 	if (rc == -1)
 		return rc;

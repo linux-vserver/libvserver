@@ -66,24 +66,24 @@ int nx_create(nid_t nid, nx_flags_t *data)
 	if (data)
 		kdata.flagword = data->flags;
 
-	return sys_vserver(VCMD_net_create, nid, &kdata);
+	return vserver(VCMD_net_create, nid, &kdata);
 }
 
 int nx_migrate(nid_t nid)
 {
-	return sys_vserver(VCMD_net_migrate, nid, NULL);
+	return vserver(VCMD_net_migrate, nid, NULL);
 }
 
 int nx_task_nid(pid_t pid)
 {
-	return sys_vserver(VCMD_task_nid, pid, NULL);
+	return vserver(VCMD_task_nid, pid, NULL);
 }
 
 int nx_info(nid_t nid, nx_info_t *data)
 {
 	struct vcmd_nx_info_v0 kdata;
 
-	int rc = sys_vserver(VCMD_nx_info, nid, &kdata);
+	int rc = vserver(VCMD_nx_info, nid, &kdata);
 
 	if (rc == -1)
 		return rc;
@@ -107,7 +107,7 @@ int nx_addr_add(nid_t nid, nx_addr_t *data)
 	str_cpyn(kdata.ip,   data->ip,   sizeof(kdata.ip));
 	str_cpyn(kdata.mask, data->mask, sizeof(kdata.mask));
 
-	return sys_vserver(VCMD_net_add, nid, &kdata);
+	return vserver(VCMD_net_add, nid, &kdata);
 }
 
 int nx_addr_remove(nid_t nid, nx_addr_t *data)
@@ -123,7 +123,7 @@ int nx_addr_remove(nid_t nid, nx_addr_t *data)
 	str_cpyn(kdata.ip,   data->ip,   sizeof(kdata.ip));
 	str_cpyn(kdata.mask, data->mask, sizeof(kdata.mask));
 
-	return sys_vserver(VCMD_net_remove, nid, &kdata);
+	return vserver(VCMD_net_remove, nid, &kdata);
 }
 
 int nx_flags_set(nid_t nid, nx_flags_t *data)
@@ -136,7 +136,7 @@ int nx_flags_set(nid_t nid, nx_flags_t *data)
 	kdata.flagword = data->flags;
 	kdata.mask     = data->mask;
 
-	return sys_vserver(VCMD_set_nflags, nid, &kdata);
+	return vserver(VCMD_set_nflags, nid, &kdata);
 }
 
 int nx_flags_get(nid_t nid, nx_flags_t *data)
@@ -146,7 +146,7 @@ int nx_flags_get(nid_t nid, nx_flags_t *data)
 	if (!data)
 		return errno = EINVAL, -1;
 
-	int rc = sys_vserver(VCMD_get_nflags, nid, &kdata);
+	int rc = vserver(VCMD_get_nflags, nid, &kdata);
 
 	if (rc == -1)
 		return rc;
@@ -167,7 +167,7 @@ int nx_caps_set(nid_t nid, nx_flags_t *data)
 	kdata.ncaps = data->flags;
 	kdata.cmask = data->mask;
 
-	return sys_vserver(VCMD_set_ncaps, nid, &kdata);
+	return vserver(VCMD_set_ncaps, nid, &kdata);
 }
 
 int nx_caps_get(nid_t nid, nx_flags_t *data)
@@ -177,7 +177,7 @@ int nx_caps_get(nid_t nid, nx_flags_t *data)
 	if (!data)
 		return errno = EINVAL, -1;
 
-	int rc = sys_vserver(VCMD_get_ncaps, nid, &kdata);
+	int rc = vserver(VCMD_get_ncaps, nid, &kdata);
 
 	if (rc == -1)
 		return rc;
@@ -197,7 +197,7 @@ int nx_sock_stat(nid_t nid, nx_sock_stat_t *data)
 
 	kdata.field = data->id;
 
-	int rc = sys_vserver(VCMD_sock_stat, nid, &kdata);
+	int rc = vserver(VCMD_sock_stat, nid, &kdata);
 
 	if (rc == -1)
 		return rc;

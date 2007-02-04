@@ -31,7 +31,7 @@ int vx_limit_mask_get(vx_limit_t *data)
 	if (!data)
 		return errno = EINVAL, -1;
 
-	rc = sys_vserver(VCMD_get_rlimit_mask, 0, &kdata);
+	rc = vserver(VCMD_get_rlimit_mask, 0, &kdata);
 
 	if (rc == -1)
 		return rc;
@@ -55,7 +55,7 @@ int vx_limit_set(xid_t xid, vx_limit_t *data)
 	kdata.softlimit = data->softlimit;
 	kdata.maximum   = data->maximum;
 
-	return sys_vserver(VCMD_set_rlimit, xid, &kdata);
+	return vserver(VCMD_set_rlimit, xid, &kdata);
 }
 
 int vx_limit_get(xid_t xid, vx_limit_t *data)
@@ -68,7 +68,7 @@ int vx_limit_get(xid_t xid, vx_limit_t *data)
 
 	kdata.id = data->id;
 
-	rc = sys_vserver(VCMD_get_rlimit, xid, &kdata);
+	rc = vserver(VCMD_get_rlimit, xid, &kdata);
 
 	if (rc == -1)
 		return rc;
@@ -90,7 +90,7 @@ int vx_limit_stat(xid_t xid, vx_limit_stat_t *data)
 
 	kdata.id = data->id;
 
-	rc = sys_vserver(VCMD_rlimit_stat, xid, &kdata);
+	rc = vserver(VCMD_rlimit_stat, xid, &kdata);
 
 	if (rc == -1)
 		return rc;
@@ -105,5 +105,5 @@ int vx_limit_stat(xid_t xid, vx_limit_stat_t *data)
 
 int vx_limit_reset(xid_t xid)
 {
-	return sys_vserver(VCMD_reset_minmax, xid, NULL);
+	return vserver(VCMD_reset_minmax, xid, NULL);
 }

@@ -67,7 +67,7 @@ int vx_create(xid_t xid, vx_flags_t *data)
 	if (data)
 		kdata.flagword = data->flags;
 
-	return sys_vserver(VCMD_ctx_create, xid, &kdata);
+	return vserver(VCMD_ctx_create, xid, &kdata);
 }
 
 int vx_migrate(xid_t xid, vx_flags_t *data)
@@ -79,19 +79,19 @@ int vx_migrate(xid_t xid, vx_flags_t *data)
 	if (data)
 		kdata.flagword = data->flags;
 
-	return sys_vserver(VCMD_ctx_migrate, xid, &kdata);
+	return vserver(VCMD_ctx_migrate, xid, &kdata);
 }
 
 int vx_task_xid(pid_t pid)
 {
-	return sys_vserver(VCMD_task_xid, pid, NULL);
+	return vserver(VCMD_task_xid, pid, NULL);
 }
 
 int vx_info(xid_t xid, vx_info_t *data)
 {
 	struct vcmd_vx_info_v0 kdata;
 
-	int rc = sys_vserver(VCMD_vx_info, xid, &kdata);
+	int rc = vserver(VCMD_vx_info, xid, &kdata);
 
 	if (rc == -1)
 		return rc;
@@ -110,12 +110,12 @@ int vx_stat(xid_t xid, vx_stat_t *data)
 	struct vcmd_ctx_stat_v0 kdata1;
 	struct vcmd_virt_stat_v0 kdata2;
 
-	rc = sys_vserver(VCMD_ctx_stat, xid, &kdata1);
+	rc = vserver(VCMD_ctx_stat, xid, &kdata1);
 
 	if (rc == -1)
 		return rc;
 
-	rc = sys_vserver(VCMD_virt_stat, xid, &kdata2);
+	rc = vserver(VCMD_virt_stat, xid, &kdata2);
 
 	if (rc == -1)
 		return rc;
@@ -148,7 +148,7 @@ int vx_bcaps_set(xid_t xid, vx_flags_t *data)
 	kdata.bcaps = data->flags;
 	kdata.bmask = data->mask;
 
-	return sys_vserver(VCMD_set_bcaps, xid, &kdata);
+	return vserver(VCMD_set_bcaps, xid, &kdata);
 }
 
 int vx_bcaps_get(xid_t xid, vx_flags_t *data)
@@ -158,7 +158,7 @@ int vx_bcaps_get(xid_t xid, vx_flags_t *data)
 	if (!data)
 		return errno = EINVAL, -1;
 
-	int rc = sys_vserver(VCMD_get_bcaps, xid, &kdata);
+	int rc = vserver(VCMD_get_bcaps, xid, &kdata);
 
 	if (rc == -1)
 		return rc;
@@ -179,7 +179,7 @@ int vx_ccaps_set(xid_t xid, vx_flags_t *data)
 	kdata.ccaps = data->flags;
 	kdata.cmask = data->mask;
 
-	return sys_vserver(VCMD_set_ccaps, xid, &kdata);
+	return vserver(VCMD_set_ccaps, xid, &kdata);
 }
 
 int vx_ccaps_get(xid_t xid, vx_flags_t *data)
@@ -189,7 +189,7 @@ int vx_ccaps_get(xid_t xid, vx_flags_t *data)
 	if (!data)
 		return errno = EINVAL, -1;
 
-	int rc = sys_vserver(VCMD_get_ccaps, xid, &kdata);
+	int rc = vserver(VCMD_get_ccaps, xid, &kdata);
 
 	if (rc == -1)
 		return rc;
@@ -210,7 +210,7 @@ int vx_flags_set(xid_t xid, vx_flags_t *data)
 	kdata.flagword = data->flags;
 	kdata.mask     = data->mask;
 
-	return sys_vserver(VCMD_set_cflags, xid, &kdata);
+	return vserver(VCMD_set_cflags, xid, &kdata);
 }
 
 int vx_flags_get(xid_t xid, vx_flags_t *data)
@@ -220,7 +220,7 @@ int vx_flags_get(xid_t xid, vx_flags_t *data)
 	if (!data)
 		return errno = EINVAL, -1;
 
-	int rc = sys_vserver(VCMD_get_cflags, xid, &kdata);
+	int rc = vserver(VCMD_get_cflags, xid, &kdata);
 
 	if (rc == -1)
 		return rc;
@@ -246,7 +246,7 @@ int vx_uname_set(xid_t xid, vx_uname_t *data)
 	str_zero(kdata.name, sizeof(kdata.name));
 	str_cpyn(kdata.name, data->value, sizeof(kdata.name) - 1);
 
-	return sys_vserver(VCMD_set_vhi_name, xid, &kdata);
+	return vserver(VCMD_set_vhi_name, xid, &kdata);
 }
 
 int vx_uname_get(xid_t xid, vx_uname_t *data)
@@ -259,7 +259,7 @@ int vx_uname_get(xid_t xid, vx_uname_t *data)
 
 	kdata.field = data->id;
 
-	rc = sys_vserver(VCMD_get_vhi_name, xid, &kdata);
+	rc = vserver(VCMD_get_vhi_name, xid, &kdata);
 
 	if (rc == -1)
 		return rc;
@@ -277,7 +277,7 @@ int vx_kill(xid_t xid, pid_t pid, int sig)
 	kdata.pid = pid;
 	kdata.sig = sig;
 
-	return sys_vserver(VCMD_ctx_kill, xid, &kdata);
+	return vserver(VCMD_ctx_kill, xid, &kdata);
 }
 
 int vx_wait(xid_t xid, vx_wait_t *data)
@@ -286,7 +286,7 @@ int vx_wait(xid_t xid, vx_wait_t *data)
 
 	int rc;
 
-	rc = sys_vserver(VCMD_wait_exit, xid, &kdata);
+	rc = vserver(VCMD_wait_exit, xid, &kdata);
 
 	if (rc == -1)
 		return -1;

@@ -33,7 +33,7 @@ int dx_limit_add(xid_t xid, dx_limit_t *data)
 	kdata.name  = data->filename;
 	kdata.flags = data->flags;
 
-	return sys_vserver(VCMD_add_dlimit, xid, &kdata);
+	return vserver(VCMD_add_dlimit, xid, &kdata);
 }
 
 int dx_limit_remove(xid_t xid, dx_limit_t *data)
@@ -45,7 +45,7 @@ int dx_limit_remove(xid_t xid, dx_limit_t *data)
 
 	kdata.name = data->filename;
 
-	return sys_vserver(VCMD_rem_dlimit, xid, &kdata);
+	return vserver(VCMD_rem_dlimit, xid, &kdata);
 }
 
 int dx_limit_set(xid_t xid, dx_limit_t *data)
@@ -63,7 +63,7 @@ int dx_limit_set(xid_t xid, dx_limit_t *data)
 	kdata.reserved     = data->reserved;
 	kdata.flags        = data->flags;
 
-	return sys_vserver(VCMD_set_dlimit, xid, &kdata);
+	return vserver(VCMD_set_dlimit, xid, &kdata);
 }
 
 int dx_limit_get(xid_t xid, dx_limit_t *data)
@@ -76,7 +76,7 @@ int dx_limit_get(xid_t xid, dx_limit_t *data)
 
 	kdata.name = data->filename;
 
-	rc = sys_vserver(VCMD_get_dlimit, xid, &kdata);
+	rc = vserver(VCMD_get_dlimit, xid, &kdata);
 
 	if (rc == -1)
 		return rc;

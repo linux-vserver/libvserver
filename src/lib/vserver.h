@@ -43,7 +43,7 @@
  *   </a>
  * \endhtmlonly
  */
-int sys_vserver(uint32_t cmd, uint32_t id, void *data);
+int vserver(uint32_t cmd, uint32_t id, void *data);
 
 /*!
  * @brief Clone system call
@@ -56,9 +56,9 @@ int sys_vserver(uint32_t cmd, uint32_t id, void *data);
  * @see clone(2)
  */
 #if defined (__s390__)
-int sys_clone(void *child_stack, int flags);
+int clone(void *child_stack, int flags);
 #else
-int sys_clone(int flags, void *child_stack);
+int clone(int flags, void *child_stack);
 #endif
 
 /*!

@@ -24,17 +24,17 @@
 
 int ns_clone(int flags, void *child_stack)
 {
-	return sys_clone(flags|CLONE_NEWNS|CLONE_NEWUTS|CLONE_NEWIPC, child_stack);
+	return clone(flags|CLONE_NEWNS|CLONE_NEWUTS|CLONE_NEWIPC, child_stack);
 }
 
 int ns_enter(xid_t xid, uint64_t mask)
 {
 	struct vcmd_space_mask kdata = { .mask = mask };
-	return sys_vserver(VCMD_enter_space, xid, &kdata);
+	return vserver(VCMD_enter_space, xid, &kdata);
 }
 
 int ns_set(xid_t xid, uint64_t mask)
 {
 	struct vcmd_space_mask kdata = { .mask = mask };
-	return sys_vserver(VCMD_set_space, xid, &kdata);
+	return vserver(VCMD_set_space, xid, &kdata);
 }
