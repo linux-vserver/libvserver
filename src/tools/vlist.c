@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
 	goto usage;
 
 print_list32:
-	val32 = ~0UL;
+	val32 = ~0U;
 
 	if (argc > optind)
 		sscanf(argv[optind], "%" SCNu32, &val32);

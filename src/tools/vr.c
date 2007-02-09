@@ -58,7 +58,8 @@ void usage(int rc)
 
 int main(int argc, char *argv[])
 {
-	int c, fd, realfd, rc = EXIT_SUCCESS;
+	long realfd;
+	int c, fd, rc = EXIT_SUCCESS;
 	char *dev;
 
 	/* logging */
@@ -101,7 +102,6 @@ set:
 	}
 
 	else {
-		/* TODO: vr.c:97: warning: cast to pointer from integer of different size */
 		if (ioctl(fd, VROOT_SET_DEV, (void *)realfd) == -1)
 			rc = log_perror("ioctl");
 
