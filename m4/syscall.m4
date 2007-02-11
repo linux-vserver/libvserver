@@ -18,7 +18,7 @@
 AC_DEFUN([LV_NR_VSERVER],
 [
 	AC_MSG_CHECKING([for vserver syscall number])
-	
+
 	AC_LANG_PUSH(C)
 	AC_LANG_CONFTEST([
 #if 	defined(__alpha__)
@@ -61,22 +61,22 @@ AC_DEFUN([LV_NR_VSERVER],
 
 lv_nr_vserver=__NR_vserver
 	])
-	
+
 	eval $(${CPP} conftest.c | ${EGREP} '^lv_nr_vserver=.*$')
-	
+
 	if test x"$lv_nr_vserver" = x; then
 		AC_MSG_ERROR([Cannot determine vserver syscall number])
 	else
 		AC_DEFINE_UNQUOTED(__NR_vserver, $lv_nr_vserver, [vserver syscall number])
 		AC_MSG_RESULT([$lv_nr_vserver])
 	fi
-	
+
 	AC_LANG_POP
 ])
 AC_DEFUN([LV_NR_CLONE],
 [
 	AC_MSG_CHECKING([for clone syscall number])
-	
+
 	AC_LANG_PUSH(C)
 	AC_LANG_CONFTEST([
 #if 	defined(__alpha__)
@@ -121,15 +121,15 @@ AC_DEFUN([LV_NR_CLONE],
 
 lv_nr_clone=__NR_clone
 	])
-	
+
 	eval $(${CPP} conftest.c | ${EGREP} '^lv_nr_clone=.*$')
-	
+
 	if test x"$lv_nr_clone" = x; then
 		AC_MSG_ERROR([Cannot determine clone syscall number])
 	else
 		AC_DEFINE_UNQUOTED(__NR_clone, $lv_nr_clone, [clone syscall number])
 		AC_MSG_RESULT([$lv_nr_clone])
 	fi
-	
+
 	AC_LANG_POP
 ])
