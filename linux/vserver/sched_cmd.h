@@ -76,17 +76,6 @@ struct	vcmd_sched_v5 {
 
 #define SCHED_KEEP		(-2)	/* only for v2 */
 
-#ifdef	__KERNEL__
-
-#include <linux/compiler.h>
-
-extern int vc_set_sched_v2(struct vx_info *, void __user *);
-extern int vc_set_sched_v3(struct vx_info *, void __user *);
-extern int vc_set_sched_v4(struct vx_info *, void __user *);
-extern int vc_set_sched(struct vx_info *, void __user *);
-extern int vc_get_sched(struct vx_info *, void __user *);
-
-#endif	/* __KERNEL__ */
 
 #define VCMD_sched_info		VC_CMD(SCHED, 3, 0)
 
@@ -100,9 +89,4 @@ struct	vcmd_sched_info {
 	int32_t vavavoom;
 };
 
-#ifdef	__KERNEL__
-
-extern int vc_sched_info(struct vx_info *, void __user *);
-
-#endif	/* __KERNEL__ */
 #endif	/* _VX_SCHED_CMD_H */

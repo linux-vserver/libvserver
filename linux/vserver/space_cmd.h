@@ -16,11 +16,4 @@ struct	vcmd_space_mask {
 };
 
 
-#ifdef	__KERNEL__
-
-extern int vc_enter_space(struct vx_info *, void __user *);
-extern int vc_set_space(struct vx_info *, void __user *);
-extern int vc_get_space_mask(struct vx_info *, void __user *);
-
-#endif	/* __KERNEL__ */
 #endif	/* _VX_SPACE_CMD_H */
