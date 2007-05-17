@@ -44,8 +44,8 @@ static inline
 void usage(int rc)
 {
 	printf("Usage:\n\n"
-	          "ns -create  <xid>\n"
-	          "   -migrate <xid> -- <program> <args>*\n");
+			"ns -create  <xid>\n"
+			"   -migrate <xid> -- <program> <args>*\n");
 	exit(rc);
 }
 
@@ -65,8 +65,9 @@ int main(int argc, char *argv[])
 	log_init(&log_options);
 
 #define CASE_GOTO(ID, P) case ID: \
-	sscanf(optarg, "%" SCNu32, &xid); \
-	goto P; break
+sscanf(optarg, "%" SCNu32, &xid); \
+if (xid < 2 || xid > 65535) { log_error_and_die("Invalid xid: %d", xid); } \
+goto P; break
 
 	/* parse command line */
 	while (GETOPT(c)) {

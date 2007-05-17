@@ -48,13 +48,14 @@ uint32_t str_to_dlim(char *str)
 	if (str == NULL)
 		return CDLIM_KEEP;
 
-	if (str_cmp(str, "inf") == 0)
+	if (str_equal(str, "inf"))
 		return CDLIM_INFINITY;
 
-	if (str_cmp(str, "keep") == 0)
+	if (str_equal(str, "keep"))
 		return CDLIM_KEEP;
 
 	uint32_t lim;
+
 	sscanf(str, "%" SCNu32, &lim);
 
 	return lim;
@@ -77,10 +78,10 @@ static inline
 void usage(int rc)
 {
 	printf("Usage:\n\n"
-	       "dx -limit-add    <xid> <path>*\n"
-	       "   -limit-remove <xid> <path>*\n"
-	       "   -limit-set    <xid> <path>=<su>,<st>,<iu>,<it>,<rr>*\n"
-	       "   -limit-get    <xid> <path>*\n");
+			"dx -limit-add    <xid> <path>*\n"
+			"   -limit-remove <xid> <path>*\n"
+			"   -limit-set    <xid> <path>=<su>,<st>,<iu>,<it>,<rr>*\n"
+			"   -limit-get    <xid> <path>*\n");
 	exit(rc);
 }
 
@@ -105,8 +106,9 @@ int main(int argc, char *argv[])
 	log_init(&log_options);
 
 #define CASE_GOTO(ID, P) case ID: \
-	sscanf(optarg, "%" SCNu32, &xid); \
-	goto P; break
+sscanf(optarg, "%" SCNu32, &xid); \
+if (xid < 2 || xid > 65535) { log_error_and_die("Invalid xid: %d", xid); } \
+goto P; break
 
 	/* parse command line */
 	while (GETOPT(c)) {

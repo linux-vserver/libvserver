@@ -45,10 +45,10 @@ static inline
 void usage(int rc)
 {
 	printf("Usage:\n\n"
-	          "ix -attr-set <file>=<list>*\n"
-	          "   -attr-get <file>*\n"
-	          "   -xid-set  <file>=<xid>*\n"
-	          "   -xid-get  <file>*\n");
+			"ix -attr-set <file>=<list>*\n"
+			"   -attr-get <file>*\n"
+			"   -xid-set  <file>=<xid>*\n"
+			"   -xid-get  <file>*\n");
 	exit(rc);
 }
 
@@ -107,7 +107,7 @@ attrset:
 			rc = log_error("Invalid argument: %s", argv[i]);
 
 		else if (flist32_from_str(buf, ix_attr_list,
-					&data.flags, &data.mask, '~', ",") == -1)
+				&data.flags, &data.mask, '~', ",") == -1)
 			rc = log_perror("flist32_parse(%s)", data.filename);
 
 		else if (ix_attr_set(&data) == -1)
@@ -127,7 +127,7 @@ attrget:
 			rc = log_perror("ix_attr_get(%s)", data.filename);
 
 		else if (!(buf = flist32_to_str(ix_attr_list,
-						data.flags & data.mask, ",")))
+				data.flags & data.mask, ",")))
 			rc = log_perror("flist32_to_str(%s)", data.filename);
 
 		else {

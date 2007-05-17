@@ -16,6 +16,7 @@
 // 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <getopt.h>
+
 #include <lucid/flist.h>
 
 #define COMMON_LONG_OPTS \

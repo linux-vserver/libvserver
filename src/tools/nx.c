@@ -52,14 +52,14 @@ static inline
 void usage(int rc)
 {
 	printf("Usage:\n\n"
-	       "nx -create      <nid> [<list>] [-- <program> <args>*]\n"
-	       "   -migrate     <nid> -- <program> <args>*\n"
-	       "   -info        <nid>\n"
-	       "   -addr-add    <nid> <addr>/<netmask>*\n"
-	       "   -addr-remove <nid> <addr>/<netmask>*\n"
-	       "   -flags-set   <nid> <list>\n"
-	       "   -flags-get   <nid>\n"
-	       "   -sock-stat   <nid> <type>*\n");
+			"nx -create      <nid> [<list>] [-- <program> <args>*]\n"
+			"   -migrate     <nid> -- <program> <args>*\n"
+			"   -info        <nid>\n"
+			"   -addr-add    <nid> <addr>/<netmask>*\n"
+			"   -addr-remove <nid> <addr>/<netmask>*\n"
+			"   -flags-set   <nid> <list>\n"
+			"   -flags-get   <nid>\n"
+			"   -sock-stat   <nid> <type>*\n");
 	exit(rc);
 }
 
@@ -89,8 +89,9 @@ int main(int argc, char *argv[])
 	log_init(&log_options);
 
 #define CASE_GOTO(ID, P) case ID: \
-	sscanf(optarg, "%" SCNu32, &nid); \
-	goto P; break
+sscanf(optarg, "%" SCNu32, &nid); \
+if (nid < 2 || nid > 65535) { log_error_and_die("Invalid nid: %d", nid); } \
+goto P; break
 
 	/* parse command line */
 	while (GETOPT(c)) {
@@ -117,7 +118,7 @@ int main(int argc, char *argv[])
 create:
 	if (argc > optind && str_cmp(argv[optind], "--") != 0) {
 		if (flist64_from_str(argv[optind], nx_flags_list,
-					&data.f.flags, &data.f.mask, '~', ",") == -1)
+							&data.f.flags, &data.f.mask, '~', ",") == -1)
 			rc = log_perror("flist64_from_str");
 
 		else if (nx_create(nid, &data.f) == -1)
@@ -194,7 +195,7 @@ flagsset:
 		goto usage;
 
 	if (flist64_from_str(argv[optind], nx_flags_list,
-				&data.f.flags, &data.f.mask, '~', ",") == -1)
+						&data.f.flags, &data.f.mask, '~', ",") == -1)
 		rc = log_perror("flist64_from_str");
 
 	else if (nx_flags_set(nid, &data.f) == -1)
@@ -210,7 +211,7 @@ flagsget:
 		buf = flist64_to_str(nx_flags_list, data.f.flags, "\n");
 
 		if (!str_isempty(buf))
-			printf("%s", buf);
+			printf("%s\n", buf);
 
 		mem_free(buf);
 	}

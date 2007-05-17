@@ -32,8 +32,6 @@
 #include "tools.h"
 #include "vserver.h"
 
-void do_vlogin(int argc, char *argv[], int ind);
-
 static const char *rcsid = "$Id: vx.c 294 2006-07-09 08:46:15Z hollow $";
 
 static
@@ -69,13 +67,14 @@ uint64_t str_to_rlim(char *str)
 	if (str == NULL)
 		return CRLIM_KEEP;
 
-	if (str_cmp(str, "inf") == 0)
+	if (str_equal(str, "inf"))
 		return CRLIM_INFINITY;
 
-	if (str_cmp(str, "keep") == 0)
+	if (str_equal(str, "keep"))
 		return CRLIM_KEEP;
 
 	uint64_t lim;
+
 	sscanf(str, "%" SCNu64, &lim);
 
 	return lim;
@@ -94,32 +93,42 @@ char *rlim_to_str(uint64_t lim)
 	return buf;
 }
 
+static
+int check_cpuid(int cpuid)
+{
+	int numcpus = sysconf(_SC_NPROCESSORS_ONLN);
+
+    if (cpuid < 0 || cpuid >= numcpus)
+		return 0;
+	else
+		return 1;
+}
+
 static inline
 void usage(int rc)
 {
 	printf("Usage:\n\n"
-	          "vx -create      <xid> [<list>] [-- <program> <args>*]\n"
-	          "   -migrate     <xid> [<list>] -- <program> <args>*\n"
-	          "   -info        <xid>\n"
-	          "   -stat        <xid>\n"
-	          "   -bcaps-set   <xid> <list>\n"
-	          "   -bcaps-get   <xid>\n"
-	          "   -ccaps-set   <xid> <list>\n"
-	          "   -ccaps-get   <xid>\n"
-	          "   -flags-set   <xid> <list>\n"
-	          "   -flags-get   <xid>\n"
-	          "   -limit-set   <xid> <type>=<min>,<soft>,<hard>*\n"
-	          "   -limit-get   <xid> <type>*\n"
-	          "   -limit-stat  <xid> <type>*\n"
-	          "   -limit-reset <xid>\n"
-	          "   -sched-set   <xid> <type>=<value>*\n"
-	          "   -sched-get   <xid> <cpuid>\n"
-	          "   -sched-info  <xid> <cpuid>\n"
-	          "   -uname-set   <xid> <type>=<value>*\n"
-	          "   -uname-get   <xid> <type>*\n"
-	          "   -kill        <xid> [<pid> [<sig>]]\n"
-	          "   -wait        <xid>\n"
-	          );
+			"vx -create      <xid> [<list>] [-- <program> <args>*]\n"
+			"   -migrate     <xid> [<list>] -- <program> <args>*\n"
+			"   -info        <xid>\n"
+			"   -stat        <xid>\n"
+			"   -bcaps-set   <xid> <list>\n"
+			"   -bcaps-get   <xid>\n"
+			"   -ccaps-set   <xid> <list>\n"
+			"   -ccaps-get   <xid>\n"
+			"   -flags-set   <xid> <list>\n"
+			"   -flags-get   <xid>\n"
+			"   -limit-set   <xid> <type>=<min>,<soft>,<hard>*\n"
+			"   -limit-get   <xid> <type>*\n"
+			"   -limit-stat  <xid> <type>*\n"
+			"   -limit-reset <xid>\n"
+			"   -sched-set   <xid> <type>=<value>*\n"
+			"   -sched-get   <xid> <cpuid>\n"
+			"   -sched-info  <xid> <cpuid>\n"
+			"   -uname-set   <xid> <type>=<value>*\n"
+			"   -uname-get   <xid> <type>*\n"
+			"   -kill        <xid> [<pid> [<sig>]]\n"
+			"   -wait        <xid>\n");
 	exit(rc);
 }
 
@@ -155,7 +164,10 @@ int main(int argc, char *argv[])
 
 	log_init(&log_options);
 
-#define CASE_GOTO(ID, P) case ID: sscanf(optarg, "%" SCNu32, &xid); goto P; break
+#define CASE_GOTO(ID, P) case ID: \
+sscanf(optarg, "%" SCNu32, &xid); \
+if (xid < 2 || xid > 65535) { log_error_and_die("Invalid xid: %d", xid); } \
+goto P; break
 
 	/* parse command line */
 	while (GETOPT(c)) {
@@ -195,7 +207,7 @@ int main(int argc, char *argv[])
 create:
 	if (argc > optind && str_cmp(argv[optind], "--") != 0) {
 		if (flist64_from_str(argv[optind], vx_cflags_list,
-		                     &data.f.flags, &data.f.mask, '~', ",") == -1)
+							&data.f.flags, &data.f.mask, '~', ",") == -1)
 			rc = log_perror("flist64_from_str");
 
 		else if (vx_create(xid, &data.f) == -1)
@@ -218,7 +230,7 @@ create:
 migrate:
 	if (argc > optind && str_cmp(argv[optind], "--") != 0) {
 		if (flist64_from_str(argv[optind], vx_mflags_list,
-		                     &data.f.flags, &data.f.mask, '~', ",") == -1)
+							&data.f.flags, &data.f.mask, '~', ",") == -1)
 			rc = log_perror("flist64_from_str");
 
 		else if (vx_migrate(xid, &data.f) == -1)
@@ -278,7 +290,7 @@ bcapsset:
 		goto usage;
 
 	if (flist64_from_str(argv[optind], vx_bcaps_list,
-	                     &data.f.flags, &data.f.mask, '~', ",") == -1)
+						&data.f.flags, &data.f.mask, '~', ",") == -1)
 		rc = log_perror("flist64_from_str");
 
 	else if (vx_bcaps_set(xid, &data.f) == -1)
@@ -306,7 +318,7 @@ ccapsset:
 		goto usage;
 
 	if (flist64_from_str(argv[optind], vx_ccaps_list,
-	                     &data.f.flags, &data.f.mask, '~', ",") == -1)
+						&data.f.flags, &data.f.mask, '~', ",") == -1)
 		rc = log_perror("flist64_from_str");
 
 	else if (vx_ccaps_set(xid, &data.f) == -1)
@@ -334,7 +346,7 @@ flagsset:
 		goto usage;
 
 	if (flist64_from_str(argv[optind], vx_cflags_list,
-	                    &data.f.flags, &data.f.mask, '~', ",") == -1)
+						&data.f.flags, &data.f.mask, '~', ",") == -1)
 		rc = log_perror("flist64_from_str");
 
 	else if (vx_flags_set(xid, &data.f) == -1)
@@ -490,7 +502,11 @@ schedset:
 				case VXSM_TOKENS_MIN: data.s.tokens_min   = atoi(buf2); break;
 				case VXSM_TOKENS_MAX: data.s.tokens_max   = atoi(buf2); break;
 				case VXSM_PRIO_BIAS:  data.s.prio_bias    = atoi(buf2); break;
-				case VXSM_CPU_ID:     data.s.cpu_id       = atoi(buf2); break;
+				case VXSM_CPU_ID:
+					data.s.cpu_id = atoi(buf2);
+					if (!check_cpuid(data.s.cpu_id))
+						log_error_and_die("Invalid cpuid: %d", data.s.cpu_id);
+					break;
 				case VXSM_BUCKET_ID:  data.s.bucket_id    = atoi(buf2); break;
 			}
 		}
@@ -507,17 +523,20 @@ schedget:
 
 	data.s.cpu_id = atoi(argv[optind]);
 
+	if (!check_cpuid(data.s.cpu_id))
+		log_error_and_die("Invalid cpuid: %d", data.s.cpu_id);
+
 	if (vx_sched_get(xid, &data.s) == -1)
 		log_perror("vx_sched_get");
 
-	printf("fill_rate=%"PRIi32"\n", data.s.fill_rate[0]);
-	printf("fill_rate2=%"PRIi32"\n", data.s.fill_rate[1]);
-	printf("interval=%"PRIi32"\n", data.s.interval[0]);
-	printf("interval2=%"PRIi32"\n", data.s.interval[1]);
-	printf("tokens=%"PRIi32"\n", data.s.tokens);
-	printf("tokens_min=%"PRIi32"\n", data.s.tokens_min);
-	printf("tokens_max=%"PRIi32"\n", data.s.tokens_max);
-	printf("prio_bias=%"PRIi32"\n", data.s.prio_bias);
+	printf("fill_rate=%" PRIi32 "\n", data.s.fill_rate[0]);
+	printf("fill_rate2=%" PRIi32 "\n", data.s.fill_rate[1]);
+	printf("interval=%" PRIi32 "\n", data.s.interval[0]);
+	printf("interval2=%" PRIi32 "\n", data.s.interval[1]);
+	printf("tokens=%" PRIi32 "\n", data.s.tokens);
+	printf("tokens_min=%" PRIi32 "\n", data.s.tokens_min);
+	printf("tokens_max=%" PRIi32 "\n", data.s.tokens_max);
+	printf("prio_bias=%" PRIi32 "\n", data.s.prio_bias);
 
 	goto out;
 
@@ -527,14 +546,17 @@ schedinfo:
 
 	data.si.cpu_id = atoi(argv[optind]);
 
+	if (!check_cpuid(data.si.cpu_id))
+		log_error_and_die("Invalid cpuid: %d", data.si.cpu_id);
+
 	if (vx_sched_info(xid, &data.si) == -1)
 		log_perror("vx_sched_info");
 
-	printf("user_msec=%"PRIu64"\n", data.si.user_msec);
-	printf("sys_msec=%"PRIu64"\n", data.si.sys_msec);
-	printf("hold_msec=%"PRIu64"\n", data.si.hold_msec);
-	printf("token_usec=%"PRIu32"\n", data.si.token_usec);
-	printf("vavavoom=%"PRIi32"\n", data.si.vavavoom);
+	printf("user_msec=%" PRIu64 "\n", data.si.user_msec);
+	printf("sys_msec=%" PRIu64 "\n", data.si.sys_msec);
+	printf("hold_msec=%" PRIu64 "\n", data.si.hold_msec);
+	printf("token_usec=%" PRIu32 "\n", data.si.token_usec);
+	printf("vavavoom=%" PRIi32 "\n", data.si.vavavoom);
 
 	goto out;
 

@@ -49,16 +49,16 @@ static inline
 void usage(int rc)
 {
 	printf("Usage:\n\n"
-	          "vlist -ix-attr\n"
-	          "      -nx-flags\n"
-	          "      -nx-sock\n"
-	          "      -vx-bcaps\n"
-	          "      -vx-ccaps\n"
-	          "      -vx-flags\n"
-	          "      -vx-limit\n"
-	          "      -vx-mflags\n"
-	          "      -vx-sched\n"
-	          "      -vx-uname\n");
+			"vlist -ix-attr\n"
+			"      -nx-flags\n"
+			"      -nx-sock\n"
+			"      -vx-bcaps\n"
+			"      -vx-ccaps\n"
+			"      -vx-flags\n"
+			"      -vx-limit\n"
+			"      -vx-mflags\n"
+			"      -vx-sched\n"
+			"      -vx-uname\n");
 	exit(rc);
 }
 
@@ -124,7 +124,7 @@ print_list64:
 	val64 = ~0UL;
 
 	if (argc > optind)
-		sscanf(argv[optind], "%llx", &val64);
+		sscanf(argv[optind], "%" SCNu64, &val64);
 
 	for (i = 0; list64[i].key; i++)
 		if (val64 & list64[i].val)
