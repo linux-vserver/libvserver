@@ -98,7 +98,7 @@ int check_cpuid(int cpuid)
 {
 	int numcpus = sysconf(_SC_NPROCESSORS_ONLN);
 
-    if (cpuid < 0 || cpuid >= numcpus)
+	if (cpuid < 0 || cpuid >= numcpus)
 		return 0;
 	else
 		return 1;
