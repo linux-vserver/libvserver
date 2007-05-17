@@ -58,6 +58,8 @@ struct option long_opts[] = {
 	{ "uname-get",   1, 0, 0x20 },
 	{ "kill",        1, 0, 0x21 },
 	{ "wait",        1, 0, 0x22 },
+	{ "sched-get",   1, 0, 0x23 },
+	{ "sched-info",  1, 0, 0x24 },
 	{ NULL,          0, 0, 0 },
 };
 
@@ -111,6 +113,8 @@ void usage(int rc)
 	          "   -limit-stat  <xid> <type>*\n"
 	          "   -limit-reset <xid>\n"
 	          "   -sched-set   <xid> <type>=<value>*\n"
+	          "   -sched-get   <xid> <cpuid>\n"
+	          "   -sched-info  <xid> <cpuid>\n"
 	          "   -uname-set   <xid> <type>=<value>*\n"
 	          "   -uname-get   <xid> <type>*\n"
 	          "   -kill        <xid> [<pid> [<sig>]]\n"
@@ -134,6 +138,7 @@ int main(int argc, char *argv[])
 		vx_limit_t      l;
 		vx_limit_stat_t ls;
 		vx_sched_t      s;
+		vx_sched_info_t si;
 		vx_stat_t       st;
 		vx_uname_t      u;
 		vx_wait_t       w;
@@ -176,6 +181,8 @@ int main(int argc, char *argv[])
 			CASE_GOTO(0x20, unameget);
 			CASE_GOTO(0x21, kill);
 			CASE_GOTO(0x22, wait);
+			CASE_GOTO(0x23, schedget);
+			CASE_GOTO(0x24, schedinfo);
 
 			DEFAULT_GETOPT_CASES
 		}
@@ -491,6 +498,43 @@ schedset:
 
 	if (vx_sched_set(xid, &data.s) == -1)
 		log_perror("vx_sched_set");
+
+	goto out;
+
+schedget:
+	if (argc <= optind)
+		goto usage;
+
+	data.s.cpu_id = atoi(argv[optind]);
+
+	if (vx_sched_get(xid, &data.s) == -1)
+		log_perror("vx_sched_get");
+
+	printf("fill_rate=%"PRIi32"\n", data.s.fill_rate[0]);
+	printf("fill_rate2=%"PRIi32"\n", data.s.fill_rate[1]);
+	printf("interval=%"PRIi32"\n", data.s.interval[0]);
+	printf("interval2=%"PRIi32"\n", data.s.interval[1]);
+	printf("tokens=%"PRIi32"\n", data.s.tokens);
+	printf("tokens_min=%"PRIi32"\n", data.s.tokens_min);
+	printf("tokens_max=%"PRIi32"\n", data.s.tokens_max);
+	printf("prio_bias=%"PRIi32"\n", data.s.prio_bias);
+
+	goto out;
+
+schedinfo:
+	if (argc <= optind)
+		goto usage;
+
+	data.si.cpu_id = atoi(argv[optind]);
+
+	if (vx_sched_info(xid, &data.si) == -1)
+		log_perror("vx_sched_info");
+
+	printf("user_msec=%"PRIu64"\n", data.si.user_msec);
+	printf("sys_msec=%"PRIu64"\n", data.si.sys_msec);
+	printf("hold_msec=%"PRIu64"\n", data.si.hold_msec);
+	printf("token_usec=%"PRIu32"\n", data.si.token_usec);
+	printf("vavavoom=%"PRIi32"\n", data.si.vavavoom);
 
 	goto out;
 
