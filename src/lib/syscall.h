@@ -397,7 +397,7 @@
 */
 
 #define	__sysc_cmd(n)	\
-	__casm(n,0,1,	"ori	$v0,$0,%2"	,)\
+	__casm(n,0,1,	"ori	v0,zero,%2"	,)\
 	__casm(n,0,1,	"syscall"		,)
 
 #define	__sysc_regs	"a0","a1","a2","a3", "t0", "t1"
