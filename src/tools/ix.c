@@ -45,10 +45,10 @@ static inline
 void usage(int rc)
 {
 	printf("Usage:\n\n"
-			"ix -attr-set <file>=<list>*\n"
-			"   -attr-get <file>*\n"
-			"   -xid-set  <file>=<xid>*\n"
-			"   -xid-get  <file>*\n");
+	       "ix -attr-set <file>=<list>*\n"
+	       "   -attr-get <file>*\n"
+	       "   -xid-set  <file>=<xid>*\n"
+	       "   -xid-get  <file>*\n");
 	exit(rc);
 }
 

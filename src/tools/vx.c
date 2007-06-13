@@ -108,27 +108,27 @@ static inline
 void usage(int rc)
 {
 	printf("Usage:\n\n"
-			"vx -create      <xid> [<list>] [-- <program> <args>*]\n"
-			"   -migrate     <xid> [<list>] -- <program> <args>*\n"
-			"   -info        <xid>\n"
-			"   -stat        <xid>\n"
-			"   -bcaps-set   <xid> <list>\n"
-			"   -bcaps-get   <xid>\n"
-			"   -ccaps-set   <xid> <list>\n"
-			"   -ccaps-get   <xid>\n"
-			"   -flags-set   <xid> <list>\n"
-			"   -flags-get   <xid>\n"
-			"   -limit-set   <xid> <type>=<min>,<soft>,<hard>*\n"
-			"   -limit-get   <xid> <type>*\n"
-			"   -limit-stat  <xid> <type>*\n"
-			"   -limit-reset <xid>\n"
-			"   -sched-set   <xid> <type>=<value>*\n"
-			"   -sched-get   <xid> <cpuid>\n"
-			"   -sched-info  <xid> <cpuid>\n"
-			"   -uname-set   <xid> <type>=<value>*\n"
-			"   -uname-get   <xid> <type>*\n"
-			"   -kill        <xid> [<pid> [<sig>]]\n"
-			"   -wait        <xid>\n");
+	       "vx -create      <xid> [<list>] [-- <program> <args>*]\n"
+	       "   -migrate     <xid> [<list>] -- <program> <args>*\n"
+	       "   -info        <xid>\n"
+	       "   -stat        <xid>\n"
+	       "   -bcaps-set   <xid> <list>\n"
+	       "   -bcaps-get   <xid>\n"
+	       "   -ccaps-set   <xid> <list>\n"
+	       "   -ccaps-get   <xid>\n"
+	       "   -flags-set   <xid> <list>\n"
+	       "   -flags-get   <xid>\n"
+	       "   -limit-set   <xid> <type>=<min>,<soft>,<hard>*\n"
+	       "   -limit-get   <xid> <type>*\n"
+	       "   -limit-stat  <xid> <type>*\n"
+	       "   -limit-reset <xid>\n"
+	       "   -sched-set   <xid> <type>=<value>*\n"
+	       "   -sched-get   <xid> <cpuid>\n"
+	       "   -sched-info  <xid> <cpuid>\n"
+	       "   -uname-set   <xid> <type>=<value>*\n"
+	       "   -uname-get   <xid> <type>*\n"
+	       "   -kill        <xid> [<pid> [<sig>]]\n"
+	       "   -wait        <xid>\n");
 	exit(rc);
 }
 
@@ -165,9 +165,10 @@ int main(int argc, char *argv[])
 	log_init(&log_options);
 
 #define CASE_GOTO(ID, P) case ID: \
-sscanf(optarg, "%" SCNu32, &xid); \
-if (xid < 2 || xid > 65535) { log_error_and_die("Invalid xid: %d", xid); } \
-goto P; break
+	sscanf(optarg, "%" SCNu32, &xid); \
+	if (xid < 2 || xid > 65535) \
+		log_error_and_die("Invalid xid: %d", xid); \
+	goto P; break
 
 	/* parse command line */
 	while (GETOPT(c)) {

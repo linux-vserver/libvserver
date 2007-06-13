@@ -52,14 +52,14 @@ static inline
 void usage(int rc)
 {
 	printf("Usage:\n\n"
-			"nx -create      <nid> [<list>] [-- <program> <args>*]\n"
-			"   -migrate     <nid> -- <program> <args>*\n"
-			"   -info        <nid>\n"
-			"   -addr-add    <nid> <addr>/<netmask>*\n"
-			"   -addr-remove <nid> <addr>/<netmask>*\n"
-			"   -flags-set   <nid> <list>\n"
-			"   -flags-get   <nid>\n"
-			"   -sock-stat   <nid> <type>*\n");
+	       "nx -create      <nid> [<list>] [-- <program> <args>*]\n"
+	       "   -migrate     <nid> -- <program> <args>*\n"
+	       "   -info        <nid>\n"
+	       "   -addr-add    <nid> <addr>/<netmask>*\n"
+	       "   -addr-remove <nid> <addr>/<netmask>*\n"
+	       "   -flags-set   <nid> <list>\n"
+	       "   -flags-get   <nid>\n"
+	       "   -sock-stat   <nid> <type>*\n");
 	exit(rc);
 }
 
@@ -89,9 +89,10 @@ int main(int argc, char *argv[])
 	log_init(&log_options);
 
 #define CASE_GOTO(ID, P) case ID: \
-sscanf(optarg, "%" SCNu32, &nid); \
-if (nid < 2 || nid > 65535) { log_error_and_die("Invalid nid: %d", nid); } \
-goto P; break
+	sscanf(optarg, "%" SCNu32, &nid); \
+	if (nid < 2 || nid > 65535) \
+		log_error_and_die("Invalid nid: %d", nid); \
+	goto P; break
 
 	/* parse command line */
 	while (GETOPT(c)) {

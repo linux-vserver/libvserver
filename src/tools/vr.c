@@ -51,8 +51,8 @@ static inline
 void usage(int rc)
 {
 	printf("Usage:\n\n"
-			"vr -set   <dev> <realdev>\n"
-			"   -clear <dev>\n");
+	       "vr -set   <dev> <realdev>\n"
+	       "   -clear <dev>\n");
 	exit(rc);
 }
 
