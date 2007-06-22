@@ -130,7 +130,7 @@ AC_CONFIG_COMMANDS_PRE([SUMMARY="$PACKAGE_STRING configured successfully:
                    target: $target
 
                    prefix: $prefix
-           syscall number: $ac_lv_syscall_nr
+           syscall number: $lv_nr_vserver
 "])
 
 # Output
