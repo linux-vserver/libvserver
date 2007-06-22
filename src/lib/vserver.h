@@ -43,7 +43,9 @@
  *   </a>
  * \endhtmlonly
  */
+#ifndef SWIG
 int vserver(uint32_t cmd, uint32_t id, void *data);
+#endif
 
 /*!
  * @brief Clone system call
@@ -55,10 +57,12 @@ int vserver(uint32_t cmd, uint32_t id, void *data);
  *
  * @see clone(2)
  */
+#ifndef SWIG
 #if defined (__s390__)
 int clone(void *child_stack, int flags);
 #else
 int clone(int flags, void *child_stack);
+#endif
 #endif
 
 /*!
@@ -523,7 +527,7 @@ int vx_limit_reset(xid_t xid);
  * @brief Disk limit values
  */
 typedef struct _dx_limit {
-	const char *filename;  /*!< Mount point */
+	char *filename;        /*!< Mount point */
 	uint32_t space_used;   /*!< Currently used space */
 	uint32_t space_total;  /*!< Total space */
 	uint32_t inodes_used;  /*!< Currently used inodes */
@@ -586,10 +590,10 @@ int dx_limit_get(xid_t xid, dx_limit_t *data);
  * @brief Inode attributes
  */
 typedef struct _ix_attr {
-	const char *filename; /*!< Filename */
-	xid_t xid;            /*!< Context ID */
-	uint32_t flags;       /*!< Inode flags */
-	uint32_t mask;        /*!< Set mask */
+	char *filename; /*!< Filename */
+	xid_t xid;      /*!< Context ID */
+	uint32_t flags; /*!< Inode flags */
+	uint32_t mask;  /*!< Set mask */
 } ix_attr_t;
 
 /*!
@@ -642,7 +646,9 @@ int ix_attr_get(ix_attr_t *data);
  * @param flags       Clone flags
  * @param child_stack Child stack
  */
+#ifndef SWIG
 int ns_clone(int flags, void *child_stack);
+#endif
 
 /*!
  * @brief Enter namespace
